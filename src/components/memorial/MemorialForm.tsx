@@ -81,7 +81,7 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     const data: MemorialFormData = {
@@ -95,7 +95,7 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
     if (dateOfDeath) data.dateOfDeath = dateOfDeath;
     if (city.trim()) data.city = city.trim();
     if (visibility === "password_protected") data.password = password;
-    void onSubmit(data);
+    await onSubmit(data);
   };
 
   return (
@@ -119,10 +119,10 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
               <button
                 type="button"
                 onClick={() => setType("human")}
-                className={`flex items-center justify-center gap-2 rounded-lg border-2 py-3 text-sm font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 rounded-lg border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
                   type === "human"
-                    ? "border-stone-800 bg-stone-800 text-white"
-                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300"
+                    ? "border-stone-900 bg-stone-800 text-white shadow-sm ring-2 ring-stone-800/20"
+                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
                 }`}
               >
                 <User className="h-5 w-5" />
@@ -131,10 +131,10 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
               <button
                 type="button"
                 onClick={() => setType("pet")}
-                className={`flex items-center justify-center gap-2 rounded-lg border-2 py-3 text-sm font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 rounded-lg border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
                   type === "pet"
-                    ? "border-stone-800 bg-stone-800 text-white"
-                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300"
+                    ? "border-stone-900 bg-stone-800 text-white shadow-sm ring-2 ring-stone-800/20"
+                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
                 }`}
               >
                 <PawPrint className="h-5 w-5" />
@@ -145,7 +145,7 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
 
           <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm space-y-4">
             <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
-              Informazioni di base
+              Basic information
             </p>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">
@@ -190,7 +190,7 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm font-medium text-stone-700">
-                  Data di nascita
+                  Date of birth
                 </label>
                 <input
                   type="date"
@@ -215,7 +215,7 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">
-                Città
+                City
               </label>
               <input
                 type="text"
@@ -230,7 +230,7 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
 
           <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm space-y-3">
             <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
-              Visibilità
+              Visibility
             </p>
             <div className="space-y-2">
               {(
@@ -249,8 +249,8 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
                   },
                   {
                     key: "password_protected" as const,
-                    label: "Protetto da password",
-                    desc: "PIN/password per vedere la pagina",
+                    label: "Password protected",
+                    desc: "PIN/password required to view the page",
                     icon: Shield
                   }
                 ] as const
@@ -319,8 +319,8 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
                 </p>
                 <p className="text-xs text-stone-500">
                   {status === "draft"
-                    ? "Salva e continua più tardi"
-                    : "Visibile secondo le regole di visibilità"}
+                    ? "Save and continue later"
+                    : "Visible according to your visibility settings"}
                 </p>
               </div>
               <button

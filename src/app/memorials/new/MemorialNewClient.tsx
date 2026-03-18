@@ -28,12 +28,20 @@ export default function MemorialNewClient() {
     });
     setIsLoading(false);
 
+    // Browser DevTools → Console
+    console.log("[MemorialNewClient] createMemorialAction result:", result);
+
     if (!result.ok) {
       setServerError(result.error);
       return;
     }
+    if (!result.slug) {
+      setServerError("Memorial URL was not returned. Please try again.");
+      return;
+    }
+
+    console.log("[MemorialNewClient] Redirecting to:", `/memorials/${result.slug}`);
     router.push(`/memorials/${result.slug}`);
-    router.refresh();
   }
 
   return (

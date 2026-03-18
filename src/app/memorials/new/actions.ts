@@ -41,14 +41,14 @@ export async function createMemorialAction(
   let password_hash: string | null = null;
   if (input.visibility === "password_protected") {
     if (!input.password?.trim()) {
-      return { ok: false, error: "Password obbligatoria per memoriali protetti." };
+      return { ok: false, error: "Password is required for protected memorials." };
     }
     password_hash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
   }
 
   const is_draft = input.status === "draft";
 
-  const { error } = await supabase.from("memorials").insert({
+  const insertRow = {
     owner_id: user.id,
     type: input.type,
     full_name: input.fullName.trim(),
@@ -59,17 +59,57 @@ export async function createMemorialAction(
     visibility: input.visibility,
     password_hash,
     is_draft
-  });
+  };
+
+  // Logs appear in the terminal where `npm run dev` runs (not the browser console).
+  console.log("[createMemorial] auth.uid context: user.id =", user.id);
+  console.log("[createMemorial] insert payload:", JSON.stringify(insertRow, null, 2));
+
+  const { data, error } = await supabase
+    .from("memorials")
+    .insert(insertRow)
+    .select("id, slug, owner_id, full_name, is_draft")
+    .maybeSingle();
+
+  console.log("[createMemorial] Supabase insert data:", data);
+  console.log("[createMemorial] Supabase insert error:", error);
 
   if (error) {
+    const detail = [
+      error.message,
+      error.code ? `code=${error.code}` : "",
+      error.details ? `details=${error.details}` : "",
+      error.hint ? `hint=${error.hint}` : ""
+    ]
+      .filter(Boolean)
+      .join(" | ");
+
+    console.log("[createMemorial] full error object:", JSON.stringify(error, null, 2));
+
     if (error.code === "23505") {
       return {
         ok: false,
         error: "This memorial URL is already in use. Please choose another."
       };
     }
-    return { ok: false, error: error.message };
+
+    // Surface DB/RLS/FK messages so you can debug in the UI too
+    return {
+      ok: false,
+      error: `Save failed: ${detail}`
+    };
   }
 
-  return { ok: true, slug };
+  if (!data) {
+    console.warn(
+      "[createMemorial] Insert reported no error but .select() returned no row (check RLS SELECT after INSERT)."
+    );
+    return {
+      ok: false,
+      error:
+        "Row may have been created but could not be read back. Check Table Editor and server terminal logs."
+    };
+  }
+
+  return { ok: true, slug: data.slug };
 }
