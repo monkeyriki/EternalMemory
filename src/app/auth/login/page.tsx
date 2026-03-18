@@ -35,7 +35,7 @@ export default function LoginPage() {
     <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm space-y-6">
         <h1 className="text-2xl font-semibold text-slate-900 text-center">
-          Accedi
+          Sign in
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -78,13 +78,13 @@ export default function LoginPage() {
             </p>
           )}
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Accesso in corso…" : "Accedi"}
+            {loading ? "Signing in…" : "Sign in"}
           </Button>
         </form>
         <p className="text-center text-sm text-slate-600">
-          Non hai un account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/auth/signup" className="text-slate-900 underline">
-            Registrati
+            Sign up
           </Link>
         </p>
       </div>

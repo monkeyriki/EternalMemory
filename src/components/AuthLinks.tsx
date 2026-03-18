@@ -32,7 +32,7 @@ export function AuthLinks() {
 
   if (isLoggedIn === null) {
     return (
-      <span className="text-sm text-slate-500">Caricamento…</span>
+      <span className="text-sm text-slate-500">Loading…</span>
     );
   }
 
@@ -46,7 +46,7 @@ export function AuthLinks() {
 
   return (
     <Link href="/auth/login">
-      <Button variant="secondary">Accedi</Button>
+      <Button variant="secondary">Sign in</Button>
     </Link>
   );
 }

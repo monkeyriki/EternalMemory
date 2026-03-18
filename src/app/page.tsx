@@ -9,14 +9,14 @@ export default function HomePage() {
           EternalMemory
         </h1>
         <p className="text-sm sm:text-base text-slate-600">
-          Una piattaforma commemorativa digitale rispettosa e duratura.
+          A calm, respectful digital memorial platform.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link href="/memorials">
-            <Button variant="secondary">Sfoglia memoriali</Button>
+            <Button variant="secondary">Browse memorials</Button>
           </Link>
           <Link href="/memorials/new">
-            <Button>Crea memoriale</Button>
+            <Button>Create memorial</Button>
           </Link>
         </div>
       </div>

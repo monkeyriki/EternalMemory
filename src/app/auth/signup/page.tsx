@@ -39,7 +39,7 @@ export default function SignupPage() {
     <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm space-y-6">
         <h1 className="text-2xl font-semibold text-slate-900 text-center">
-          Registrati
+          Sign up
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -47,7 +47,7 @@ export default function SignupPage() {
               htmlFor="displayName"
               className="block text-sm font-medium text-slate-700 mb-1"
             >
-              Nome (opzionale)
+              Display name (optional)
             </label>
             <input
               id="displayName"
@@ -99,13 +99,13 @@ export default function SignupPage() {
             </p>
           )}
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Registrazione…" : "Registrati"}
+            {loading ? "Creating account…" : "Sign up"}
           </Button>
         </form>
         <p className="text-center text-sm text-slate-600">
-          Hai già un account?{" "}
+          Already have an account?{" "}
           <Link href="/auth/login" className="text-slate-900 underline">
-            Accedi
+            Sign in
           </Link>
         </p>
       </div>
