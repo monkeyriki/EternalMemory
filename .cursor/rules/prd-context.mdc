@@ -1,0 +1,29 @@
+---
+description: Keep PRD context and role requirements in every session
+alwaysApply: true
+---
+
+# PRD is the source of truth
+
+- Always consult `CONTEXT.md` before making product decisions.
+- If a suggestion conflicts with the PRD, **call it out explicitly** and propose the PRD-aligned approach.
+
+## Roles must match PRD
+
+- Guest (unregistered): browse/search public memorials, leave text condolences, purchase virtual tributes.
+- Registered user: owns memorials; edits content; uploads media; moderates guestbook + tributes on their memorials.
+- B2B: subscription partner; supports bulk creation/management for clients.
+- Admin: global CMS; store/ad/settings; global moderation.
+
+## Security requirements
+
+- Enforce permissions via **Supabase RLS** and server-side operations where needed.
+- Prevent role self-promotion (only admin/service-role can change roles).
+- Guest purchases must be finalized via **Stripe webhook** (server-to-server), not direct client writes.
+
+## Git hygiene (remind about commits)
+
+- After creating/updating files or changing DB-related scripts, **check whether there are uncommitted changes**.
+- If changes exist, **explicitly remind the user** to run `git status` and decide whether to commit + push.
+- Never commit/push automatically unless the user asks.
+

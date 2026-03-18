@@ -1,0 +1,75 @@
+# EternalMemory — Project Context (PRD Summary)
+
+This repository implements the **Digital Memorial & Obituary Platform** described in the PRD (humans + pets).
+
+## Product goals
+- Create respectful, enduring memorial pages for **humans** and **pets**
+- Provide a public **directory + search**
+- Enable visitors to leave condolences and purchase **virtual tributes**
+- Monetize via **store items**, **premium upgrades**, and **ads**
+
+## Roles (PRD)
+- **Guest (unregistered)**: can search directory, view **public** memorials, leave text condolences, and purchase virtual tributes.
+- **Registered User**: creates/owns memorials; can edit content, upload media, set visibility (public/unlisted/password), and moderate guestbook + tributes on **their** memorial.
+- **B2B Partner** (funeral home / pet crematorium): upgraded registered user on subscription; can create/manage **bulk** memorials for clients.
+- **Super Admin** (site owner): full CMS; manage users, global moderation, store items, ads/settings, and platform controls.
+
+## Non-negotiables (critical PRD requirements)
+- **Roles & permissions**: enforce Guest / Registered / B2B / Super Admin with distinct capabilities; owner-moderation on their memorial; admin global override.
+- **Privacy**: memorial visibility must support **public / unlisted / password-protected** with correct behavior:
+  - public: directory + Google index
+  - unlisted: not in directory + not indexed; accessible by direct link/QR
+  - password-protected: requires PIN/password to view and leave tributes
+- **Draft mode**: memorial creation must support draft saving and later publishing.
+- **Humans vs Pets**: separate directory routes and UI for both categories.
+- **Directory search**: advanced filtering (name, location, birth/death years, tags), pagination, sorting (recently added/updated, alphabetical).
+- **Guestbook + tributes**: free text condolences; purchasable virtual items; premium/animated options (e.g., highlighted candle for 30 days).
+- **Payments**: Stripe checkout for virtual items (secure checkout, SSL).
+- **Admin CMS**: store item CRUD (asset upload, price, category, active flag), global moderation queue, profanity filter, ad slots/settings and global ads toggle, revenue dashboard, multiple plans.
+- **Email**: transactional system emails (verification/reset), receipts for purchasers, notifications for owners and renewals for B2B.
+- **UX**: mobile-first, calm tone, WCAG-friendly, fast loads; uploaded images must be compressed.
+- **Compliance/Security**: SSL everywhere (especially checkout), GDPR/CCPA privacy + account deletion; admin tools include takedown and IP ban.
+
+## Core feature requirements (high level)
+- **Draft mode** for memorial creation
+- **Directory** split: Humans vs Pets, with filtering (name, location, birth/death years, tags), pagination & sorting
+- **Memorial page**:
+  - privacy controls (**public / unlisted / password-protected**)
+    - **public**: in directory + indexable by Google
+    - **unlisted**: hidden from directory + search engines; accessible via direct link/QR
+    - **password-protected**: requires PIN/password to view + leave tribute
+  - rich content, gallery, video embeds (YouTube/Vimeo)
+  - QR code generator (downloadable)
+  - SEO/OG tags: dynamic OG image/name/dates; one-click share (FB/WhatsApp/email)
+  - ad slots (AdSense) toggleable by Admin; disable ads on premium pages
+- **Guestbook**: free text condolences + moderation
+- **Virtual tributes**: microtransactions, tiered items (static/animated), premium highlight duration
+- **Payments**: Stripe (chosen) for checkout
+- **Admin CMS**:
+  - CRUD store items (SVG/PNG, price, category, active/inactive)
+  - global moderation queue (reported memorials/comments), profanity filter, and admin override (take down memorial, delete comment, ban IP)
+  - ad slots + platform settings (global AdSense snippets + global ads on/off)
+  - basic revenue reporting (sales + premium upgrades) and support for multiple plans
+- **Emails/notifications**:
+  - users: new tribute purchased + guestbook entry pending approval
+  - guests/purchasers: e-commerce receipts
+  - system: password resets, account verification, subscription renewals
+- **UI/UX**: mobile-first, calm/muted palette, high accessibility (WCAG); compress uploads for performance
+- **Compliance/Security**: SSL required (especially checkout); GDPR/CCPA privacy + account deletion
+
+## Tech stack (current decisions)
+- **Next.js 14 (App Router) + TypeScript (strict) + Tailwind**
+- **Supabase**: Auth, Postgres, RLS, Storage (to be configured), plus server-side operations when needed
+- **Stripe**: payments (PayPal not planned)
+
+## Security & access control principles
+- Use **RLS** for all tables.
+- Guests must not be able to write “paid” records directly. Guest purchases should be finalized via **server/webhook**.
+- Users must never be able to self-promote roles.
+
+## Current DB (as created via SQL Editor)
+Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`, `store_items`, `orders`, `virtual_tributes`, `b2b_subscriptions`, `qr_codes`, `ad_slots`, `platform_settings`.
+
+## Current app routing skeleton
+See `src/app/*` for placeholders (home, auth pages, memorials sections, dashboard, admin sections).
+
