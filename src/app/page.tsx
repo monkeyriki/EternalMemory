@@ -1,21 +1,25 @@
+import Link from "next/link";
 import { Button } from "@/components/Button";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-900">
-      <div className="max-w-xl px-6 text-center space-y-6">
-        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
+      <div className="max-w-xl text-center space-y-6">
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
           EternalMemory
         </h1>
         <p className="text-sm sm:text-base text-slate-600">
-          A calm, respectful digital memorial platform. This is the starting
-          point for building the full experience described in the PRD.
+          Una piattaforma commemorativa digitale rispettosa e duratura.
         </p>
-        <div className="flex items-center justify-center gap-3">
-          <Button>Get started</Button>
-          <Button variant="secondary">Browse memorials</Button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link href="/memorials">
+            <Button variant="secondary">Sfoglia memoriali</Button>
+          </Link>
+          <Link href="/memorials/new">
+            <Button>Crea memoriale</Button>
+          </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
