@@ -15,6 +15,7 @@ export default function MemorialNewClient() {
   async function handleSubmit(data: MemorialFormData) {
     setIsLoading(true);
     setServerError(null);
+    console.log("[MemorialNewClient] submit payload status:", data.status);
     const result = await createMemorialAction({
       type: data.type,
       fullName: data.fullName,

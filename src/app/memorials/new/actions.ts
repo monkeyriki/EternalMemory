@@ -47,6 +47,12 @@ export async function createMemorialAction(
   }
 
   const is_draft = input.status === "draft";
+  console.log(
+    "[createMemorial] input.status:",
+    input.status,
+    "=> is_draft:",
+    is_draft
+  );
 
   const insertRow = {
     owner_id: user.id,

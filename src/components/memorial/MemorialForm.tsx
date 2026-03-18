@@ -84,6 +84,8 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    // Useful for debugging: confirm toggle value at submit time.
+    console.log("[MemorialForm] submit status =", status);
     const data: MemorialFormData = {
       type,
       fullName: fullName.trim(),
@@ -312,36 +314,38 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
             <p className="mb-3 text-xs font-medium uppercase tracking-wide text-stone-500">
               Status
             </p>
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="font-medium text-stone-800">
-                  {status === "draft" ? "Draft" : "Published"}
-                </p>
-                <p className="text-xs text-stone-500">
-                  {status === "draft"
-                    ? "Save and continue later"
-                    : "Visible according to your visibility settings"}
-                </p>
-              </div>
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                role="switch"
-                aria-checked={status === "publish"}
-                onClick={() =>
-                  setStatus(status === "draft" ? "publish" : "draft")
-                }
+                onClick={() => setStatus("draft")}
                 disabled={isLoading}
-                className={`relative h-8 w-14 rounded-full transition-colors ${
-                  status === "publish" ? "bg-stone-800" : "bg-stone-300"
+                className={`flex items-center justify-center rounded-lg border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
+                  status === "draft"
+                    ? "border-stone-900 bg-stone-800 text-white shadow-sm ring-2 ring-stone-800/20"
+                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
                 }`}
               >
-                <span
-                  className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
-                    status === "publish" ? "left-7" : "left-1"
-                  }`}
-                />
+                Draft
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatus("publish")}
+                disabled={isLoading}
+                className={`flex items-center justify-center rounded-lg border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
+                  status === "publish"
+                    ? "border-stone-900 bg-stone-800 text-white shadow-sm ring-2 ring-stone-800/20"
+                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+                }`}
+              >
+                Publish
               </button>
             </div>
+
+            <p className="mt-3 text-xs text-stone-500">
+              {status === "draft"
+                ? "Save and continue later"
+                : "Visible according to your visibility settings"}
+            </p>
           </section>
 
           <button
