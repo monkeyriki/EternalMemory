@@ -12,12 +12,21 @@ export type MemorialCardProps = {
   slug: string;
 };
 
+/** Returns 4-digit year string, or null if invalid. Avoids malformed values like 19001. */
 function formatYear(date?: string | null): string | null {
-  if (!date) return null;
-  const d = new Date(date);
+  if (!date || typeof date !== "string") return null;
+  const s = date.trim();
+  // Accept YYYY-MM-DD (e.g. from Supabase) and extract year
+  const match = s.match(/^(\d{4})-/);
+  if (match) {
+    const y = parseInt(match[1], 10);
+    if (y >= 1000 && y <= 3000) return String(y);
+    return null;
+  }
+  const d = new Date(s);
   if (Number.isNaN(d.getTime())) return null;
   const y = d.getFullYear();
-  if (!y) return null;
+  if (y < 1000 || y > 3000) return null;
   return String(y);
 }
 
@@ -33,7 +42,9 @@ export default function MemorialCard({
   const yBirth = formatYear(dateOfBirth);
   const yDeath = formatYear(dateOfDeath);
   const dateText =
-    yBirth || yDeath ? `${yBirth ?? "—"} — ${yDeath ?? "—"}` : "—";
+    yBirth || yDeath
+      ? `${yBirth ?? "—"} – ${yDeath ?? "—"}`
+      : "—";
 
   return (
     <article className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">

@@ -1,8 +1,14 @@
-export default function AdminStorePage() {
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-semibold text-slate-900">Store management</h1>
-      <p className="mt-2 text-slate-600">Virtual items CRUD — placeholder.</p>
-    </div>
-  );
+import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import StoreAdmin from "./StoreAdmin";
+
+export default async function AdminStorePage() {
+  const supabase = await getSupabaseServerClient();
+  const { data: items } = await supabase
+    .from("store_items")
+    .select(
+      "id, name, description, category, price_cents, currency, image_url, is_premium, is_active, created_at"
+    )
+    .order("created_at", { ascending: false });
+
+  return <StoreAdmin initialItems={(items ?? []) as any} />;
 }

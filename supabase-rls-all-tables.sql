@@ -189,6 +189,11 @@ create policy "virtual_tributes_insert_authenticated_or_admin"
   on public.virtual_tributes for insert
   with check (purchaser_id = auth.uid() or public.is_admin());
 
+create policy "virtual_tributes_guest_insert"
+  on public.virtual_tributes for insert
+  to anon
+  with check (purchaser_id is null and is_approved = false);
+
 create policy "virtual_tributes_update_admin"
   on public.virtual_tributes for update using (public.is_admin());
 

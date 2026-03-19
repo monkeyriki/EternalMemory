@@ -13,6 +13,8 @@ export type CreateMemorialInput = {
   visibility: "public" | "unlisted" | "password_protected";
   password?: string;
   status: "draft" | "publish";
+  story?: string;
+  coverImageUrl?: string;
 };
 
 export type CreateMemorialResult =
@@ -64,7 +66,9 @@ export async function createMemorialAction(
     city: input.city?.trim() || null,
     visibility: input.visibility,
     password_hash,
-    is_draft
+    is_draft,
+    story: input.story ?? null,
+    cover_image_url: input.coverImageUrl ?? null
   };
 
   // Logs appear in the terminal where `npm run dev` runs (not the browser console).

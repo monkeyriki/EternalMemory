@@ -25,7 +25,9 @@ export default function MemorialNewClient() {
       city: data.city,
       visibility: data.visibility,
       password: data.password,
-      status: data.status
+      status: data.status,
+      story: data.story,
+      coverImageUrl: data.coverImageUrl
     });
     setIsLoading(false);
 
@@ -57,7 +59,7 @@ export default function MemorialNewClient() {
           </p>
         </div>
       )}
-      <MemorialForm onSubmit={handleSubmit} isLoading={isLoading} />
+      <MemorialForm mode="create" onSubmit={handleSubmit} isLoading={isLoading} />
     </>
   );
 }

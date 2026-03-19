@@ -1,0 +1,4 @@
+ALTER TABLE memorials
+  ADD COLUMN IF NOT EXISTS story TEXT,
+  ADD COLUMN IF NOT EXISTS cover_image_url TEXT;
+

@@ -12,6 +12,7 @@ import {
   Link2,
   Shield
 } from "lucide-react";
+import { uploadCoverImageAction } from "@/app/memorials/actions/uploadCoverImage";
 
 export interface MemorialFormData {
   type: "human" | "pet";
@@ -23,9 +24,29 @@ export interface MemorialFormData {
   visibility: "public" | "unlisted" | "password_protected";
   password?: string;
   status: "draft" | "publish";
+  story?: string;
+  coverImageUrl?: string;
 }
 
+type MemorialFormMode = "create" | "edit";
+
+type MemorialInitialData = {
+  id: string;
+  slug: string;
+  type: "human" | "pet";
+  full_name: string;
+  date_of_birth: string | null;
+  date_of_death: string | null;
+  city: string | null;
+  visibility: "public" | "unlisted" | "password_protected";
+  is_draft: boolean;
+  story: string | null;
+  cover_image_url: string | null;
+};
+
 interface MemorialFormProps {
+  mode: MemorialFormMode;
+  initialData?: MemorialInitialData;
   onSubmit: (data: MemorialFormData) => void | Promise<void>;
   isLoading: boolean;
 }
@@ -39,7 +60,13 @@ function generateSlug(name: string): string {
     .replace(/-+/g, "-");
 }
 
-export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps) {
+export default function MemorialForm({
+  mode,
+  initialData,
+  onSubmit,
+  isLoading
+}: MemorialFormProps) {
+  const isEdit = mode === "edit";
   const [type, setType] = useState<"human" | "pet">("human");
   const [fullName, setFullName] = useState("");
   const [slug, setSlug] = useState("");
@@ -53,13 +80,34 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<"draft" | "publish">("draft");
+  const [story, setStory] = useState("");
+  const [coverImageUrl, setCoverImageUrl] = useState("");
+  const [coverUploadLoading, setCoverUploadLoading] = useState(false);
+  const [coverUploadError, setCoverUploadError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!slugManuallyEdited && fullName) {
+    if (isEdit && initialData) {
+      setType(initialData.type);
+      setFullName(initialData.full_name);
+      setSlug(initialData.slug);
+      setSlugManuallyEdited(true);
+      setDateOfBirth(initialData.date_of_birth ?? "");
+      setDateOfDeath(initialData.date_of_death ?? "");
+      setCity(initialData.city ?? "");
+      setVisibility(initialData.visibility);
+      setStatus(initialData.is_draft ? "draft" : "publish");
+      setStory(initialData.story ?? "");
+      setCoverImageUrl(initialData.cover_image_url ?? "");
+    }
+  }, [isEdit, initialData]);
+
+  useEffect(() => {
+    if (!slugManuallyEdited && fullName && !isEdit) {
       setSlug(generateSlug(fullName));
     }
-  }, [fullName, slugManuallyEdited]);
+  }, [fullName, slugManuallyEdited, isEdit]);
 
   const handleSlugChange = (value: string) => {
     setSlugManuallyEdited(true);
@@ -84,8 +132,7 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    // Useful for debugging: confirm toggle value at submit time.
-    console.log("[MemorialForm] submit status =", status);
+    setSubmitError(null);
     const data: MemorialFormData = {
       type,
       fullName: fullName.trim(),
@@ -97,7 +144,16 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
     if (dateOfDeath) data.dateOfDeath = dateOfDeath;
     if (city.trim()) data.city = city.trim();
     if (visibility === "password_protected") data.password = password;
-    await onSubmit(data);
+    if (story.trim()) data.story = story.trim();
+    if (coverImageUrl.trim()) data.coverImageUrl = coverImageUrl.trim();
+
+    try {
+      await onSubmit(data);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      setSubmitError(message);
+    }
   };
 
   return (
@@ -105,7 +161,7 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
       <div className="mx-auto max-w-xl">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-light tracking-tight text-stone-800 sm:text-3xl">
-            Create a memorial
+            {isEdit ? "Edit memorial" : "Create a memorial"}
           </h1>
           <p className="mt-2 text-sm text-stone-500">
             Honor and remember those who meant so much
@@ -121,26 +177,34 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
               <button
                 type="button"
                 onClick={() => setType("human")}
-                className={`flex items-center justify-center gap-2 rounded-lg border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
+                aria-pressed={type === "human"}
+                className={`flex items-center justify-center gap-2 rounded-xl border-2 py-3.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${
                   type === "human"
-                    ? "border-stone-900 bg-stone-800 text-white shadow-sm ring-2 ring-stone-800/20"
+                    ? "border-amber-600 bg-amber-600 text-white shadow-md ring-2 ring-amber-400/50 ring-offset-2"
                     : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
                 }`}
               >
-                <User className="h-5 w-5" />
+                <User className="h-5 w-5" aria-hidden />
                 Human
+                {type === "human" && (
+                  <span className="ml-1 text-amber-200" aria-hidden>✓</span>
+                )}
               </button>
               <button
                 type="button"
                 onClick={() => setType("pet")}
-                className={`flex items-center justify-center gap-2 rounded-lg border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
+                aria-pressed={type === "pet"}
+                className={`flex items-center justify-center gap-2 rounded-xl border-2 py-3.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${
                   type === "pet"
-                    ? "border-stone-900 bg-stone-800 text-white shadow-sm ring-2 ring-stone-800/20"
+                    ? "border-amber-600 bg-amber-600 text-white shadow-md ring-2 ring-amber-400/50 ring-offset-2"
                     : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
                 }`}
               >
-                <PawPrint className="h-5 w-5" />
+                <PawPrint className="h-5 w-5" aria-hidden />
                 Pet
+                {type === "pet" && (
+                  <span className="ml-1 text-amber-200" aria-hidden>✓</span>
+                )}
               </button>
             </div>
           </section>
@@ -227,6 +291,82 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
                 placeholder="e.g. London"
                 disabled={isLoading}
               />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-stone-700">
+                Story
+              </label>
+              <textarea
+                rows={5}
+                value={story}
+                onChange={(e) => setStory(e.target.value)}
+                className="w-full rounded-lg border border-stone-200 p-3 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                placeholder="Write a short biography or memory..."
+                disabled={isLoading}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-stone-700">
+                Cover photo
+              </label>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                disabled={isLoading || coverUploadLoading}
+                className="block w-full text-sm text-stone-500 file:mr-4 file:rounded-lg file:border-0 file:bg-amber-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber-700 hover:file:bg-amber-100"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  setCoverUploadError(null);
+                  setCoverUploadLoading(true);
+                  const fd = new FormData();
+                  fd.set("file", f);
+                  const result = await uploadCoverImageAction(fd);
+                  setCoverUploadLoading(false);
+                  if (result.ok && result.url) {
+                    setCoverImageUrl(result.url);
+                  } else {
+                    setCoverUploadError(result.error ?? "Upload failed");
+                  }
+                  e.target.value = "";
+                }}
+              />
+              {coverUploadLoading && (
+                <p className="mt-1 text-sm text-stone-500">Uploading...</p>
+              )}
+              {coverUploadError && (
+                <p className="mt-1 text-sm text-red-600">{coverUploadError}</p>
+              )}
+              <label className="mt-2 mb-1 block text-xs font-medium text-stone-500">
+                Or paste image URL
+              </label>
+              <input
+                type="url"
+                value={coverImageUrl}
+                onChange={(e) => {
+                  setCoverImageUrl(e.target.value);
+                  setCoverUploadError(null);
+                }}
+                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                placeholder="https://..."
+                disabled={isLoading}
+              />
+              {coverImageUrl.trim() && (
+                <div className="mt-2">
+                  <img
+                    src={coverImageUrl}
+                    alt="Cover preview"
+                    className="h-32 w-full rounded-lg border border-stone-200 object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCoverImageUrl("")}
+                    className="mt-1 text-xs text-red-500 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
             </div>
           </section>
 
@@ -359,9 +499,12 @@ export default function MemorialForm({ onSubmit, isLoading }: MemorialFormProps)
                 Saving…
               </>
             ) : (
-              "Save memorial"
+              isEdit ? "Save changes" : "Create memorial"
             )}
           </button>
+          {submitError && (
+            <p className="mt-2 text-sm text-red-500">{submitError}</p>
+          )}
         </form>
       </div>
     </div>
