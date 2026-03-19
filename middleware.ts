@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import type { SupabaseSsrCookie } from "@/lib/supabaseSsrCookies";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -12,10 +13,18 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            response.cookies.set(name, value)
-          );
+        setAll(cookiesToSet: SupabaseSsrCookie[]) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(
+                name,
+                value,
+                options as Parameters<typeof response.cookies.set>[2]
+              )
+            );
+          } catch {
+            // Ignore (same pattern as cookie store in Server Components)
+          }
         }
       }
     }

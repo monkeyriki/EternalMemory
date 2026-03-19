@@ -49,7 +49,7 @@ export default function EditMemorialClient({ memorial }: EditMemorialClientProps
     setIsLoading(false);
 
     if (!result.ok) {
-      setServerError(result.error);
+      setServerError(result.error ?? null);
       throw new Error(result.error || "Failed to update memorial");
     }
 
