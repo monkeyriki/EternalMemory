@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import "./globals.css";
+import "./tailwind.generated.css";
 import { AuthLinks } from "@/components/AuthLinks";
 
 export const metadata: Metadata = {
