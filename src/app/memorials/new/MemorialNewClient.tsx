@@ -27,7 +27,8 @@ export default function MemorialNewClient() {
       password: data.password,
       status: data.status,
       story: data.story,
-      coverImageUrl: data.coverImageUrl
+      coverImageUrl: data.coverImageUrl,
+      galleryImageUrls: data.galleryImageUrls ?? []
     });
     setIsLoading(false);
 

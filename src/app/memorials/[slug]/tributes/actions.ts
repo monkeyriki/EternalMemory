@@ -71,6 +71,78 @@ export async function createTributeAction(
   return { ok: true };
 }
 
+/**
+ * Approve a pending (guest) free-text tribute.
+ * Allowed for: memorial owner or platform admin.
+ */
+export async function approveTributeAction(
+  id: string
+): Promise<TributeActionResult> {
+  const supabase = await getSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "You must be signed in to approve a tribute." };
+  }
+
+  const { data: tribute, error: tributeError } = await supabase
+    .from("virtual_tributes")
+    .select("id, memorial_id, is_approved, store_item_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (tributeError || !tribute) {
+    return { ok: false, error: "Tribute not found." };
+  }
+
+  if (tribute.is_approved) {
+    return { ok: true };
+  }
+
+  // Paid tributes are created approved; do not use this path for store purchases.
+  if (tribute.store_item_id) {
+    return {
+      ok: false,
+      error: "This tribute does not require approval."
+    };
+  }
+
+  const { data: memorial } = await supabase
+    .from("memorials")
+    .select("owner_id")
+    .eq("id", tribute.memorial_id)
+    .maybeSingle();
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const isAdmin = profile?.role === "admin";
+  const isOwner = memorial?.owner_id === user.id;
+
+  if (!isOwner && !isAdmin) {
+    return {
+      ok: false,
+      error: "You do not have permission to approve this tribute."
+    };
+  }
+
+  const { error } = await supabase
+    .from("virtual_tributes")
+    .update({ is_approved: true })
+    .eq("id", id);
+
+  if (error) {
+    return { ok: false, error: "Failed to approve tribute." };
+  }
+
+  return { ok: true };
+}
+
 type DeleteTributeInput = {
   id: string;
 };

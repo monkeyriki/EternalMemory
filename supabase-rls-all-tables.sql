@@ -197,8 +197,34 @@ create policy "virtual_tributes_guest_insert"
 create policy "virtual_tributes_update_admin"
   on public.virtual_tributes for update using (public.is_admin());
 
+-- Memorial owner can update tributes on their memorial (e.g. approve guest messages)
+create policy "virtual_tributes_update_memorial_owner"
+  on public.virtual_tributes for update
+  using (
+    exists (
+      select 1 from public.memorials m
+      where m.id = virtual_tributes.memorial_id and m.owner_id = auth.uid()
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.memorials m
+      where m.id = virtual_tributes.memorial_id and m.owner_id = auth.uid()
+    )
+  );
+
 create policy "virtual_tributes_delete_admin"
   on public.virtual_tributes for delete using (public.is_admin());
+
+-- Memorial owner can delete tributes on their memorial
+create policy "virtual_tributes_delete_memorial_owner"
+  on public.virtual_tributes for delete
+  using (
+    exists (
+      select 1 from public.memorials m
+      where m.id = virtual_tributes.memorial_id and m.owner_id = auth.uid()
+    )
+  );
 
 -- -----------------------------------------------------------------------------
 -- 8) B2B_SUBSCRIPTIONS

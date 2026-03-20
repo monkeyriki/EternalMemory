@@ -20,6 +20,7 @@ type EditMemorialClientProps = {
     is_draft: boolean;
     story: string | null;
     cover_image_url: string | null;
+    gallery_image_urls?: string[] | null;
   };
 };
 
@@ -43,7 +44,8 @@ export default function EditMemorialClient({ memorial }: EditMemorialClientProps
       visibility: data.visibility,
       status: data.status,
       story: data.story ?? null,
-      coverImageUrl: data.coverImageUrl ?? null
+      coverImageUrl: data.coverImageUrl ?? null,
+      galleryImageUrls: data.galleryImageUrls ?? []
     });
 
     setIsLoading(false);
@@ -53,7 +55,7 @@ export default function EditMemorialClient({ memorial }: EditMemorialClientProps
       throw new Error(result.error || "Failed to update memorial");
     }
 
-    router.push(`/memorials/${memorial.slug}`);
+    router.push(`/memorials/${data.slug.trim().toLowerCase()}`);
   }
 
   return (

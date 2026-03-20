@@ -26,6 +26,8 @@ export interface MemorialFormData {
   status: "draft" | "publish";
   story?: string;
   coverImageUrl?: string;
+  /** Gallery image URLs (order = display order), max 24 */
+  galleryImageUrls?: string[];
 }
 
 type MemorialFormMode = "create" | "edit";
@@ -42,6 +44,7 @@ type MemorialInitialData = {
   is_draft: boolean;
   story: string | null;
   cover_image_url: string | null;
+  gallery_image_urls?: string[] | null;
 };
 
 interface MemorialFormProps {
@@ -50,6 +53,8 @@ interface MemorialFormProps {
   onSubmit: (data: MemorialFormData) => void | Promise<void>;
   isLoading: boolean;
 }
+
+const MAX_GALLERY_IMAGES = 24;
 
 function generateSlug(name: string): string {
   return name
@@ -84,6 +89,9 @@ export default function MemorialForm({
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [coverUploadLoading, setCoverUploadLoading] = useState(false);
   const [coverUploadError, setCoverUploadError] = useState<string | null>(null);
+  const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
+  const [galleryUploadLoading, setGalleryUploadLoading] = useState(false);
+  const [galleryError, setGalleryError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -100,6 +108,7 @@ export default function MemorialForm({
       setStatus(initialData.is_draft ? "draft" : "publish");
       setStory(initialData.story ?? "");
       setCoverImageUrl(initialData.cover_image_url ?? "");
+      setGalleryUrls(initialData.gallery_image_urls ?? []);
     }
   }, [isEdit, initialData]);
 
@@ -146,6 +155,7 @@ export default function MemorialForm({
     if (visibility === "password_protected") data.password = password;
     if (story.trim()) data.story = story.trim();
     if (coverImageUrl.trim()) data.coverImageUrl = coverImageUrl.trim();
+    data.galleryImageUrls = galleryUrls;
 
     try {
       await onSubmit(data);
@@ -366,6 +376,82 @@ export default function MemorialForm({
                     Remove
                   </button>
                 </div>
+              )}
+            </div>
+
+            <div className="mt-6 border-t border-stone-100 pt-6">
+              <label className="mb-1 block text-sm font-medium text-stone-700">
+                More photos (gallery)
+              </label>
+              <p className="mb-2 text-xs text-stone-500">
+                Up to {MAX_GALLERY_IMAGES} images in addition to the cover. Shown on the memorial
+                page in a grid.
+              </p>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                multiple
+                disabled={isLoading || galleryUploadLoading || galleryUrls.length >= MAX_GALLERY_IMAGES}
+                className="block w-full text-sm text-stone-500 file:mr-4 file:rounded-lg file:border-0 file:bg-amber-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber-700 hover:file:bg-amber-100"
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files ?? []);
+                  e.target.value = "";
+                  if (files.length === 0) return;
+                  setGalleryError(null);
+                  const room = MAX_GALLERY_IMAGES - galleryUrls.length;
+                  if (room <= 0) {
+                    setGalleryError(`Maximum ${MAX_GALLERY_IMAGES} gallery photos.`);
+                    return;
+                  }
+                  const toUpload = files.slice(0, room);
+                  setGalleryUploadLoading(true);
+                  try {
+                    const next: string[] = [...galleryUrls];
+                    for (const f of toUpload) {
+                      const fd = new FormData();
+                      fd.set("file", f);
+                      const result = await uploadCoverImageAction(fd);
+                      if (result.ok && result.url) {
+                        next.push(result.url);
+                      } else {
+                        setGalleryError(result.error ?? "One or more uploads failed.");
+                        break;
+                      }
+                    }
+                    setGalleryUrls(next.slice(0, MAX_GALLERY_IMAGES));
+                  } finally {
+                    setGalleryUploadLoading(false);
+                  }
+                }}
+              />
+              {galleryUploadLoading && (
+                <p className="mt-1 text-sm text-stone-500">Uploading gallery…</p>
+              )}
+              {galleryError && (
+                <p className="mt-1 text-sm text-red-600">{galleryError}</p>
+              )}
+              {galleryUrls.length > 0 && (
+                <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {galleryUrls.map((url, idx) => (
+                    <li key={`${url}-${idx}`} className="relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={url}
+                        alt=""
+                        className="h-24 w-full rounded-lg border border-stone-200 object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setGalleryUrls((prev) => prev.filter((_, i) => i !== idx))
+                        }
+                        className="mt-1 text-xs text-red-500 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
           </section>

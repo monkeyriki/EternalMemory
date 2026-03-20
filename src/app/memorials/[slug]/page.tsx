@@ -164,6 +164,27 @@ export default async function MemorialSlugPage({
   const isOwner = !!user && memorial.owner_id === user.id;
   const isAdmin = role === "admin";
 
+  // Do not load gallery server-side for password-gated guests (RLS would return [] anyway;
+  // avoids exposing URLs in props before unlock).
+  let galleryMedia: { id: string; image_url: string }[] = [];
+  const skipGalleryForPasswordGuest =
+    memorial.visibility === "password_protected" && !isOwner && !isAdmin;
+
+  if (!skipGalleryForPasswordGuest) {
+    const { data: galleryRows } = await supabase
+      .from("memorial_media")
+      .select("id, image_url")
+      .eq("memorial_id", memorial.id)
+      .order("sort_order", { ascending: true });
+    galleryMedia = galleryRows ?? [];
+  }
+
+  // Pending guest tributes: only owner/admin should receive them (privacy).
+  const tributesForClient =
+    isOwner || isAdmin
+      ? (tributes ?? [])
+      : (tributes ?? []).filter((t) => t.is_approved);
+
   // Draft memorials must not be visible to public visitors.
   if (memorial.is_draft && !isOwner && !isAdmin) return notFound();
 
@@ -173,9 +194,12 @@ export default async function MemorialSlugPage({
       <PasswordGateWrapper
         slug={slug}
         memorial={memorial as any}
-        tributes={tributes ?? []}
+        tributes={tributesForClient}
         storeItems={storeItems ?? []}
+        galleryMedia={galleryMedia}
         isAuthenticated={!!user}
+        isOwner={isOwner}
+        isAdmin={isAdmin}
       />
     );
   }
@@ -186,8 +210,9 @@ export default async function MemorialSlugPage({
       isOwner={isOwner}
       isAdmin={isAdmin}
       isAuthenticated={!!user}
-      tributes={tributes ?? []}
+      tributes={tributesForClient}
       storeItems={storeItems ?? []}
+      galleryMedia={galleryMedia}
     />
   );
 }

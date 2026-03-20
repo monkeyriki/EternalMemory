@@ -2,6 +2,7 @@
 
 import bcrypt from "bcryptjs";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { replaceMemorialGalleryRows } from "@/app/memorials/actions/syncMemorialGallery";
 
 export type CreateMemorialInput = {
   type: "human" | "pet";
@@ -15,6 +16,8 @@ export type CreateMemorialInput = {
   status: "draft" | "publish";
   story?: string;
   coverImageUrl?: string;
+  /** Additional photos (not cover); max 24 URLs */
+  galleryImageUrls?: string[];
 };
 
 export type CreateMemorialResult =
@@ -119,6 +122,14 @@ export async function createMemorialAction(
       error:
         "Row may have been created but could not be read back. Check Table Editor and server terminal logs."
     };
+  }
+
+  const gallery = input.galleryImageUrls ?? [];
+  if (gallery.length > 0) {
+    const gal = await replaceMemorialGalleryRows(supabase, data.id, gallery);
+    if (!gal.ok) {
+      return { ok: false, error: gal.error };
+    }
   }
 
   return { ok: true, slug: data.slug };

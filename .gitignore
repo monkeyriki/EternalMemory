@@ -16,6 +16,9 @@ pnpm-debug.log*
 .env*
 !.env.local.example
 
+# TypeScript
+*.tsbuildinfo
+
 # Editor
 .vscode
 .DS_Store

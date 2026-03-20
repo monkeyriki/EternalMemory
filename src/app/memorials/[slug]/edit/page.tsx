@@ -44,13 +44,24 @@ export default async function EditMemorialPage({
     redirect("/memorials/humans");
   }
 
+  const { data: galleryRows } = await supabase
+    .from("memorial_media")
+    .select("image_url")
+    .eq("memorial_id", memorial.id)
+    .order("sort_order", { ascending: true });
+
+  const memorialWithGallery = {
+    ...memorial,
+    gallery_image_urls: galleryRows?.map((r) => r.image_url) ?? []
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-2xl">
         <h1 className="mb-6 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
           Edit memorial
         </h1>
-        <EditMemorialClient memorial={memorial as any} />
+        <EditMemorialClient memorial={memorialWithGallery as any} />
       </div>
     </div>
   );

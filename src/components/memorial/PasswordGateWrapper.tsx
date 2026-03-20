@@ -8,7 +8,11 @@ type PasswordGateWrapperProps = {
   memorial: any;
   tributes: any[];
   storeItems: any[];
+  galleryMedia?: { id: string; image_url: string }[];
   isAuthenticated: boolean;
+  /** After password unlock, preserve real owner/admin so moderation UI works. */
+  isOwner: boolean;
+  isAdmin: boolean;
 };
 
 const storageKeyForSlug = (slug: string) => `memorial_access_${slug}`;
@@ -18,7 +22,10 @@ export function PasswordGateWrapper({
   memorial,
   tributes,
   storeItems,
-  isAuthenticated
+  galleryMedia = [],
+  isAuthenticated,
+  isOwner,
+  isAdmin
 }: PasswordGateWrapperProps) {
   const [unlocked, setUnlocked] = useState(false);
 
@@ -35,11 +42,12 @@ export function PasswordGateWrapper({
     return (
       <SingleMemorialClient
         memorial={memorial}
-        isOwner={false}
-        isAdmin={false}
+        isOwner={isOwner}
+        isAdmin={isAdmin}
         isAuthenticated={isAuthenticated}
         tributes={tributes}
         storeItems={storeItems}
+        galleryMedia={galleryMedia}
       />
     );
   }

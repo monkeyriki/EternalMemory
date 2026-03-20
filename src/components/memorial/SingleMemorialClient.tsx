@@ -5,7 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { MapPin } from "lucide-react";
-import { createTributeAction, deleteTributeAction } from "@/app/memorials/[slug]/tributes/actions";
+import {
+  approveTributeAction,
+  createTributeAction,
+  deleteTributeAction
+} from "@/app/memorials/[slug]/tributes/actions";
 import { generateQRAction } from "@/app/memorials/[slug]/qr/actions";
 
 type MemorialType = "human" | "pet";
@@ -51,6 +55,7 @@ export type SingleMemorialProps = {
   isAuthenticated: boolean;
   tributes: TributeItem[];
   storeItems: StoreItem[];
+  galleryMedia?: { id: string; image_url: string }[];
 };
 
 function formatYear(date?: string | null): string | null {
@@ -105,9 +110,9 @@ export function SingleMemorialClient({
   isAdmin,
   isAuthenticated,
   tributes: initialTributes,
-  storeItems
+  storeItems,
+  galleryMedia = []
 }: SingleMemorialProps) {
-  const approvedTributes = (initialTributes ?? []).filter((t) => t.is_approved);
   const [copied, setCopied] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
@@ -118,7 +123,8 @@ export function SingleMemorialClient({
   const [tributeGuestName, setTributeGuestName] = useState("");
   const [tributeError, setTributeError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [tributes, setTributes] = useState<TributeItem[]>(approvedTributes);
+  const [tributes, setTributes] = useState<TributeItem[]>(initialTributes ?? []);
+  const [approveLoadingId, setApproveLoadingId] = useState<string | null>(null);
   const [checkoutLoadingItemId, setCheckoutLoadingItemId] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -133,8 +139,21 @@ export function SingleMemorialClient({
     return new Map(storeItems.map((s) => [s.id, s]));
   }, [storeItems]);
 
-  const freeTributes = tributes.filter((t) => !t.store_item_id);
-  const paidTributes = tributes.filter((t) => !!t.store_item_id);
+  const canModerate = isOwner || isAdmin;
+
+  const approvedTributes = useMemo(
+    () => tributes.filter((t) => t.is_approved),
+    [tributes]
+  );
+
+  /** Guest free-text tributes awaiting approval (not paid store items). */
+  const pendingGuestTributes = useMemo(
+    () => tributes.filter((t) => !t.is_approved && !t.store_item_id),
+    [tributes]
+  );
+
+  const freeTributes = approvedTributes.filter((t) => !t.store_item_id);
+  const paidTributes = approvedTributes.filter((t) => !!t.store_item_id);
 
   const activePremiumHighlight = useMemo(() => {
     const now = Date.now();
@@ -156,6 +175,17 @@ export function SingleMemorialClient({
     active.sort((a, b) => b.until - a.until);
     return active[0] ?? null;
   }, [paidTributes, storeItemById]);
+
+  const handleApproveTribute = async (id: string) => {
+    setApproveLoadingId(id);
+    const result = await approveTributeAction(id);
+    setApproveLoadingId(null);
+    if (result.ok) {
+      setTributes((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, is_approved: true } : t))
+      );
+    }
+  };
 
   const tribute = searchParams.get("tribute");
 
@@ -229,6 +259,7 @@ export function SingleMemorialClient({
         ...prev
       ]);
     }
+    // Guest posts stay pending until owner/admin approves — do not add optimistically.
     setTributeMessage("");
     setTributeGuestName("");
     setShowForm(false);
@@ -298,13 +329,11 @@ export function SingleMemorialClient({
 
     const result = await deleteTributeAction({ id });
     if (!result.ok) {
-      // revert optimistic delete
       setTributes(prev);
-      // keep error local, not surfaced in UI for now
     }
   };
 
-  const canEdit = isOwner || isAdmin;
+  const canEdit = canModerate;
   const visibilityLabel = formatVisibility(memorial.visibility);
   const typeLabel = formatTypeLabel(memorial.type);
   const yearRange = formatYearRange(
@@ -367,6 +396,29 @@ export function SingleMemorialClient({
             </div>
           )}
         </section>
+
+        {/* Gallery (additional photos) */}
+        {galleryMedia.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold text-slate-800">Gallery</h2>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
+              {galleryMedia.map((item) => (
+                <div
+                  key={item.id}
+                  className="overflow-hidden rounded-xl border border-slate-100 bg-slate-50 aspect-square"
+                >
+                  <Image
+                    src={item.image_url}
+                    alt=""
+                    width={400}
+                    height={400}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Story / About */}
         <section>
@@ -500,14 +552,72 @@ export function SingleMemorialClient({
         <section>
           <div className="mb-3 flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-slate-800">Tributes</h2>
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-              {tributes.length}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                {approvedTributes.length} published
+              </span>
+              {canModerate && pendingGuestTributes.length > 0 && (
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                  {pendingGuestTributes.length} pending
+                </span>
+              )}
+            </div>
           </div>
 
-          {tributes.length === 0 ? (
+          {canModerate && pendingGuestTributes.length > 0 && (
+            <div className="mb-5 space-y-3 rounded-xl border border-amber-200 bg-amber-50/80 p-4">
+              <h3 className="text-sm font-semibold text-amber-900">
+                Pending approval (guest messages)
+              </h3>
+              <p className="text-xs text-amber-800/90">
+                Only you and admins can see these until you approve them.
+              </p>
+              <div className="space-y-3">
+                {pendingGuestTributes.map((t) => (
+                  <div
+                    key={t.id}
+                    className="rounded-xl border border-amber-200 bg-white p-4 text-sm text-slate-700"
+                  >
+                    <p className="mb-1 text-xs font-medium text-slate-600">
+                      {tributeDisplayName(t)}
+                    </p>
+                    <p>{t.message ?? ""}</p>
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+                      <span>{formatTributeDate(t.created_at)}</span>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          disabled={approveLoadingId === t.id}
+                          onClick={() => handleApproveTribute(t.id)}
+                          className="font-medium text-amber-700 hover:underline disabled:opacity-50"
+                        >
+                          {approveLoadingId === t.id ? "Approving…" : "Approve"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteTribute(t.id)}
+                          className="text-red-500 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {approvedTributes.length === 0 && pendingGuestTributes.length === 0 ? (
             <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm">
               No tributes yet. Leave a free message or purchase a paid tribute.
+            </div>
+          ) : approvedTributes.length === 0 ? (
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm">
+              No published tributes yet.
+              {!canModerate &&
+                pendingGuestTributes.length > 0 &&
+                " Messages may appear after the memorial owner approves them."}
             </div>
           ) : (
             <div className="space-y-5">
@@ -528,7 +638,7 @@ export function SingleMemorialClient({
                         <p>{t.message ?? ""}</p>
                         <div className="mt-2 flex items-center justify-between gap-2 text-xs text-slate-400">
                           <span>{formatTributeDate(t.created_at)}</span>
-                          {(isOwner || isAdmin) && (
+                          {canModerate && (
                             <button
                               type="button"
                               onClick={() => handleDeleteTribute(t.id)}
@@ -596,7 +706,7 @@ export function SingleMemorialClient({
 
                           <div className="mt-3 flex items-center justify-between gap-2 text-xs text-slate-400">
                             <span>{formatTributeDate(t.created_at)}</span>
-                            {(isOwner || isAdmin) && (
+                            {canModerate && (
                               <button
                                 type="button"
                                 onClick={() => handleDeleteTribute(t.id)}

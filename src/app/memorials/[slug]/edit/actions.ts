@@ -1,6 +1,7 @@
 "use server";
 
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { replaceMemorialGalleryRows } from "@/app/memorials/actions/syncMemorialGallery";
 
 type UpdateMemorialInput = {
   id: string;
@@ -14,6 +15,7 @@ type UpdateMemorialInput = {
   status: "draft" | "publish";
   story: string | null;
   coverImageUrl: string | null;
+  galleryImageUrls?: string[];
 };
 
 type UpdateMemorialResult = {
@@ -76,6 +78,14 @@ export async function updateMemorialAction(
 
   if (updateError) {
     return { ok: false, error: "Failed to update memorial. Please try again." };
+  }
+
+  const gallery = input.galleryImageUrls;
+  if (gallery !== undefined) {
+    const gal = await replaceMemorialGalleryRows(supabase, input.id, gallery);
+    if (!gal.ok) {
+      return { ok: false, error: gal.error };
+    }
   }
 
   return { ok: true };
