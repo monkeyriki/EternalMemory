@@ -7,12 +7,19 @@ type PasswordGateWrapperProps = {
   slug: string;
   memorial: any;
   tributes: any[];
+  storeItems: any[];
   isAuthenticated: boolean;
 };
 
 const storageKeyForSlug = (slug: string) => `memorial_access_${slug}`;
 
-export function PasswordGateWrapper({ slug, memorial, tributes, isAuthenticated }: PasswordGateWrapperProps) {
+export function PasswordGateWrapper({
+  slug,
+  memorial,
+  tributes,
+  storeItems,
+  isAuthenticated
+}: PasswordGateWrapperProps) {
   const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
@@ -32,6 +39,7 @@ export function PasswordGateWrapper({ slug, memorial, tributes, isAuthenticated 
         isAdmin={false}
         isAuthenticated={isAuthenticated}
         tributes={tributes}
+        storeItems={storeItems}
       />
     );
   }

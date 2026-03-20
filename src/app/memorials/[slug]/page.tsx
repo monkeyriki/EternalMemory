@@ -146,10 +146,20 @@ export default async function MemorialSlugPage({
 
   const { data: tributes } = await supabase
     .from("virtual_tributes")
-    .select("id, message, created_at, purchaser_id, guest_name, is_approved")
+    .select(
+      "id, message, created_at, purchaser_id, guest_name, is_approved, store_item_id, highlight_until"
+    )
     .eq("memorial_id", memorial.id)
     .order("created_at", { ascending: false })
     .limit(50);
+
+  const { data: storeItems } = await supabase
+    .from("store_items")
+    .select(
+      "id, name, price_cents, currency, image_url, category, is_premium"
+    )
+    .eq("is_active", true)
+    .order("price_cents", { ascending: true });
 
   const isOwner = !!user && memorial.owner_id === user.id;
   const isAdmin = role === "admin";
@@ -164,6 +174,7 @@ export default async function MemorialSlugPage({
         slug={slug}
         memorial={memorial as any}
         tributes={tributes ?? []}
+        storeItems={storeItems ?? []}
         isAuthenticated={!!user}
       />
     );
@@ -176,6 +187,7 @@ export default async function MemorialSlugPage({
       isAdmin={isAdmin}
       isAuthenticated={!!user}
       tributes={tributes ?? []}
+      storeItems={storeItems ?? []}
     />
   );
 }
