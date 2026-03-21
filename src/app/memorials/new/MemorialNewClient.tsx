@@ -28,7 +28,8 @@ export default function MemorialNewClient() {
       status: data.status,
       story: data.story,
       coverImageUrl: data.coverImageUrl,
-      galleryImageUrls: data.galleryImageUrls ?? []
+      galleryImageUrls: data.galleryImageUrls ?? [],
+      tags: data.tags ?? []
     });
     setIsLoading(false);
 

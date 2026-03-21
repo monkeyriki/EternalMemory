@@ -10,6 +10,7 @@ export type MemorialCardProps = {
   dateOfDeath?: string | null;
   city?: string | null;
   slug: string;
+  tags?: string[];
 };
 
 /** Returns 4-digit year string, or null if invalid. Avoids malformed values like 19001. */
@@ -36,7 +37,8 @@ export default function MemorialCard({
   dateOfBirth,
   dateOfDeath,
   city,
-  slug
+  slug,
+  tags = []
 }: MemorialCardProps) {
   const label = type === "human" ? "Human" : "Pet";
   const yBirth = formatYear(dateOfBirth);
@@ -66,6 +68,23 @@ export default function MemorialCard({
             </div>
           ) : (
             <div className="mt-2 text-sm text-slate-600">—</div>
+          )}
+          {tags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {tags.slice(0, 4).map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-900 ring-1 ring-amber-200/80"
+                >
+                  {t.replace(/-/g, " ")}
+                </span>
+              ))}
+              {tags.length > 4 && (
+                <span className="text-[10px] text-slate-500">
+                  +{tags.length - 4}
+                </span>
+              )}
+            </div>
           )}
         </div>
         <Link

@@ -38,6 +38,7 @@ create policy "profiles_delete_admin"
 -- -----------------------------------------------------------------------------
 drop policy if exists "Public memorials readable by anyone" on public.memorials;
 drop policy if exists "Owners manage own memorials" on public.memorials;
+drop policy if exists "memorials_select_managed_by_partner" on public.memorials;
 
 create policy "memorials_select_public_or_owner_or_admin"
   on public.memorials for select
@@ -48,16 +49,37 @@ create policy "memorials_select_public_or_owner_or_admin"
 
 create policy "memorials_insert_authenticated"
   on public.memorials for insert
-  with check (auth.uid() = owner_id);
+  with check (
+    auth.uid() = owner_id
+    and (managed_by_partner_id is null or managed_by_partner_id = auth.uid())
+  );
+
+-- Partner can read memorials they manage (e.g. owner = client, managed_by_partner = B2B user)
+create policy "memorials_select_managed_by_partner"
+  on public.memorials for select
+  to authenticated
+  using (managed_by_partner_id = auth.uid());
 
 create policy "memorials_update_owner_or_admin"
   on public.memorials for update
-  using (owner_id = auth.uid() or public.is_admin())
-  with check (owner_id = auth.uid() or public.is_admin());
+  using (
+    owner_id = auth.uid()
+    or managed_by_partner_id = auth.uid()
+    or public.is_admin()
+  )
+  with check (
+    owner_id = auth.uid()
+    or managed_by_partner_id = auth.uid()
+    or public.is_admin()
+  );
 
 create policy "memorials_delete_owner_or_admin"
   on public.memorials for delete
-  using (owner_id = auth.uid() or public.is_admin());
+  using (
+    owner_id = auth.uid()
+    or managed_by_partner_id = auth.uid()
+    or public.is_admin()
+  );
 
 -- -----------------------------------------------------------------------------
 -- 3) MEMORIAL_MEDIA

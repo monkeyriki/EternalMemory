@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { replaceMemorialGalleryRows } from "@/app/memorials/actions/syncMemorialGallery";
+import { normalizeTagArray } from "@/lib/memorialTags";
 
 export type CreateMemorialInput = {
   type: "human" | "pet";
@@ -71,7 +72,8 @@ export async function createMemorialAction(
     password_hash,
     is_draft,
     story: input.story ?? null,
-    cover_image_url: input.coverImageUrl ?? null
+    cover_image_url: input.coverImageUrl ?? null,
+    tags: normalizeTagArray(input.tags)
   };
 
   // Logs appear in the terminal where `npm run dev` runs (not the browser console).

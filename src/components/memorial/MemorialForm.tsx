@@ -13,6 +13,7 @@ import {
   Shield
 } from "lucide-react";
 import { uploadCoverImageAction } from "@/app/memorials/actions/uploadCoverImage";
+import { normalizeTagsFromInput, tagsToInputString } from "@/lib/memorialTags";
 
 export interface MemorialFormData {
   type: "human" | "pet";
@@ -28,6 +29,8 @@ export interface MemorialFormData {
   coverImageUrl?: string;
   /** Gallery image URLs (order = display order), max 24 */
   galleryImageUrls?: string[];
+  /** Normalized tag slugs (server re-validates) */
+  tags?: string[];
 }
 
 type MemorialFormMode = "create" | "edit";
@@ -92,6 +95,7 @@ export default function MemorialForm({
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [galleryUploadLoading, setGalleryUploadLoading] = useState(false);
   const [galleryError, setGalleryError] = useState<string | null>(null);
+  const [tagsInput, setTagsInput] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -156,6 +160,7 @@ export default function MemorialForm({
     if (story.trim()) data.story = story.trim();
     if (coverImageUrl.trim()) data.coverImageUrl = coverImageUrl.trim();
     data.galleryImageUrls = galleryUrls;
+    data.tags = normalizeTagsFromInput(tagsInput);
 
     try {
       await onSubmit(data);
@@ -301,6 +306,22 @@ export default function MemorialForm({
                 placeholder="e.g. London"
                 disabled={isLoading}
               />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-stone-700">
+                Tags <span className="font-normal text-stone-500">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={tagsInput}
+                onChange={(e) => setTagsInput(e.target.value)}
+                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                placeholder="e.g. veteran, golden-retriever, acme-funeral-home"
+                disabled={isLoading}
+              />
+              <p className="mt-1 text-xs text-stone-500">
+                Comma-separated. Used for directory search (e.g. breed, organization, military).
+              </p>
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">

@@ -13,6 +13,12 @@ export default async function DashboardPage() {
     redirect("/auth/login");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
   const { data: memorials } = await supabase
     .from("memorials")
     .select("id, slug, type, full_name, visibility, is_draft, created_at")
@@ -20,10 +26,27 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false });
 
   const hasMemorials = Array.isArray(memorials) && memorials.length > 0;
+  const showB2BBanner = profile?.role !== "b2b";
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-4xl space-y-6">
+        {showB2BBanner && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 shadow-sm">
+            <p className="text-sm font-medium text-amber-950">
+              Are you a funeral home or pet crematorium? Join our B2B program.
+            </p>
+            <p className="mt-1 text-xs text-amber-900/80">
+              Bulk memorials for your clients with a monthly subscription.
+            </p>
+            <Link
+              href="/dashboard/b2b"
+              className="mt-3 inline-flex text-sm font-semibold text-amber-800 underline-offset-2 hover:underline"
+            >
+              Open B2B dashboard →
+            </Link>
+          </div>
+        )}
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-slate-900">

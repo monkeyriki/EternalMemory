@@ -3,28 +3,18 @@ import MemorialCard from "@/components/memorial/MemorialCard";
 import DirectoryFilters from "@/components/memorial/DirectoryFilters";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
-type SearchParams = {
-  search?: string;
-  city?: string;
-  sort?: string;
-  page?: string;
-};
-
-function buildQueryString(params: SearchParams, page?: number): string {
-  const q = new URLSearchParams();
-  if (params.search?.trim()) q.set("search", params.search.trim());
-  if (params.city?.trim()) q.set("city", params.city.trim());
-  if (params.sort && params.sort !== "recent") q.set("sort", params.sort);
-  if (page != null && page > 1) q.set("page", String(page));
-  const s = q.toString();
-  return s ? `?${s}` : "";
-}
+import {
+  buildMemorialDirectoryQueryString,
+  directoryHasAdvancedFilters,
+  parseTagsFilterParam,
+  parseYearFilter,
+  type MemorialDirectorySearchParams
+} from "@/app/memorials/directoryParams";
 
 export default async function MemorialsHumansPage({
   searchParams
 }: {
-  searchParams?: SearchParams;
+  searchParams?: MemorialDirectorySearchParams;
 }) {
   const pageSize = 10;
   const pageRaw = searchParams?.page ?? "1";
@@ -34,7 +24,9 @@ export default async function MemorialsHumansPage({
   const supabase = await getSupabaseServerClient();
   let query = supabase
     .from("memorials")
-    .select("id, slug, type, full_name, date_of_birth, date_of_death, city")
+    .select(
+      "id, slug, type, full_name, date_of_birth, date_of_death, city, tags"
+    )
     .eq("type", "human")
     .eq("visibility", "public")
     .eq("is_draft", false);
@@ -45,6 +37,21 @@ export default async function MemorialsHumansPage({
   if (searchParams?.city?.trim()) {
     query = query.ilike("city", `%${searchParams.city.trim()}%`);
   }
+
+  const bMin = parseYearFilter(searchParams?.birth_year_min);
+  const bMax = parseYearFilter(searchParams?.birth_year_max);
+  const dMin = parseYearFilter(searchParams?.death_year_min);
+  const dMax = parseYearFilter(searchParams?.death_year_max);
+  if (bMin != null) query = query.gte("birth_year", bMin);
+  if (bMax != null) query = query.lte("birth_year", bMax);
+  if (dMin != null) query = query.gte("death_year", dMin);
+  if (dMax != null) query = query.lte("death_year", dMax);
+
+  const tagFilters = parseTagsFilterParam(searchParams?.tags);
+  if (tagFilters.length > 0) {
+    query = query.overlaps("tags", tagFilters);
+  }
+
   if (searchParams?.sort === "alpha") {
     query = query.order("full_name", { ascending: true });
   } else if (searchParams?.sort === "updated") {
@@ -61,7 +68,8 @@ export default async function MemorialsHumansPage({
   const hasFilters =
     searchParams?.search?.trim() ||
     searchParams?.city?.trim() ||
-    (searchParams?.sort && searchParams.sort !== "recent");
+    (searchParams?.sort && searchParams.sort !== "recent") ||
+    directoryHasAdvancedFilters(searchParams);
 
   return (
     <div className="min-h-[60vh] bg-slate-50 px-4 py-8 sm:py-12">
@@ -77,6 +85,11 @@ export default async function MemorialsHumansPage({
           currentSearch={searchParams?.search}
           currentCity={searchParams?.city}
           currentSort={searchParams?.sort}
+          currentBirthYearMin={searchParams?.birth_year_min}
+          currentBirthYearMax={searchParams?.birth_year_max}
+          currentDeathYearMin={searchParams?.death_year_min}
+          currentDeathYearMax={searchParams?.death_year_max}
+          currentTags={searchParams?.tags}
         />
 
         {memorials.length === 0 ? (
@@ -106,6 +119,7 @@ export default async function MemorialsHumansPage({
                 dateOfDeath={m.date_of_death}
                 city={m.city}
                 slug={m.slug}
+                tags={m.tags ?? []}
               />
             ))}
           </div>
@@ -118,7 +132,10 @@ export default async function MemorialsHumansPage({
           <div>
             {page > 1 ? (
               <Link
-                href={`${basePath}${buildQueryString(searchParams ?? {}, page - 1)}`}
+                href={`${basePath}${buildMemorialDirectoryQueryString(
+                  searchParams ?? {},
+                  page - 1
+                )}`}
                 className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
               >
                 Previous
@@ -132,7 +149,10 @@ export default async function MemorialsHumansPage({
           <div>
             {memorials.length === pageSize ? (
               <Link
-                href={`${basePath}${buildQueryString(searchParams ?? {}, page + 1)}`}
+                href={`${basePath}${buildMemorialDirectoryQueryString(
+                  searchParams ?? {},
+                  page + 1
+                )}`}
                 className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
               >
                 Next

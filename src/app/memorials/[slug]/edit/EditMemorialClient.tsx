@@ -21,6 +21,7 @@ type EditMemorialClientProps = {
     story: string | null;
     cover_image_url: string | null;
     gallery_image_urls?: string[] | null;
+    tags?: string[] | null;
   };
 };
 
@@ -45,7 +46,8 @@ export default function EditMemorialClient({ memorial }: EditMemorialClientProps
       status: data.status,
       story: data.story ?? null,
       coverImageUrl: data.coverImageUrl ?? null,
-      galleryImageUrls: data.galleryImageUrls ?? []
+      galleryImageUrls: data.galleryImageUrls ?? [],
+      tags: data.tags ?? []
     });
 
     setIsLoading(false);

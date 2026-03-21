@@ -2,6 +2,7 @@
 
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { replaceMemorialGalleryRows } from "@/app/memorials/actions/syncMemorialGallery";
+import { normalizeTagArray } from "@/lib/memorialTags";
 
 type UpdateMemorialInput = {
   id: string;
@@ -70,6 +71,7 @@ export async function updateMemorialAction(
   updates.date_of_birth = input.dateOfBirth ?? null;
   updates.date_of_death = input.dateOfDeath ?? null;
   updates.city = input.city ?? null;
+  updates.tags = normalizeTagArray(input.tags);
 
   const { error: updateError } = await supabase
     .from("memorials")

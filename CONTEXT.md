@@ -70,6 +70,16 @@ This repository implements the **Digital Memorial & Obituary Platform** describe
 ## Current DB (as created via SQL Editor)
 Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`, `store_items`, `orders`, `virtual_tributes`, `b2b_subscriptions`, `qr_codes`, `ad_slots`, `platform_settings`.
 
+## Directory: years & tags (PRD advanced search)
+- Migration `supabase/migrations/20260318120000_memorial_tags_and_year_columns.sql`: `tags text[]` (GIN index), generated `birth_year` / `death_year` from date columns, B-tree indexes for range filters. Run in Supabase SQL Editor.
+- `/memorials/humans` and `/memorials/pets`: filter by birth/death year ranges + tag overlap (comma-separated in UI; memorials match if they share **any** listed tag). Memorial create/edit form includes optional tags field.
+
+## B2B Partner (MVP demo — implemented in app)
+- Migration `supabase/migrations/20260317200000_b2b_partner.sql`: `memorials.managed_by_partner_id`, RLS (insert WITH CHECK for partner column, select/update/delete for managed memorials), unique index on `b2b_subscriptions(provider_subscription_id)` for webhook upserts. **Run this SQL on Supabase before using B2B.**
+- Stripe: `POST /api/stripe/b2b-checkout` (subscription mode, `STRIPE_B2B_PRICE_ID`); `POST /api/stripe/b2b-webhook` with **`STRIPE_B2B_WEBHOOK_SECRET`** (separate endpoint from tribute webhook).
+- Dashboard `/dashboard/b2b`: subscribe CTA or bulk-create memorials (max 10) when subscription `active`.
+- Admin `/admin/users`: **Make B2B** sets `profiles.role = b2b` and upserts an active `b2b_subscriptions` row with `provider_subscription_id = admin_grant:<user_id>` for testing.
+
 ## Current app routing skeleton
 See `src/app/*` for placeholders (home, auth pages, memorials sections, dashboard, admin sections).
 
