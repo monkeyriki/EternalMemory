@@ -5,6 +5,21 @@ import { stripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 
+/** Stripe API uses snake_case; SDK typings may omit some fields in strict mode. */
+function subscriptionPeriodBounds(sub: unknown): {
+  startMs: number;
+  endMs: number;
+} {
+  const o = sub as {
+    current_period_start: number;
+    current_period_end: number;
+  };
+  return {
+    startMs: o.current_period_start * 1000,
+    endMs: o.current_period_end * 1000
+  };
+}
+
 function mapStripeSubscriptionStatus(
   status: Stripe.Subscription.Status
 ): string {
@@ -136,9 +151,11 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ received: true }, { status: 200 });
       }
 
-      const sub = await stripe.subscriptions.retrieve(subId, {
+      const subRaw = await stripe.subscriptions.retrieve(subId, {
         expand: ["items.data.price"]
       });
+      const sub = subRaw as unknown as Stripe.Subscription;
+      const { startMs, endMs } = subscriptionPeriodBounds(subRaw);
 
       const item = sub.items.data[0];
       const price = item?.price;
@@ -149,8 +166,8 @@ export async function POST(req: NextRequest) {
         "B2B Monthly";
 
       const status = mapStripeSubscriptionStatus(sub.status);
-      const start = new Date(sub.current_period_start * 1000).toISOString();
-      const end = new Date(sub.current_period_end * 1000).toISOString();
+      const start = new Date(startMs).toISOString();
+      const end = new Date(endMs).toISOString();
 
       await upsertSubscriptionFromStripe(admin, {
         accountId: userId,
@@ -168,9 +185,10 @@ export async function POST(req: NextRequest) {
       }
     } else if (event.type === "customer.subscription.updated") {
       const sub = event.data.object as Stripe.Subscription;
-      const subWithPrice = await stripe.subscriptions.retrieve(sub.id, {
+      const subWithPriceRaw = await stripe.subscriptions.retrieve(sub.id, {
         expand: ["items.data.price"]
       });
+      const subWithPrice = subWithPriceRaw as unknown as Stripe.Subscription;
       const item = subWithPrice.items.data[0];
       const price = item?.price;
       const unitAmount = price?.unit_amount ?? 0;
@@ -189,9 +207,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ received: true }, { status: 200 });
       }
 
+      const { startMs, endMs } = subscriptionPeriodBounds(subWithPriceRaw);
       const status = mapStripeSubscriptionStatus(sub.status);
-      const start = new Date(sub.current_period_start * 1000).toISOString();
-      const end = new Date(sub.current_period_end * 1000).toISOString();
+      const start = new Date(startMs).toISOString();
+      const end = new Date(endMs).toISOString();
       const planName =
         (price && typeof price === "object" && "nickname" in price && price.nickname) ||
         "B2B Monthly";
