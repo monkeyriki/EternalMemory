@@ -17,6 +17,7 @@ type UpdateMemorialInput = {
   story: string | null;
   coverImageUrl: string | null;
   galleryImageUrls?: string[];
+  tags?: string[];
 };
 
 type UpdateMemorialResult = {
