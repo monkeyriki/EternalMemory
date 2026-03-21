@@ -19,6 +19,7 @@ export type CreateMemorialInput = {
   coverImageUrl?: string;
   /** Additional photos (not cover); max 24 URLs */
   galleryImageUrls?: string[];
+  tags?: string[];
 };
 
 export type CreateMemorialResult =
