@@ -57,9 +57,17 @@ export async function generateMetadata({
   const isDraft = memorial.is_draft;
   const isPasswordProtected =
     memorial.visibility === "password_protected";
-  if (isDraft || isPasswordProtected) {
+  const isUnlisted = memorial.visibility === "unlisted";
+
+  // PRD: unlisted/password/draft must not be indexed; avoid rich previews for privacy.
+  if (isDraft || isPasswordProtected || isUnlisted) {
     return {
       title: "Memorial",
+      robots: {
+        index: false,
+        follow: false,
+        googleBot: { index: false, follow: false }
+      },
       openGraph: {
         title: "Memorial",
         type: "website",

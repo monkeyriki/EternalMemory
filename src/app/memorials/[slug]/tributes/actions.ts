@@ -4,6 +4,7 @@ import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { sendTransactionalEmail } from "@/lib/resendEmail";
 import { guestTributePendingOwnerEmail } from "@/lib/emailTemplates";
+import { assertPasswordMemorialInteractionAllowed } from "@/lib/memorialPasswordAccess";
 
 type CreateTributeInput = {
   memorial_id: string;
@@ -41,6 +42,13 @@ export async function createTributeAction(
       ok: false,
       error: "Guest name must be at most 50 characters."
     };
+  }
+
+  const access = await assertPasswordMemorialInteractionAllowed(
+    input.memorial_id
+  );
+  if (!access.ok) {
+    return { ok: false, error: access.error };
   }
 
   if (user) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { stripe } from "@/lib/stripe";
+import { assertPasswordMemorialInteractionAllowed } from "@/lib/memorialPasswordAccess";
 
 export const runtime = "nodejs";
 
@@ -54,6 +55,11 @@ export async function POST(req: NextRequest) {
         { ok: false, error: "Memorial not found." },
         { status: 404 }
       );
+    }
+
+    const gate = await assertPasswordMemorialInteractionAllowed(memorialId);
+    if (!gate.ok) {
+      return NextResponse.json({ ok: false, error: gate.error }, { status: 403 });
     }
 
     const { data: storeItem } = await supabase

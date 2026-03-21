@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   User,
   PawPrint,
@@ -14,6 +14,10 @@ import {
 } from "lucide-react";
 import { uploadCoverImageAction } from "@/app/memorials/actions/uploadCoverImage";
 import { normalizeTagsFromInput, tagsToInputString } from "@/lib/memorialTags";
+import { sanitizeMemorialStory } from "@/lib/sanitizeMemorialStory";
+import MemorialStoryEditor, {
+  type MemorialStoryEditorHandle
+} from "@/components/memorial/MemorialStoryEditor";
 
 export interface MemorialFormData {
   type: "human" | "pet";
@@ -88,7 +92,7 @@ export default function MemorialForm({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<"draft" | "publish">("draft");
-  const [story, setStory] = useState("");
+  const storyEditorRef = useRef<MemorialStoryEditorHandle>(null);
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [coverUploadLoading, setCoverUploadLoading] = useState(false);
   const [coverUploadError, setCoverUploadError] = useState<string | null>(null);
@@ -110,7 +114,6 @@ export default function MemorialForm({
       setCity(initialData.city ?? "");
       setVisibility(initialData.visibility);
       setStatus(initialData.is_draft ? "draft" : "publish");
-      setStory(initialData.story ?? "");
       setCoverImageUrl(initialData.cover_image_url ?? "");
       setGalleryUrls(initialData.gallery_image_urls ?? []);
     }
@@ -157,7 +160,13 @@ export default function MemorialForm({
     if (dateOfDeath) data.dateOfDeath = dateOfDeath;
     if (city.trim()) data.city = city.trim();
     if (visibility === "password_protected") data.password = password;
-    if (story.trim()) data.story = story.trim();
+    const rawStory = storyEditorRef.current?.getHTML() ?? "";
+    const hasStory = storyEditorRef.current
+      ? !storyEditorRef.current.isEmpty()
+      : false;
+    if (hasStory && rawStory.trim()) {
+      data.story = sanitizeMemorialStory(rawStory);
+    }
     if (coverImageUrl.trim()) data.coverImageUrl = coverImageUrl.trim();
     data.galleryImageUrls = galleryUrls;
     data.tags = normalizeTagsFromInput(tagsInput);
@@ -325,14 +334,15 @@ export default function MemorialForm({
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">
-                Story
+                Story{" "}
+                <span className="font-normal text-stone-500">
+                  (rich text, YouTube &amp; Vimeo)
+                </span>
               </label>
-              <textarea
-                rows={5}
-                value={story}
-                onChange={(e) => setStory(e.target.value)}
-                className="w-full rounded-lg border border-stone-200 p-3 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                placeholder="Write a short biography or memory..."
+              <MemorialStoryEditor
+                ref={storyEditorRef}
+                key={isEdit && initialData ? `story-${initialData.id}` : "story-new"}
+                initialContent={isEdit && initialData ? (initialData.story ?? "") : ""}
                 disabled={isLoading}
               />
             </div>

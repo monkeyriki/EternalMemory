@@ -11,6 +11,7 @@ import {
   deleteTributeAction
 } from "@/app/memorials/[slug]/tributes/actions";
 import { generateQRAction } from "@/app/memorials/[slug]/qr/actions";
+import { MemorialStoryContent } from "@/components/memorial/MemorialStoryContent";
 
 type MemorialType = "human" | "pet";
 
@@ -278,6 +279,7 @@ export function SingleMemorialClient({
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           memorial_id: memorial.id,
@@ -424,8 +426,8 @@ export function SingleMemorialClient({
         <section>
           <h2 className="mb-3 text-lg font-semibold text-slate-800">About</h2>
           {story && story.trim().length > 0 ? (
-            <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm leading-relaxed text-slate-700">
-              {story}
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+              <MemorialStoryContent html={story} />
             </div>
           ) : (
             <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm italic text-slate-400">

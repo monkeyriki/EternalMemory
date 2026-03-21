@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import {
+  MEMORIAL_GATE_COOKIE_NAME,
+  memorialGateCookieSerializeOptions,
+  signMemorialGateCookie
+} from "@/lib/memorialGateCookie";
 
 export async function POST(
   req: NextRequest,
@@ -30,7 +35,21 @@ export async function POST(
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
-  // We don't generate a signed token yet; localStorage flag is enough.
-  return NextResponse.json({ ok: true, token: slug }, { status: 200 });
+  try {
+    const gate = signMemorialGateCookie(memorial.id);
+    const res = NextResponse.json({ ok: true, token: slug }, { status: 200 });
+    res.cookies.set(
+      MEMORIAL_GATE_COOKIE_NAME,
+      gate,
+      memorialGateCookieSerializeOptions()
+    );
+    return res;
+  } catch (e) {
+    console.error("[verify-password] gate cookie signing failed:", e);
+    return NextResponse.json(
+      { ok: false, error: "Server configuration error." },
+      { status: 500 }
+    );
+  }
 }
 

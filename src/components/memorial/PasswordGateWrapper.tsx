@@ -84,6 +84,7 @@ function PasswordGate({ slug, onUnlocked }: PasswordGateProps) {
     try {
       const res = await fetch(`/api/memorials/${slug}/verify-password`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json"
         },

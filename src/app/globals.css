@@ -17,3 +17,16 @@ body {
 *::after {
   box-sizing: border-box;
 }
+
+/* TipTap / ProseMirror memorial story editor */
+.tiptap .ProseMirror {
+  outline: none;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #a8a29e;
+  pointer-events: none;
+  height: 0;
+}
