@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { stripe } from "@/lib/stripe";
+import { sendTransactionalEmail } from "@/lib/resendEmail";
+import {
+  tributePurchasedOwnerEmail,
+  tributeReceiptEmail
+} from "@/lib/emailTemplates";
 
 export const runtime = "nodejs";
 
@@ -120,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     const { data: storeItem, error: storeItemErr } = await supabase
       .from("store_items")
-      .select("id, is_premium")
+      .select("id, name, is_premium")
       .eq("id", storeItemId)
       .maybeSingle();
 
@@ -151,6 +156,94 @@ export async function POST(req: NextRequest) {
     if (tributeInsertErr) {
       console.error("Stripe webhook virtual_tributes insert failed:", tributeInsertErr);
       return NextResponse.json({ ok: false, error: "Virtual tribute insert failed" }, { status: 500 });
+    }
+
+    const appUrl =
+      process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://eternalmemory.app";
+    const itemName = storeItem.name?.trim() || "Tribute";
+
+    try {
+      const { data: memorial } = await supabase
+        .from("memorials")
+        .select("owner_id, full_name, slug")
+        .eq("id", memorialId)
+        .maybeSingle();
+
+      const memorialName = memorial?.full_name?.trim() || "Memorial";
+      const memorialSlug =
+        memorial?.slug?.trim() || String(memorialId);
+
+      const purchaserEmail = session.customer_details?.email as
+        | string
+        | undefined;
+      if (purchaserEmail?.trim()) {
+        const receiptContent = tributeReceiptEmail({
+          memorialName,
+          memorialSlug,
+          itemName,
+          amount: amountCents,
+          currency,
+          appUrl
+        });
+        const receiptResult = await sendTransactionalEmail({
+          to: purchaserEmail.trim(),
+          subject: receiptContent.subject,
+          html: receiptContent.html,
+          text: receiptContent.text
+        });
+        if (!receiptResult.ok && !receiptResult.skipped) {
+          console.error(
+            "Stripe webhook: purchaser receipt email failed:",
+            receiptResult.error
+          );
+        }
+      }
+
+      if (memorial?.owner_id) {
+        const { data: ownerAuth, error: ownerAuthErr } =
+          await supabase.auth.admin.getUserById(memorial.owner_id);
+        if (ownerAuthErr) {
+          console.error(
+            "Stripe webhook: getUserById for memorial owner failed:",
+            ownerAuthErr
+          );
+        } else {
+          const ownerUser = ownerAuth?.user;
+          const ownerEmail = ownerUser?.email?.trim();
+          if (ownerEmail) {
+            const meta = ownerUser?.user_metadata as
+              | { full_name?: string }
+              | undefined;
+            const ownerName =
+              meta?.full_name?.trim() ||
+              ownerUser?.email?.split("@")[0] ||
+              "there";
+            const memorialName = memorial.full_name?.trim() || "Memorial";
+            const memorialSlug = memorial.slug?.trim() || String(memorialId);
+            const ownerContent = tributePurchasedOwnerEmail({
+              ownerName,
+              memorialName,
+              memorialSlug,
+              itemName,
+              appUrl
+            });
+            const ownerResult = await sendTransactionalEmail({
+              to: ownerEmail,
+              subject: ownerContent.subject,
+              html: ownerContent.html,
+              text: ownerContent.text
+            });
+            if (!ownerResult.ok && !ownerResult.skipped) {
+              console.error(
+                "Stripe webhook: owner notification email failed:",
+                ownerResult.error
+              );
+            }
+          }
+        }
+      }
+    } catch (emailErr) {
+      console.error("Stripe webhook: email send block error:", emailErr);
     }
 
     return NextResponse.json({ received: true }, { status: 200 });

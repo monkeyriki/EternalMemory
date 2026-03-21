@@ -1,6 +1,9 @@
 "use server";
 
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
+import { sendTransactionalEmail } from "@/lib/resendEmail";
+import { guestTributePendingOwnerEmail } from "@/lib/emailTemplates";
 
 type CreateTributeInput = {
   memorial_id: string;
@@ -68,6 +71,66 @@ export async function createTributeAction(
   if (error) {
     return { ok: false, error: "Failed to post tribute. Please try again." };
   }
+
+  const displayGuestName = guestName || "Anonymous";
+  try {
+    const appUrl =
+      process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://eternalmemory.app";
+    const { data: memorial } = await supabase
+      .from("memorials")
+      .select("owner_id, full_name, slug")
+      .eq("id", input.memorial_id)
+      .maybeSingle();
+
+    if (memorial?.owner_id) {
+      const admin = getSupabaseAdminClient();
+      const { data: ownerAuth, error: ownerAuthErr } =
+        await admin.auth.admin.getUserById(memorial.owner_id);
+      if (ownerAuthErr) {
+        console.error(
+          "[createTributeAction] getUserById for owner failed:",
+          ownerAuthErr
+        );
+      } else {
+        const ownerUser = ownerAuth?.user;
+        const ownerEmail = ownerUser?.email?.trim();
+        if (ownerEmail) {
+          const meta = ownerUser?.user_metadata as
+            | { full_name?: string }
+            | undefined;
+          const ownerName =
+            meta?.full_name?.trim() ||
+            ownerUser?.email?.split("@")[0] ||
+            "there";
+          const memorialName = memorial.full_name?.trim() || "Memorial";
+          const content = guestTributePendingOwnerEmail({
+            ownerName,
+            guestName: displayGuestName,
+            memorialName,
+            appUrl
+          });
+          const sendResult = await sendTransactionalEmail({
+            to: ownerEmail,
+            subject: content.subject,
+            html: content.html,
+            text: content.text
+          });
+          if (!sendResult.ok && !sendResult.skipped) {
+            console.error(
+              "[createTributeAction] owner moderation email failed:",
+              sendResult.error
+            );
+          }
+        }
+      }
+    }
+  } catch (emailErr) {
+    console.error(
+      "[createTributeAction] guest tribute owner notification error:",
+      emailErr
+    );
+  }
+
   return { ok: true };
 }
 
