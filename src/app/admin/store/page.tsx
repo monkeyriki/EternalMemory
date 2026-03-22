@@ -6,7 +6,7 @@ export default async function AdminStorePage() {
   const { data: items } = await supabase
     .from("store_items")
     .select(
-      "id, name, description, category, price_cents, currency, image_url, is_premium, is_active, created_at"
+      "id, name, description, category, price_cents, currency, image_url, is_premium, is_active, highlight_duration_days, created_at"
     )
     .order("created_at", { ascending: false });
 

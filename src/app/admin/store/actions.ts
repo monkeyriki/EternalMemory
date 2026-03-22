@@ -23,6 +23,11 @@ async function requireAdmin() {
   return { ok: true as const, supabase };
 }
 
+function clampHighlightDays(n: number): number {
+  if (!Number.isFinite(n)) return 30;
+  return Math.min(365, Math.max(1, Math.floor(n)));
+}
+
 export type StoreItemInput = {
   id?: string;
   name: string;
@@ -33,6 +38,8 @@ export type StoreItemInput = {
   image_url: string;
   is_premium: boolean;
   is_active: boolean;
+  /** Days of top-of-page spotlight when premium (1–365). */
+  highlight_duration_days: number;
 };
 
 export async function createStoreItemAction(input: StoreItemInput) {
@@ -47,7 +54,8 @@ export async function createStoreItemAction(input: StoreItemInput) {
     currency: input.currency,
     image_url: input.image_url,
     is_premium: input.is_premium,
-    is_active: input.is_active
+    is_active: input.is_active,
+    highlight_duration_days: clampHighlightDays(input.highlight_duration_days)
   });
 
   if (error) return { ok: false as const, error: "Failed to create item" };
@@ -68,7 +76,8 @@ export async function updateStoreItemAction(input: StoreItemInput & { id: string
       currency: input.currency,
       image_url: input.image_url,
       is_premium: input.is_premium,
-      is_active: input.is_active
+      is_active: input.is_active,
+      highlight_duration_days: clampHighlightDays(input.highlight_duration_days)
     })
     .eq("id", input.id);
 

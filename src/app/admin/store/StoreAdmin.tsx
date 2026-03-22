@@ -18,6 +18,7 @@ type StoreItem = {
   image_url: string | null;
   is_premium: boolean | null;
   is_active: boolean | null;
+  highlight_duration_days?: number | null;
   created_at?: string | null;
 };
 
@@ -38,7 +39,8 @@ function toInput(item?: StoreItem): StoreItemInput {
     currency: item?.currency ?? "usd",
     image_url: item?.image_url ?? "",
     is_premium: item?.is_premium ?? false,
-    is_active: item?.is_active ?? true
+    is_active: item?.is_active ?? true,
+    highlight_duration_days: item?.highlight_duration_days ?? 30
   };
 }
 
@@ -117,7 +119,10 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
             Store items
           </h1>
-          <p className="mt-1 text-sm text-slate-600">Manage virtual tribute items.</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Virtual tribute shop (candles, flowers, symbols). Premium items get an animated spotlight
+            on the memorial for the number of days you set.
+          </p>
         </div>
         <button
           type="button"
@@ -179,6 +184,7 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
                 value={form.category}
                 onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="e.g. candle, flowers, religious"
               />
             </div>
             <div>
@@ -214,15 +220,38 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
               />
             </div>
-            <label className="flex items-center gap-2 text-sm text-slate-700">
+            <label className="flex items-center gap-2 text-sm text-slate-700 sm:col-span-2">
               <input
                 type="checkbox"
                 checked={form.is_premium}
                 onChange={(e) => setForm((f) => ({ ...f, is_premium: e.target.checked }))}
               />
-              Premium
+              Premium (animated top spotlight)
             </label>
-            <label className="flex items-center gap-2 text-sm text-slate-700">
+            {form.is_premium && (
+              <div className="sm:col-span-2">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  Spotlight duration (days)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={form.highlight_duration_days}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      highlight_duration_days: Number(e.target.value) || 30
+                    }))
+                  }
+                  className="w-full max-w-xs rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  1–365. Default 30 = classic “candle lit for 30 days”.
+                </p>
+              </div>
+            )}
+            <label className="flex items-center gap-2 text-sm text-slate-700 sm:col-span-2">
               <input
                 type="checkbox"
                 checked={form.is_active}
@@ -276,7 +305,7 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
                   </span>
                   {i.is_premium && (
                     <span className="rounded-full bg-purple-100 px-2 py-0.5 text-purple-700">
-                      Premium
+                      Premium · {i.highlight_duration_days ?? 30}d spotlight
                     </span>
                   )}
                 </div>

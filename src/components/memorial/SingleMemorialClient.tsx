@@ -44,6 +44,8 @@ type StoreItem = {
   currency: string | null;
   image_url: string | null;
   is_premium: boolean | null;
+  /** Days of top spotlight when premium (from store_items). */
+  highlight_duration_days?: number | null;
 };
 
 export type SingleMemorialProps = {
@@ -143,6 +145,8 @@ export function SingleMemorialClient({
   const [approveLoadingId, setApproveLoadingId] = useState<string | null>(null);
   const [checkoutLoadingItemId, setCheckoutLoadingItemId] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [payModalItemId, setPayModalItemId] = useState<string | null>(null);
+  const [payModalNote, setPayModalNote] = useState("");
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -156,6 +160,19 @@ export function SingleMemorialClient({
     const t = setTimeout(() => setShareToast(null), 3500);
     return () => clearTimeout(t);
   }, [shareToast]);
+
+  useEffect(() => {
+    if (!payModalItemId) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (checkoutLoadingItemId) return;
+      setPayModalItemId(null);
+      setPayModalNote("");
+      setCheckoutError(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [payModalItemId, checkoutLoadingItemId]);
 
   const storeItemById = useMemo(() => {
     return new Map(storeItems.map((s) => [s.id, s]));
@@ -303,9 +320,23 @@ export function SingleMemorialClient({
     return "Anonymous";
   };
 
-  const handlePurchasePaidTribute = async (storeItemId: string) => {
+  const openPayTributeModal = (storeItemId: string) => {
     setCheckoutError(null);
+    setPayModalItemId(storeItemId);
+    setPayModalNote("");
+  };
 
+  const closePayTributeModal = () => {
+    if (checkoutLoadingItemId) return;
+    setPayModalItemId(null);
+    setPayModalNote("");
+    setCheckoutError(null);
+  };
+
+  const submitPaidTributeCheckout = async () => {
+    const storeItemId = payModalItemId;
+    if (!storeItemId) return;
+    setCheckoutError(null);
     setCheckoutLoadingItemId(storeItemId);
     try {
       const res = await fetch("/api/stripe/checkout", {
@@ -315,7 +346,8 @@ export function SingleMemorialClient({
         body: JSON.stringify({
           memorial_id: memorial.id,
           memorial_slug: memorial.slug,
-          store_item_id: storeItemId
+          store_item_id: storeItemId,
+          optional_message: payModalNote.trim() || undefined
         })
       });
 
@@ -325,9 +357,11 @@ export function SingleMemorialClient({
       }
 
       window.location.href = data.url as string;
-    } catch (e: any) {
+    } catch (e: unknown) {
       setCheckoutLoadingItemId(null);
-      setCheckoutError(e?.message ?? "Failed to start checkout.");
+      setCheckoutError(
+        e instanceof Error ? e.message : "Failed to start checkout."
+      );
     }
   };
 
@@ -485,15 +519,20 @@ export function SingleMemorialClient({
         )}
 
         {activePremiumHighlight && (
-          <section className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
+          <section
+            className="memorial-premium-glow rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50 to-amber-50/40 p-4"
+            aria-label="Premium tribute spotlight"
+          >
             <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-purple-100">
+              <div
+                className="memorial-premium-flicker flex h-12 w-12 items-center justify-center rounded-xl border border-purple-200 bg-white shadow-sm"
+              >
                 {activePremiumHighlight.item.image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={activePremiumHighlight.item.image_url}
                     alt={activePremiumHighlight.item.name ?? "Premium tribute"}
-                    className="h-10 w-10 object-cover rounded-lg"
+                    className="h-10 w-10 rounded-lg object-cover"
                   />
                 ) : (
                   <span className="text-lg" aria-hidden>
@@ -503,32 +542,38 @@ export function SingleMemorialClient({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-purple-900">
-                  Premium highlight
+                  Premium tribute — lit for the memorial
                 </p>
                 <p className="mt-1 text-xs text-purple-800">
-                  Highlights active until{" "}
+                  Spotlight until{" "}
                   {formatTributeDate(
                     activePremiumHighlight.tribute.highlight_until ?? ""
                   )}{" "}
                   · from {tributeDisplayName(activePremiumHighlight.tribute)}
                 </p>
+                {activePremiumHighlight.tribute.message?.trim() && (
+                  <p className="mt-2 rounded-lg border border-purple-100/80 bg-white/70 px-3 py-2 text-sm text-slate-800">
+                    &ldquo;{activePremiumHighlight.tribute.message.trim()}&rdquo;
+                  </p>
+                )}
               </div>
             </div>
           </section>
         )}
 
         {storeItems.length > 0 && (
-          <section>
+          <section aria-label="Virtual tribute shop">
             <div className="mb-2 flex items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-slate-800">
-                Leave a virtual tribute
+                Guestbook — virtual tributes
               </h2>
               <span className="rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
                 {storeItems.length} items
               </span>
             </div>
             <p className="mb-3 text-sm text-slate-500">
-              Choose a tribute to support this memorial.
+              Purchase a digital candle, flower, or symbol to attach to this guestbook. Premium
+              items include an animated spotlight at the top of the page for a set time.
             </p>
 
             <div className="grid gap-3 sm:grid-cols-2">
@@ -559,7 +604,7 @@ export function SingleMemorialClient({
                         </p>
                         {item.is_premium && (
                           <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700">
-                            Premium
+                            Premium · {item.highlight_duration_days ?? 30}d spotlight
                           </span>
                         )}
                       </div>
@@ -571,7 +616,7 @@ export function SingleMemorialClient({
 
                   <button
                     type="button"
-                    onClick={() => handlePurchasePaidTribute(item.id)}
+                    onClick={() => openPayTributeModal(item.id)}
                     disabled={checkoutLoadingItemId === item.id}
                     className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-amber-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
@@ -587,10 +632,10 @@ export function SingleMemorialClient({
           </section>
         )}
 
-        {/* Tributes */}
-        <section>
+        {/* Guestbook entries: free messages + paid virtual items */}
+        <section aria-label="Guestbook">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-slate-800">Tributes</h2>
+            <h2 className="text-lg font-semibold text-slate-800">Guestbook</h2>
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                 {approvedTributes.length} published
@@ -649,11 +694,11 @@ export function SingleMemorialClient({
 
           {approvedTributes.length === 0 && pendingGuestTributes.length === 0 ? (
             <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm">
-              No tributes yet. Leave a free message or purchase a paid tribute.
+              No guestbook entries yet. Leave a free message or purchase a virtual tribute above.
             </div>
           ) : approvedTributes.length === 0 ? (
             <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm">
-              No published tributes yet.
+              No published guestbook entries yet.
               {!canModerate &&
                 pendingGuestTributes.length > 0 &&
                 " Messages may appear after the memorial owner approves them."}
@@ -663,7 +708,7 @@ export function SingleMemorialClient({
               {freeTributes.length > 0 && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-slate-800">
-                    Free tributes
+                    Free condolences
                   </h3>
                   <div className="space-y-3">
                     {freeTributes.map((t) => (
@@ -696,15 +741,22 @@ export function SingleMemorialClient({
               {paidTributes.length > 0 && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-slate-800">
-                    Paid tributes
+                    Virtual tributes (purchased)
                   </h3>
                   <div className="space-y-3">
                     {paidTributes.map((t) => {
                       const item =
                         t.store_item_id ? storeItemById.get(t.store_item_id) : undefined;
                       const highlightLabel = t.highlight_until
-                        ? `Highlighted until ${formatTributeDate(t.highlight_until)}`
+                        ? `Spotlight until ${formatTributeDate(t.highlight_until)}`
                         : "";
+                      const spotlightActive =
+                        !!t.highlight_until &&
+                        new Date(t.highlight_until).getTime() > Date.now();
+                      const iconAnimClass =
+                        item?.is_premium && spotlightActive
+                          ? "memorial-premium-flicker"
+                          : "";
 
                       return (
                         <div
@@ -713,7 +765,9 @@ export function SingleMemorialClient({
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-start gap-3">
-                              <div className="h-10 w-10 overflow-hidden rounded-lg border border-purple-200 bg-white flex-shrink-0 flex items-center justify-center">
+                              <div
+                                className={`h-10 w-10 overflow-hidden rounded-lg border border-purple-200 bg-white flex-shrink-0 flex items-center justify-center ${iconAnimClass}`}
+                              >
                                 {item?.image_url ? (
                                   // eslint-disable-next-line @next/next/no-img-element
                                   <img
@@ -729,11 +783,16 @@ export function SingleMemorialClient({
                               </div>
                               <div className="min-w-0">
                               <p className="truncate text-sm font-semibold">
-                                {item?.name ?? "Paid tribute"}
+                                {item?.name ?? "Virtual tribute"}
                               </p>
                               <p className="mt-1 text-xs text-slate-600">
                                 {tributeDisplayName(t)}
                               </p>
+                              {t.message?.trim() && (
+                                <p className="mt-2 text-sm text-slate-800">
+                                  &ldquo;{t.message.trim()}&rdquo;
+                                </p>
+                              )}
                               {highlightLabel && (
                                 <p className="mt-2 text-xs font-medium text-purple-700">
                                   {highlightLabel}
@@ -770,7 +829,7 @@ export function SingleMemorialClient({
               onClick={() => setShowForm((v) => !v)}
               className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
             >
-              {showForm ? "Cancel" : "Leave a tribute"}
+              {showForm ? "Cancel" : "Write a free message"}
             </button>
             {showForm && (
               <form onSubmit={handleCreateTribute} className="mt-4 space-y-2">
@@ -984,6 +1043,67 @@ export function SingleMemorialClient({
           </div>
         )}
       </div>
+
+      {payModalItemId && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pay-tribute-title"
+          onClick={closePayTributeModal}
+        >
+          <div
+            className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3
+              id="pay-tribute-title"
+              className="text-lg font-semibold text-slate-900"
+            >
+              Complete your tribute
+            </h3>
+            <p className="mt-1 text-sm text-slate-600">
+              {storeItemById.get(payModalItemId)?.name ?? "Virtual tribute"} — you can add a short
+              message to show in the guestbook with your purchase (optional).
+            </p>
+            <label className="mt-4 block text-sm font-medium text-slate-700">
+              Message with your tribute{" "}
+              <span className="font-normal text-slate-500">(optional, max 200 characters)</span>
+            </label>
+            <textarea
+              value={payModalNote}
+              onChange={(e) => setPayModalNote(e.target.value.slice(0, 200))}
+              rows={3}
+              className="mt-1 w-full rounded-lg border border-slate-200 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              placeholder="With love…"
+            />
+            <p className="mt-1 text-xs text-slate-400">{payModalNote.length} / 200</p>
+            {checkoutError && payModalItemId && (
+              <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+                {checkoutError}
+              </p>
+            )}
+            <div className="mt-5 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={closePayTributeModal}
+                disabled={checkoutLoadingItemId !== null}
+                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitPaidTributeCheckout()}
+                disabled={checkoutLoadingItemId !== null}
+                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-amber-700 disabled:opacity-60"
+              >
+                {checkoutLoadingItemId ? "Redirecting…" : "Continue to payment"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

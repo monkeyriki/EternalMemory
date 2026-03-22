@@ -21,9 +21,9 @@ export default async function AdminPage() {
       getCount("memorials"),
       getCount("profiles"),
       getCount("virtual_tributes"),
-      // If guestbook_entries or is_approved doesn't exist, return 0
-      getCount("guestbook_entries", {
-        filter: (q) => q.eq("is_approved", false)
+      // Free-text guest messages awaiting owner/admin approval (guestbook / virtual tributes)
+      getCount("virtual_tributes", {
+        filter: (q) => q.eq("is_approved", false).is("store_item_id", null)
       })
     ]);
 
@@ -31,7 +31,7 @@ export default async function AdminPage() {
     { label: "Total memorials", value: memorialsCount },
     { label: "Total users", value: usersCount },
     { label: "Total tributes", value: tributesCount },
-    { label: "Pending moderation", value: pendingCount }
+    { label: "Pending guestbook messages", value: pendingCount }
   ];
 
   return (

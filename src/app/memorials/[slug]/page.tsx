@@ -190,7 +190,7 @@ export default async function MemorialSlugPage({
   const { data: storeItems } = await supabase
     .from("store_items")
     .select(
-      "id, name, price_cents, currency, image_url, category, is_premium"
+      "id, name, price_cents, currency, image_url, category, is_premium, highlight_duration_days"
     )
     .eq("is_active", true)
     .order("price_cents", { ascending: true });

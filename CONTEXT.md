@@ -74,6 +74,14 @@ Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`
 - Migration `supabase/migrations/20260318120000_memorial_tags_and_year_columns.sql`: `tags text[]` (GIN index), generated `birth_year` / `death_year` from date columns, B-tree indexes for range filters. Run in Supabase SQL Editor.
 - `/memorials/humans` and `/memorials/pets`: filter by birth/death year ranges + tag overlap (comma-separated in UI; memorials match if they share **any** listed tag). Memorial create/edit form includes optional tags field.
 
+## Virtual tributes & guestbook (PRD 3.4 — implemented)
+- **Free tier**: text-only condolences in `virtual_tributes` (`store_item_id` null); guests require owner/admin approval; logged-in users post approved immediately.
+- **Paid tier**: `store_items` (Stripe checkout + webhook) attach a virtual item (image/icon) to the same guestbook list.
+- **Premium tier**: `store_items.is_premium` + configurable **`highlight_duration_days`** (1–365, default 30): webhook sets `virtual_tributes.highlight_until`; UI shows an animated “lit” spotlight at the top (CSS in `globals.css`, respects `prefers-reduced-motion`).
+- **Optional note with purchase**: checkout modal collects up to 200 chars, passed in Stripe metadata and stored in `virtual_tributes.message` for paid rows.
+- **Copy/UI**: memorial page uses “Guestbook” naming; admin “Pending guestbook messages” counts unapproved free-text rows (`is_approved` false, `store_item_id` null).
+- **Migration**: `supabase/migrations/20260323_store_items_highlight_duration.sql` — run on Supabase.
+
 ## Ads (AdSense-style slots — implemented)
 - Migration `supabase/migrations/20260317000000_ads_free_ad_slots.sql`: `memorials.ads_free` (default `false`), `ad_slots` table + RLS (public read, admin write), seed rows `memorial_top` / `memorial_bottom`. **Apply on Supabase** before using ads.
 - Global toggle: `platform_settings.key = ads_enabled` with value `true` / `false` (also editable under **Admin → Settings**). **Admin → Ads** toggles the same key and edits slot HTML/snippets.

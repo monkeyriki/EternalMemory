@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { stripe } from "@/lib/stripe";
 import { assertPasswordMemorialInteractionAllowed } from "@/lib/memorialPasswordAccess";
+import { sanitizeTributeCheckoutMessage } from "@/lib/sanitizeTributeCheckoutMessage";
 
 export const runtime = "nodejs";
 
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
     const memorialId = body?.memorial_id as string | undefined;
     const memorialSlug = body?.memorial_slug as string | undefined;
     const storeItemId = body?.store_item_id as string | undefined;
+    const optionalMessage = sanitizeTributeCheckoutMessage(body?.optional_message);
 
     if (!memorialId || !memorialSlug || !storeItemId) {
       return NextResponse.json(
@@ -107,7 +109,8 @@ export async function POST(req: NextRequest) {
         memorial_id: memorialId,
         memorial_slug: memorialSlug,
         store_item_id: storeItemId,
-        purchaser_id: purchaserId
+        purchaser_id: purchaserId,
+        ...(optionalMessage ? { optional_message: optionalMessage } : {})
       }
     });
 

@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     const { data: storeItem, error: storeItemErr } = await supabase
       .from("store_items")
-      .select("id, name, is_premium")
+      .select("id, name, is_premium, highlight_duration_days")
       .eq("id", storeItemId)
       .maybeSingle();
 
@@ -138,14 +138,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "Store item not found" }, { status: 404 });
     }
 
+    let highlightDays: number;
+    if (storeItem.highlight_duration_days == null) {
+      highlightDays = 30;
+    } else {
+      highlightDays = Number(storeItem.highlight_duration_days);
+      if (!Number.isFinite(highlightDays)) highlightDays = 30;
+      highlightDays = Math.min(365, Math.max(1, Math.floor(highlightDays)));
+    }
+
     const highlightUntil = storeItem.is_premium
-      ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      ? new Date(Date.now() + highlightDays * 24 * 60 * 60 * 1000).toISOString()
       : null;
+
+    const rawNote = session.metadata?.optional_message as string | undefined;
+    const paidNote =
+      typeof rawNote === "string" && rawNote.trim().length > 0
+        ? rawNote.trim().slice(0, 200)
+        : null;
 
     const { error: tributeInsertErr } = await supabase.from("virtual_tributes").insert({
       memorial_id: memorialId,
       purchaser_id: purchaserUserId,
-      message: null,
+      message: paidNote,
       order_id: orderId,
       store_item_id: storeItemId,
       guest_name: null,
