@@ -54,13 +54,8 @@ export async function generateMetadata({
     return { title: "Memorial" };
   }
 
-  const isDraft = memorial.is_draft;
-  const isPasswordProtected =
-    memorial.visibility === "password_protected";
-  const isUnlisted = memorial.visibility === "unlisted";
-
-  // PRD: unlisted/password/draft must not be indexed; avoid rich previews for privacy.
-  if (isDraft || isPasswordProtected || isUnlisted) {
+  // Draft: no rich preview (not published for the world).
+  if (memorial.is_draft) {
     return {
       title: "Memorial",
       robots: {
@@ -77,6 +72,9 @@ export async function generateMetadata({
     };
   }
 
+  // PRD SEO & Social Sharing: dynamic OG — primary photo, full name, lifespan — for
+  // any published memorial when the link is shared (iMessage, Facebook, WhatsApp, etc.).
+  // Unlisted / password: still noindex in search engines, but link previews stay rich.
   const title = `${memorial.full_name} — Memorial`;
   const yearRange = formatYearRangeForMeta(
     memorial.date_of_birth,
@@ -87,20 +85,23 @@ export async function generateMetadata({
       ? `In loving memory of ${memorial.full_name}. ${yearRange}.`
       : `In loving memory of ${memorial.full_name}.`;
   const canonicalUrl = `${BASE_URL}/memorials/${memorial.slug}`;
+  const desc160 = description.slice(0, 160);
+
+  const cover =
+    memorial.cover_image_url && memorial.cover_image_url.trim().length > 0
+      ? memorial.cover_image_url.trim()
+      : null;
 
   const openGraph: Metadata["openGraph"] = {
     title,
-    description: description.slice(0, 160),
+    description: desc160,
     type: "website",
     url: canonicalUrl
   };
-  if (
-    memorial.cover_image_url &&
-    memorial.cover_image_url.trim().length > 0
-  ) {
+  if (cover) {
     openGraph.images = [
       {
-        url: memorial.cover_image_url,
+        url: cover,
         width: 1200,
         height: 630,
         alt: memorial.full_name
@@ -108,15 +109,37 @@ export async function generateMetadata({
     ];
   }
 
+  const twitterImages = cover
+    ? [
+        {
+          url: cover,
+          width: 1200,
+          height: 630,
+          alt: memorial.full_name
+        }
+      ]
+    : undefined;
+
+  const isPublic = memorial.visibility === "public";
+  const robots: Metadata["robots"] = isPublic
+    ? { index: true, follow: true, googleBot: { index: true, follow: true } }
+    : {
+        index: false,
+        follow: false,
+        googleBot: { index: false, follow: false }
+      };
+
   return {
     title,
-    description: description.slice(0, 160),
+    description: desc160,
     openGraph,
     twitter: {
-      card: "summary_large_image",
+      card: cover ? "summary_large_image" : "summary",
       title,
-      description: description.slice(0, 160)
-    }
+      description: desc160,
+      ...(twitterImages ? { images: twitterImages } : {})
+    },
+    robots
   };
 }
 
