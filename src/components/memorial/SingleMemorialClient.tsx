@@ -11,7 +11,8 @@ import {
   Twitter,
   Mail,
   MessageCircle,
-  Link2
+  Link2,
+  Flag
 } from "lucide-react";
 import {
   approveTributeAction,
@@ -21,6 +22,7 @@ import {
 import { generateQRAction } from "@/app/memorials/[slug]/qr/actions";
 import { MemorialStoryContent } from "@/components/memorial/MemorialStoryContent";
 import { AdSenseSlot } from "@/components/ads/AdSenseSlot";
+import { ReportContentModal } from "@/components/memorial/ReportContentModal";
 import type { MemorialAdsForClient } from "@/lib/memorialAds";
 
 type MemorialType = "human" | "pet";
@@ -147,6 +149,9 @@ export function SingleMemorialClient({
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [payModalItemId, setPayModalItemId] = useState<string | null>(null);
   const [payModalNote, setPayModalNote] = useState("");
+  const [reportModal, setReportModal] = useState<
+    null | { scope: "memorial" } | { scope: "tribute"; tributeId: string }
+  >(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -443,6 +448,16 @@ export function SingleMemorialClient({
               )}
             </div>
           </div>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setReportModal({ scope: "memorial" })}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 underline-offset-2 hover:text-amber-800 hover:underline"
+            >
+              <Flag className="h-3.5 w-3.5" aria-hidden />
+              Report this page
+            </button>
+          </div>
         </header>
 
         {memorialAds.show && memorialAds.topHtml && (
@@ -720,17 +735,32 @@ export function SingleMemorialClient({
                           {tributeDisplayName(t)}
                         </p>
                         <p>{t.message ?? ""}</p>
-                        <div className="mt-2 flex items-center justify-between gap-2 text-xs text-slate-400">
+                        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
                           <span>{formatTributeDate(t.created_at)}</span>
-                          {canModerate && (
+                          <div className="flex items-center gap-3">
                             <button
                               type="button"
-                              onClick={() => handleDeleteTribute(t.id)}
-                              className="text-red-500 hover:underline"
+                              onClick={() =>
+                                setReportModal({
+                                  scope: "tribute",
+                                  tributeId: t.id
+                                })
+                              }
+                              className="inline-flex items-center gap-1 font-medium text-slate-500 hover:text-amber-800 hover:underline"
                             >
-                              Delete
+                              <Flag className="h-3 w-3" aria-hidden />
+                              Report
                             </button>
-                          )}
+                            {canModerate && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteTribute(t.id)}
+                                className="text-red-500 hover:underline"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -802,17 +832,32 @@ export function SingleMemorialClient({
                             </div>
                           </div>
 
-                          <div className="mt-3 flex items-center justify-between gap-2 text-xs text-slate-400">
+                          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
                             <span>{formatTributeDate(t.created_at)}</span>
-                            {canModerate && (
+                            <div className="flex items-center gap-3">
                               <button
                                 type="button"
-                                onClick={() => handleDeleteTribute(t.id)}
-                                className="text-red-500 hover:underline"
+                                onClick={() =>
+                                  setReportModal({
+                                    scope: "tribute",
+                                    tributeId: t.id
+                                  })
+                                }
+                                className="inline-flex items-center gap-1 font-medium text-slate-500 hover:text-amber-800 hover:underline"
                               >
-                                Delete
+                                <Flag className="h-3 w-3" aria-hidden />
+                                Report
                               </button>
-                            )}
+                              {canModerate && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteTribute(t.id)}
+                                  className="text-red-500 hover:underline"
+                                >
+                                  Delete
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -1104,6 +1149,20 @@ export function SingleMemorialClient({
           </div>
         </div>
       )}
+
+      <ReportContentModal
+        memorialId={memorial.id}
+        tributeId={
+          reportModal?.scope === "tribute" ? reportModal.tributeId : null
+        }
+        title={
+          reportModal?.scope === "tribute"
+            ? "Report this guestbook entry"
+            : "Report this memorial"
+        }
+        open={reportModal !== null}
+        onClose={() => setReportModal(null)}
+      />
     </div>
   );
 }

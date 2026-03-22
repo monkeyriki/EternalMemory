@@ -124,3 +124,45 @@ A guest (${guestName}) left a condolence on ${memorialName}.
 Review and approve it in your admin panel: ${modLink}`;
   return { subject, html, text };
 }
+
+/** Owner notified that their memorial or a guestbook entry was reported (moderation team). */
+export function contentReportOwnerEmail({
+  ownerName,
+  memorialName,
+  memorialSlug,
+  reasonLabel,
+  isTributeReport,
+  reporterNote,
+  appUrl
+}: {
+  ownerName: string;
+  memorialName: string;
+  memorialSlug: string;
+  reasonLabel: string;
+  isTributeReport: boolean;
+  reporterNote: string | null;
+  appUrl: string;
+}): EmailContent {
+  const link = memorialLink(appUrl, memorialSlug);
+  const safeOwner = escapeHtml(ownerName);
+  const safeReason = escapeHtml(reasonLabel);
+  const target = isTributeReport
+    ? "A guestbook entry on your memorial was reported"
+    : "Your memorial page was reported";
+  const subject = `Content report — ${memorialName}`;
+  const noteBlock =
+    reporterNote && reporterNote.trim().length > 0
+      ? `<p><strong>Reporter note (may be empty):</strong></p><blockquote style="margin:0 0 1em;border-left:3px solid #e2e8f0;padding-left:12px;color:#475569;">${escapeHtml(reporterNote.trim())}</blockquote>`
+      : "";
+  const html = `<p>Hi ${safeOwner},</p>
+<p>${escapeHtml(target)}. Reason category: <strong>${safeReason}</strong>.</p>
+${noteBlock}
+<p>Our team may review and take action if needed. If you believe this is a mistake, you can reply to this email or contact support.</p>
+<p><a href="${escapeHtml(link)}">View your memorial</a></p>`;
+  const text = `Hi ${ownerName},
+
+${target}. Reason: ${reasonLabel}.
+
+${reporterNote?.trim() ? `Note from reporter:\n${reporterNote.trim()}\n\n` : ""}View your memorial: ${link}`;
+  return { subject, html, text };
+}

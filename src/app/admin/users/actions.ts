@@ -44,7 +44,8 @@ export async function assignB2BRoleAction(userId: string): Promise<AssignB2BResu
   if (!target) {
     return { ok: false, error: "User not found." };
   }
-  if (target.role === "admin") {
+  const targetRole = (target as { role: string }).role;
+  if (targetRole === "admin") {
     return { ok: false, error: "Cannot change admin role." };
   }
 

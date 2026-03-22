@@ -68,7 +68,12 @@ This repository implements the **Digital Memorial & Obituary Platform** describe
 - Users must never be able to self-promote roles.
 
 ## Current DB (as created via SQL Editor)
-Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`, `store_items`, `orders`, `virtual_tributes`, `b2b_subscriptions`, `qr_codes`, `ad_slots`, `platform_settings`.
+Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`, `store_items`, `orders`, `virtual_tributes`, `b2b_subscriptions`, `qr_codes`, `ad_slots`, `platform_settings`, `content_reports`.
+
+## Content reports (user flags — implemented)
+- **Migration**: `supabase/migrations/20260326_content_reports.sql` — enum reasons/status, RLS (anyone **INSERT**, admin **SELECT/UPDATE/DELETE**).
+- **Memorial page**: “Report this page” under the header; per–guestbook entry **Report** on published free/paid rows. Server action `submitContentReportAction` validates tribute ↔ memorial, optional EN profanity on reporter note, password-gate via `assertPasswordMemorialInteractionAllowed` (same as guestbook).
+- **Admin → Reports** (`/admin/reports`): queue sorted with **open** first; actions — dismiss, mark reviewed, email owner (`contentReportOwnerEmail` + Resend), remove guestbook entry (`deleteTributeAction`), remove entire memorial (double-click confirm; cascades).
 
 ## Directory: years & tags (PRD advanced search)
 - Migration `supabase/migrations/20260318120000_memorial_tags_and_year_columns.sql`: `tags text[]` (GIN index), generated `birth_year` / `death_year` from date columns, B-tree indexes for range filters. Run in Supabase SQL Editor.

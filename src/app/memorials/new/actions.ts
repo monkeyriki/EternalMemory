@@ -20,8 +20,6 @@ export type CreateMemorialInput = {
   /** Additional photos (not cover); max 24 URLs */
   galleryImageUrls?: string[];
   tags?: string[];
-  /** Premium memorial — hide platform ads */
-  adsFree?: boolean;
 };
 
 export type CreateMemorialResult =
@@ -76,8 +74,7 @@ export async function createMemorialAction(
     is_draft,
     story: input.story ?? null,
     cover_image_url: input.coverImageUrl ?? null,
-    tags: normalizeTagArray(input.tags),
-    ads_free: input.adsFree === true
+    tags: normalizeTagArray(input.tags)
   };
 
   // Logs appear in the terminal where `npm run dev` runs (not the browser console).
