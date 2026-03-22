@@ -74,6 +74,11 @@ Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`
 - Migration `supabase/migrations/20260318120000_memorial_tags_and_year_columns.sql`: `tags text[]` (GIN index), generated `birth_year` / `death_year` from date columns, B-tree indexes for range filters. Run in Supabase SQL Editor.
 - `/memorials/humans` and `/memorials/pets`: filter by birth/death year ranges + tag overlap (comma-separated in UI; memorials match if they share **any** listed tag). Memorial create/edit form includes optional tags field.
 
+## Store items — CMS (PRD 4.1)
+- **Admin → Store**: full CRUD for `store_items` including **Delete** (blocked if any `virtual_tributes` reference the item).
+- **Images**: upload **SVG / PNG / JPEG / WebP** (max 2MB) to Supabase Storage bucket **`store-items`**, or paste an external **image URL**.
+- **Migration**: `supabase/migrations/20260324_storage_store_items_bucket.sql` creates the public bucket and storage policies (admin write, public read). Apply in SQL Editor if uploads fail with “bucket not found”.
+
 ## Virtual tributes & guestbook (PRD 3.4 — implemented)
 - **Free tier**: text-only condolences in `virtual_tributes` (`store_item_id` null); guests require owner/admin approval; logged-in users post approved immediately.
 - **Paid tier**: `store_items` (Stripe checkout + webhook) attach a virtual item (image/icon) to the same guestbook list.

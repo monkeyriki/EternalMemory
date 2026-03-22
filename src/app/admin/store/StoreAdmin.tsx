@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   createStoreItemAction,
+  deleteStoreItemAction,
   toggleStoreItemActiveAction,
   updateStoreItemAction,
   type StoreItemInput
 } from "./actions";
+import { uploadStoreItemImageAction } from "./uploadStoreItemImage";
 
 type StoreItem = {
   id: string;
@@ -50,26 +52,27 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
   const [form, setForm] = useState<StoreItemInput>(() => toInput());
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
-  const activeItem = useMemo(
-    () => (editingId && editingId !== "new" ? items.find((i) => i.id === editingId) : null),
-    [editingId, items]
-  );
+  const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const startNew = () => {
     setError(null);
+    setImageUploadError(null);
     setEditingId("new");
     setForm(toInput());
   };
 
   const startEdit = (id: string) => {
     setError(null);
+    setImageUploadError(null);
     setEditingId(id);
     setForm(toInput(items.find((i) => i.id === id)));
   };
 
   const cancel = () => {
     setError(null);
+    setImageUploadError(null);
     setEditingId(null);
   };
 
@@ -96,6 +99,28 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
       setError(e?.message ?? "Something went wrong");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteItem = async (id: string) => {
+    if (
+      !window.confirm(
+        "Delete this store item permanently? This cannot be undone if the item has no tribute history."
+      )
+    ) {
+      return;
+    }
+    setError(null);
+    setDeletingId(id);
+    const res = await deleteStoreItemAction(id);
+    setDeletingId(null);
+    if (!res.ok) {
+      setError(res.error ?? "Delete failed");
+      return;
+    }
+    setItems((prev) => prev.filter((i) => i.id !== id));
+    if (editingId === id) {
+      setEditingId(null);
     }
   };
 
@@ -210,15 +235,60 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
               />
             </div>
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-2 space-y-2">
               <label className="mb-1 block text-sm font-medium text-slate-700">
-                Image URL
+                Item image
+              </label>
+              <p className="text-xs text-slate-500">
+                Upload an SVG or PNG (max 2MB), or paste a public image URL below.
+              </p>
+              <input
+                type="file"
+                accept="image/svg+xml,image/png,image/jpeg,image/webp,.svg"
+                disabled={saving || imageUploadLoading}
+                className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-amber-800 hover:file:bg-amber-100"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!f) return;
+                  setImageUploadError(null);
+                  setImageUploadLoading(true);
+                  const fd = new FormData();
+                  fd.set("file", f);
+                  const result = await uploadStoreItemImageAction(fd);
+                  setImageUploadLoading(false);
+                  if (result.ok && result.url) {
+                    setForm((prev) => ({ ...prev, image_url: result.url! }));
+                  } else {
+                    setImageUploadError(result.error ?? "Upload failed");
+                  }
+                }}
+              />
+              {imageUploadLoading && (
+                <p className="text-xs text-slate-500">Uploading…</p>
+              )}
+              {imageUploadError && (
+                <p className="text-xs text-red-600">{imageUploadError}</p>
+              )}
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Or image URL
               </label>
               <input
                 value={form.image_url}
                 onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="https://…"
               />
+              {form.image_url.trim() && (
+                <div className="mt-2 flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={form.image_url.trim()}
+                    alt=""
+                    className="h-16 w-16 rounded-lg border border-slate-200 bg-white object-contain p-1"
+                  />
+                </div>
+              )}
             </div>
             <label className="flex items-center gap-2 text-sm text-slate-700 sm:col-span-2">
               <input
@@ -324,6 +394,14 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
                   className="text-sm text-amber-700 underline-offset-2 hover:underline"
                 >
                   Toggle active
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleDeleteItem(i.id)}
+                  disabled={deletingId === i.id}
+                  className="text-sm text-red-600 underline-offset-2 hover:underline disabled:opacity-50"
+                >
+                  {deletingId === i.id ? "Deleting…" : "Delete"}
                 </button>
               </div>
             </div>
