@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { MemorialAdsForClient } from "@/lib/memorialAds";
 import { SingleMemorialClient } from "./SingleMemorialClient";
 
 type PasswordGateWrapperProps = {
@@ -13,6 +14,7 @@ type PasswordGateWrapperProps = {
   /** After password unlock, preserve real owner/admin so moderation UI works. */
   isOwner: boolean;
   isAdmin: boolean;
+  memorialAds?: MemorialAdsForClient;
 };
 
 const storageKeyForSlug = (slug: string) => `memorial_access_${slug}`;
@@ -25,7 +27,8 @@ export function PasswordGateWrapper({
   galleryMedia = [],
   isAuthenticated,
   isOwner,
-  isAdmin
+  isAdmin,
+  memorialAds = { show: false }
 }: PasswordGateWrapperProps) {
   const [unlocked, setUnlocked] = useState(false);
 
@@ -48,6 +51,7 @@ export function PasswordGateWrapper({
         tributes={tributes}
         storeItems={storeItems}
         galleryMedia={galleryMedia}
+        memorialAds={memorialAds}
       />
     );
   }

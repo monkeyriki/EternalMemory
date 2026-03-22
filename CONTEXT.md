@@ -74,6 +74,13 @@ Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`
 - Migration `supabase/migrations/20260318120000_memorial_tags_and_year_columns.sql`: `tags text[]` (GIN index), generated `birth_year` / `death_year` from date columns, B-tree indexes for range filters. Run in Supabase SQL Editor.
 - `/memorials/humans` and `/memorials/pets`: filter by birth/death year ranges + tag overlap (comma-separated in UI; memorials match if they share **any** listed tag). Memorial create/edit form includes optional tags field.
 
+## Ads (AdSense-style slots — implemented)
+- Migration `supabase/migrations/20260317000000_ads_free_ad_slots.sql`: `memorials.ads_free` (default `false`), `ad_slots` table + RLS (public read, admin write), seed rows `memorial_top` / `memorial_bottom`. **Apply on Supabase** before using ads.
+- Global toggle: `platform_settings.key = ads_enabled` with value `true` / `false` (also editable under **Admin → Settings**). **Admin → Ads** toggles the same key and edits slot HTML/snippets.
+- Memorial UI: fixed slots **below the header** (`memorial_top`) and **above the share/footer** (`memorial_bottom`). Scripts in snippets run client-side via `AdSenseSlot`.
+- **Premium / no ads**: create/edit memorial → “Premium memorial (no ads)” sets `ads_free`; those pages never load slots while global ads are on.
+- If Content-Security-Policy blocks third-party scripts, relax policy for AdSense domains as needed.
+
 ## B2B Partner (MVP demo — implemented in app)
 - Migration `supabase/migrations/20260317200000_b2b_partner.sql`: `memorials.managed_by_partner_id`, RLS (insert WITH CHECK for partner column, select/update/delete for managed memorials), unique index on `b2b_subscriptions(provider_subscription_id)` for webhook upserts. **Run this SQL on Supabase before using B2B.**
 - Stripe: `POST /api/stripe/b2b-checkout` (subscription mode, `STRIPE_B2B_PRICE_ID`); `POST /api/stripe/b2b-webhook` with **`STRIPE_B2B_WEBHOOK_SECRET`** (separate endpoint from tribute webhook).

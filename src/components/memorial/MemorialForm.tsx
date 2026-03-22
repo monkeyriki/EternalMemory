@@ -35,6 +35,8 @@ export interface MemorialFormData {
   galleryImageUrls?: string[];
   /** Normalized tag slugs (server re-validates) */
   tags?: string[];
+  /** Premium / no third-party ads on this memorial */
+  adsFree?: boolean;
 }
 
 type MemorialFormMode = "create" | "edit";
@@ -52,6 +54,7 @@ type MemorialInitialData = {
   story: string | null;
   cover_image_url: string | null;
   gallery_image_urls?: string[] | null;
+  ads_free?: boolean | null;
 };
 
 interface MemorialFormProps {
@@ -100,6 +103,7 @@ export default function MemorialForm({
   const [galleryUploadLoading, setGalleryUploadLoading] = useState(false);
   const [galleryError, setGalleryError] = useState<string | null>(null);
   const [tagsInput, setTagsInput] = useState("");
+  const [adsFree, setAdsFree] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -116,6 +120,7 @@ export default function MemorialForm({
       setStatus(initialData.is_draft ? "draft" : "publish");
       setCoverImageUrl(initialData.cover_image_url ?? "");
       setGalleryUrls(initialData.gallery_image_urls ?? []);
+      setAdsFree(!!initialData.ads_free);
     }
   }, [isEdit, initialData]);
 
@@ -154,7 +159,8 @@ export default function MemorialForm({
       fullName: fullName.trim(),
       slug: slug.trim(),
       visibility,
-      status
+      status,
+      adsFree
     };
     if (dateOfBirth) data.dateOfBirth = dateOfBirth;
     if (dateOfDeath) data.dateOfDeath = dateOfDeath;
@@ -565,6 +571,29 @@ export default function MemorialForm({
                 )}
               </div>
             )}
+          </section>
+
+          <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm space-y-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
+              Ads &amp; premium
+            </p>
+            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-stone-200 p-3 transition-colors hover:bg-stone-50">
+              <input
+                type="checkbox"
+                checked={adsFree}
+                onChange={(e) => setAdsFree(e.target.checked)}
+                disabled={isLoading}
+                className="mt-1 h-4 w-4 rounded border-stone-300 text-amber-700 focus:ring-amber-500"
+              />
+              <span>
+                <span className="block text-sm font-medium text-stone-800">
+                  Premium memorial (no ads)
+                </span>
+                <span className="mt-0.5 block text-xs text-stone-500">
+                  When enabled, platform advertising is not shown on this page.
+                </span>
+              </span>
+            </label>
           </section>
 
           <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">

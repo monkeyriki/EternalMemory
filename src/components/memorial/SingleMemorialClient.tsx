@@ -20,6 +20,8 @@ import {
 } from "@/app/memorials/[slug]/tributes/actions";
 import { generateQRAction } from "@/app/memorials/[slug]/qr/actions";
 import { MemorialStoryContent } from "@/components/memorial/MemorialStoryContent";
+import { AdSenseSlot } from "@/components/ads/AdSenseSlot";
+import type { MemorialAdsForClient } from "@/lib/memorialAds";
 
 type MemorialType = "human" | "pet";
 
@@ -58,6 +60,8 @@ export type SingleMemorialProps = {
     // Optional fields – may or may not exist in DB
     story?: string | null;
     cover_image_url?: string | null;
+    /** When true, memorial page does not show platform ads */
+    ads_free?: boolean | null;
   };
   isOwner: boolean;
   isAdmin: boolean;
@@ -65,6 +69,7 @@ export type SingleMemorialProps = {
   tributes: TributeItem[];
   storeItems: StoreItem[];
   galleryMedia?: { id: string; image_url: string }[];
+  memorialAds?: MemorialAdsForClient;
 };
 
 function formatYear(date?: string | null): string | null {
@@ -120,7 +125,8 @@ export function SingleMemorialClient({
   isAuthenticated,
   tributes: initialTributes,
   storeItems,
-  galleryMedia = []
+  galleryMedia = [],
+  memorialAds = { show: false }
 }: SingleMemorialProps) {
   const [shareUrl, setShareUrl] = useState("");
   const [shareToast, setShareToast] = useState<string | null>(null);
@@ -404,6 +410,12 @@ export function SingleMemorialClient({
             </div>
           </div>
         </header>
+
+        {memorialAds.show && memorialAds.topHtml && (
+          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/80 p-3">
+            <AdSenseSlot html={memorialAds.topHtml} className="text-center" />
+          </div>
+        )}
 
         {/* Cover photo */}
         <section className="space-y-3">
@@ -810,6 +822,12 @@ export function SingleMemorialClient({
             )}
           </div>
         </section>
+
+        {memorialAds.show && memorialAds.bottomHtml && (
+          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/80 p-3">
+            <AdSenseSlot html={memorialAds.bottomHtml} className="text-center" />
+          </div>
+        )}
 
         {/* Actions bar */}
         <footer className="border-t border-slate-100 pt-5 flex flex-col gap-4">

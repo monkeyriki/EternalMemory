@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { buildMemorialAdsPayload } from "@/lib/memorialAds";
 import { SingleMemorialClient } from "@/components/memorial/SingleMemorialClient";
 import { PasswordGateWrapper } from "@/components/memorial/PasswordGateWrapper";
 import type { Metadata } from "next";
@@ -168,12 +169,14 @@ export default async function MemorialSlugPage({
   const { data: memorial } = await supabase
     .from("memorials")
     .select(
-      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, password_hash"
+      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, password_hash, ads_free"
     )
     .eq("slug", slug)
     .maybeSingle();
 
   if (!memorial) return notFound();
+
+  const memorialAds = await buildMemorialAdsPayload(supabase, memorial);
 
   const { data: tributes } = await supabase
     .from("virtual_tributes")
@@ -231,6 +234,7 @@ export default async function MemorialSlugPage({
         isAuthenticated={!!user}
         isOwner={isOwner}
         isAdmin={isAdmin}
+        memorialAds={memorialAds}
       />
     );
   }
@@ -244,6 +248,7 @@ export default async function MemorialSlugPage({
       tributes={tributesForClient}
       storeItems={storeItems ?? []}
       galleryMedia={galleryMedia}
+      memorialAds={memorialAds}
     />
   );
 }

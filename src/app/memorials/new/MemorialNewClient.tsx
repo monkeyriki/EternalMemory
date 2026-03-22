@@ -29,7 +29,8 @@ export default function MemorialNewClient() {
       story: data.story,
       coverImageUrl: data.coverImageUrl,
       galleryImageUrls: data.galleryImageUrls ?? [],
-      tags: data.tags ?? []
+      tags: data.tags ?? [],
+      adsFree: data.adsFree === true
     });
     setIsLoading(false);
 

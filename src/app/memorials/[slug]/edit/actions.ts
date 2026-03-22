@@ -18,6 +18,7 @@ type UpdateMemorialInput = {
   coverImageUrl: string | null;
   galleryImageUrls?: string[];
   tags?: string[];
+  adsFree?: boolean;
 };
 
 type UpdateMemorialResult = {
@@ -73,6 +74,7 @@ export async function updateMemorialAction(
   updates.date_of_death = input.dateOfDeath ?? null;
   updates.city = input.city ?? null;
   updates.tags = normalizeTagArray(input.tags);
+  updates.ads_free = input.adsFree === true;
 
   const { error: updateError } = await supabase
     .from("memorials")
