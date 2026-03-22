@@ -74,6 +74,13 @@ Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`
 - Migration `supabase/migrations/20260318120000_memorial_tags_and_year_columns.sql`: `tags text[]` (GIN index), generated `birth_year` / `death_year` from date columns, B-tree indexes for range filters. Run in Supabase SQL Editor.
 - `/memorials/humans` and `/memorials/pets`: filter by birth/death year ranges + tag overlap (comma-separated in UI; memorials match if they share **any** listed tag). Memorial create/edit form includes optional tags field.
 
+## Profanity filter (PRD — EN, hard block)
+- **`blocked_words`** table: `word` (single word or phrase), `is_active`. Public **SELECT** (for server checks with anon/guest); **write** = admin only.
+- **One-shot SQL (schema + RLS + EN seed list)**: `supabase/sql/blocked_words_complete.sql` — run in SQL Editor for a full setup.
+- **Migration only (empty table)**: `supabase/migrations/20260325_blocked_words.sql`.
+- **Applied in**: guestbook message + guest name (`createTributeAction`); optional paid-tribute checkout message (`/api/stripe/checkout`). **Not** on memorial story/title (avoid false positives).
+- **Behavior**: block with user message, **do not save**. Add terms via SQL (future: admin UI + `invalidateBlockedWordsCache`).
+
 ## Store items — CMS (PRD 4.1)
 - **Admin → Store**: full CRUD for `store_items` including **Delete** (blocked if any `virtual_tributes` reference the item).
 - **Images**: upload **SVG / PNG / JPEG / WebP** (max 2MB) to Supabase Storage bucket **`store-items`**, or paste an external **image URL**.

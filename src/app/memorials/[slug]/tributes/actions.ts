@@ -5,6 +5,11 @@ import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { sendTransactionalEmail } from "@/lib/resendEmail";
 import { guestTributePendingOwnerEmail } from "@/lib/emailTemplates";
 import { assertPasswordMemorialInteractionAllowed } from "@/lib/memorialPasswordAccess";
+import {
+  getActiveBlockedWordsEn,
+  PROFANITY_BLOCKED_MESSAGE,
+  textMatchesBlockedTerms
+} from "@/lib/profanityEn";
 
 type CreateTributeInput = {
   memorial_id: string;
@@ -49,6 +54,14 @@ export async function createTributeAction(
   );
   if (!access.ok) {
     return { ok: false, error: access.error };
+  }
+
+  const blocked = await getActiveBlockedWordsEn(supabase);
+  if (textMatchesBlockedTerms(message, blocked)) {
+    return { ok: false, error: PROFANITY_BLOCKED_MESSAGE };
+  }
+  if (guestName && textMatchesBlockedTerms(guestName, blocked)) {
+    return { ok: false, error: PROFANITY_BLOCKED_MESSAGE };
   }
 
   if (user) {

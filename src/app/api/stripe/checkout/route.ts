@@ -3,6 +3,11 @@ import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { stripe } from "@/lib/stripe";
 import { assertPasswordMemorialInteractionAllowed } from "@/lib/memorialPasswordAccess";
 import { sanitizeTributeCheckoutMessage } from "@/lib/sanitizeTributeCheckoutMessage";
+import {
+  getActiveBlockedWordsEn,
+  PROFANITY_BLOCKED_MESSAGE,
+  textMatchesBlockedTerms
+} from "@/lib/profanityEn";
 
 export const runtime = "nodejs";
 
@@ -43,6 +48,16 @@ export async function POST(req: NextRequest) {
     const {
       data: { user }
     } = await supabase.auth.getUser();
+
+    if (optionalMessage) {
+      const blocked = await getActiveBlockedWordsEn(supabase);
+      if (textMatchesBlockedTerms(optionalMessage, blocked)) {
+        return NextResponse.json(
+          { ok: false, error: PROFANITY_BLOCKED_MESSAGE },
+          { status: 400 }
+        );
+      }
+    }
 
     const purchaserId = user?.id ?? "guest";
 
