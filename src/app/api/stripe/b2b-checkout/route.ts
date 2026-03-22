@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { stripe } from "@/lib/stripe";
+import { assertIpNotBannedFromHeaders } from "@/lib/ipBanCheck";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
+    const ipBlock = await assertIpNotBannedFromHeaders(req.headers);
+    if (!ipBlock.ok) {
+      return NextResponse.json(
+        { ok: false, error: ipBlock.error },
+        { status: 403 }
+      );
+    }
+
     const priceId = process.env.STRIPE_B2B_PRICE_ID?.trim();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
     if (!priceId) {

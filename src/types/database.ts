@@ -339,6 +339,72 @@ export type Database = {
         }
         Relationships: []
       }
+      ip_bans: {
+        Row: {
+          id: string
+          cidr: string
+          reason: string | null
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+        }
+        Insert: {
+          id?: string
+          cidr: string
+          reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+        }
+        Update: {
+          id?: string
+          cidr?: string
+          reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+        }
+        Relationships: []
+      }
+      content_reports: {
+        Row: {
+          id: string
+          reporter_id: string | null
+          memorial_id: string
+          tribute_id: string | null
+          reason: "spam" | "offensive" | "inappropriate" | "other"
+          custom_message: string | null
+          status: "open" | "reviewed" | "dismissed"
+          created_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+        }
+        Insert: {
+          id?: string
+          reporter_id?: string | null
+          memorial_id: string
+          tribute_id?: string | null
+          reason: "spam" | "offensive" | "inappropriate" | "other"
+          custom_message?: string | null
+          status?: "open" | "reviewed" | "dismissed"
+          created_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+        }
+        Update: {
+          id?: string
+          reporter_id?: string | null
+          memorial_id?: string
+          tribute_id?: string | null
+          reason?: "spam" | "offensive" | "inappropriate" | "other"
+          custom_message?: string | null
+          status?: "open" | "reviewed" | "dismissed"
+          created_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -499,6 +565,7 @@ export type Database = {
     }
     Functions: {
       is_admin: { Args: never; Returns: boolean }
+      is_ip_address_banned: { Args: { check_ip: string }; Returns: boolean }
       is_b2b: { Args: never; Returns: boolean }
     }
     Enums: {

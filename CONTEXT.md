@@ -70,6 +70,12 @@ This repository implements the **Digital Memorial & Obituary Platform** describe
 ## Current DB (as created via SQL Editor)
 Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`, `store_items`, `orders`, `virtual_tributes`, `b2b_subscriptions`, `qr_codes`, `ad_slots`, `platform_settings`, `content_reports`.
 
+## Super-admin takedown & IP bans (implemented)
+- **Migration**: `supabase/migrations/20260327_ip_bans_and_memorials_admin_select.sql` — table `ip_bans` (cidr, reason, expires_at), RLS admin-only CRUD; RPC `is_ip_address_banned(check_ip text)` granted to `anon` for middleware; policy **`memorials_select_admin_all`** so admins can list all memorials for CMS search.
+- **Admin → Memorials** (`/admin/memorials`): search by name/slug, paginated list, **Delete memorial** (permanent).
+- **Admin → IP bans** (`/admin/ip-bans`): add IPv4/IPv6 or CIDR, optional expiry; remove ban. **Middleware** calls `is_ip_address_banned` on every matched request; **server checks** also on tribute create, content report, memorial create, Stripe checkout, B2B checkout, password verify API.
+- **Exemptions**: users with **`profiles.role = admin`** (session valid) skip IP ban everywhere. Optional env **`IP_BAN_EXEMPT_IPS`** (comma-separated) for trusted IPs without logging in (recovery).
+
 ## Content reports (user flags — implemented)
 - **Migration**: `supabase/migrations/20260326_content_reports.sql` — enum reasons/status, RLS (anyone **INSERT**, admin **SELECT/UPDATE/DELETE**).
 - **Memorial page**: “Report this page” under the header; per–guestbook entry **Report** on published free/paid rows. Server action `submitContentReportAction` validates tribute ↔ memorial, optional EN profanity on reporter note, password-gate via `assertPasswordMemorialInteractionAllowed` (same as guestbook).

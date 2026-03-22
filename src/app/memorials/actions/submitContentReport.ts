@@ -11,6 +11,7 @@ import {
   textMatchesBlockedTerms
 } from "@/lib/profanityEn";
 import { assertPasswordMemorialInteractionAllowed } from "@/lib/memorialPasswordAccess";
+import { assertIpNotBanned } from "@/lib/ipBanCheck";
 
 export type SubmitContentReportResult =
   | { ok: true }
@@ -33,6 +34,11 @@ export async function submitContentReportAction(input: {
     return { ok: false, error: "Please choose a valid reason." };
   }
   const reason = input.reason as ContentReportReason;
+
+  const ipOk = await assertIpNotBanned();
+  if (!ipOk.ok) {
+    return { ok: false, error: ipOk.error };
+  }
 
   let custom =
     typeof input.custom_message === "string"

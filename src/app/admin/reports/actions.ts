@@ -1,32 +1,12 @@
 "use server";
 
-import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { deleteTributeAction } from "@/app/memorials/[slug]/tributes/actions";
 import { sendTransactionalEmail } from "@/lib/resendEmail";
 import { contentReportOwnerEmail } from "@/lib/emailTemplates";
 import { CONTENT_REPORT_REASON_LABELS, type ContentReportReason } from "@/lib/contentReport";
-
-async function requireAdmin() {
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) return { ok: false as const, error: "Not authenticated", user: null, supabase };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profile?.role !== "admin") {
-    return { ok: false as const, error: "Not authorized", user: null, supabase };
-  }
-
-  return { ok: true as const, user, supabase };
-}
+import { requireAdmin } from "@/lib/requireAdmin";
+import { deleteMemorialAsAdminAction } from "@/app/admin/memorials/actions";
 
 export type ReportActionResult =
   | { ok: true }
@@ -115,18 +95,11 @@ export async function removeTributeAndReviewReportAction(
   return { ok: true };
 }
 
-/** Delete the memorial (cascades related data and reports). */
-export async function removeMemorialAsAdminAction(memorialId: string): Promise<ReportActionResult> {
-  const guard = await requireAdmin();
-  if (!guard.ok || !guard.user) return { ok: false, error: guard.error };
-
-  const { error } = await guard.supabase.from("memorials").delete().eq("id", memorialId);
-
-  if (error) {
-    console.error("[removeMemorialAsAdminAction]", error);
-    return { ok: false, error: "Could not remove memorial." };
-  }
-  return { ok: true };
+/** @deprecated Use deleteMemorialAsAdminAction from @/app/admin/memorials/actions */
+export async function removeMemorialAsAdminAction(
+  memorialId: string
+): Promise<ReportActionResult> {
+  return deleteMemorialAsAdminAction(memorialId);
 }
 
 export async function notifyOwnerAboutReportAction(reportId: string): Promise<ReportActionResult> {

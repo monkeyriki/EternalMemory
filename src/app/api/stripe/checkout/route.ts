@@ -8,11 +8,20 @@ import {
   PROFANITY_BLOCKED_MESSAGE,
   textMatchesBlockedTerms
 } from "@/lib/profanityEn";
+import { assertIpNotBannedFromHeaders } from "@/lib/ipBanCheck";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
+    const ipBlock = await assertIpNotBannedFromHeaders(req.headers);
+    if (!ipBlock.ok) {
+      return NextResponse.json(
+        { ok: false, error: ipBlock.error },
+        { status: 403 }
+      );
+    }
+
     const raw = await req.text();
     let body: any;
     try {

@@ -10,6 +10,7 @@ import {
   PROFANITY_BLOCKED_MESSAGE,
   textMatchesBlockedTerms
 } from "@/lib/profanityEn";
+import { assertIpNotBanned } from "@/lib/ipBanCheck";
 
 type CreateTributeInput = {
   memorial_id: string;
@@ -25,6 +26,11 @@ type TributeActionResult = {
 export async function createTributeAction(
   input: CreateTributeInput
 ): Promise<TributeActionResult> {
+  const ipOk = await assertIpNotBanned();
+  if (!ipOk.ok) {
+    return { ok: false, error: ipOk.error };
+  }
+
   const supabase = await getSupabaseServerClient();
   const {
     data: { user }

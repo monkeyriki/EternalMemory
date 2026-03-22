@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { replaceMemorialGalleryRows } from "@/app/memorials/actions/syncMemorialGallery";
 import { normalizeTagArray } from "@/lib/memorialTags";
+import { assertIpNotBanned } from "@/lib/ipBanCheck";
 
 export type CreateMemorialInput = {
   type: "human" | "pet";
@@ -31,6 +32,11 @@ const BCRYPT_ROUNDS = 12;
 export async function createMemorialAction(
   input: CreateMemorialInput
 ): Promise<CreateMemorialResult> {
+  const ipOk = await assertIpNotBanned();
+  if (!ipOk.ok) {
+    return { ok: false, error: ipOk.error };
+  }
+
   const supabase = await getSupabaseServerClient();
   const {
     data: { user }

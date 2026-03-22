@@ -6,11 +6,17 @@ import {
   memorialGateCookieSerializeOptions,
   signMemorialGateCookie
 } from "@/lib/memorialGateCookie";
+import { assertIpNotBannedFromHeaders } from "@/lib/ipBanCheck";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
+  const ipBlock = await assertIpNotBannedFromHeaders(req.headers);
+  if (!ipBlock.ok) {
+    return NextResponse.json({ ok: false, error: ipBlock.error }, { status: 403 });
+  }
+
   const { password } = await req.json();
   const slug = params.slug.toLowerCase();
 
