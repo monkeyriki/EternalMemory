@@ -4,7 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { MapPin } from "lucide-react";
+import {
+  MapPin,
+  Facebook,
+  Instagram,
+  Twitter,
+  Mail,
+  MessageCircle,
+  Link2
+} from "lucide-react";
 import {
   approveTributeAction,
   createTributeAction,
@@ -114,7 +122,8 @@ export function SingleMemorialClient({
   storeItems,
   galleryMedia = []
 }: SingleMemorialProps) {
-  const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [shareToast, setShareToast] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
   const [qrError, setQrError] = useState<string | null>(null);
@@ -131,16 +140,24 @@ export function SingleMemorialClient({
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!copied) return;
-    const t = setTimeout(() => setCopied(false), 2000);
+    if (typeof window !== "undefined") {
+      setShareUrl(window.location.href);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!shareToast) return;
+    const t = setTimeout(() => setShareToast(null), 3500);
     return () => clearTimeout(t);
-  }, [copied]);
+  }, [shareToast]);
 
   const storeItemById = useMemo(() => {
     return new Map(storeItems.map((s) => [s.id, s]));
   }, [storeItems]);
 
   const canModerate = isOwner || isAdmin;
+  /** QR generate/download: owner or admin only (PRD / privacy). */
+  const canViewQrSection = isOwner || isAdmin;
 
   const approvedTributes = useMemo(
     () => tributes.filter((t) => t.is_approved),
@@ -197,15 +214,23 @@ export function SingleMemorialClient({
     return `${curr} ${value}`;
   };
 
-  const handleShare = async () => {
-    if (typeof window === "undefined" || !window.location) return;
+  const shareTitle = useMemo(
+    () => `In memory of ${memorial.full_name}`,
+    [memorial.full_name]
+  );
+
+  const copyPageLink = async (message: string) => {
+    if (!shareUrl) return;
     try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
+      await navigator.clipboard.writeText(shareUrl);
+      setShareToast(message);
     } catch {
-      setCopied(false);
+      setShareToast("Could not copy link.");
     }
   };
+
+  const shareIconClass =
+    "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 disabled:pointer-events-none disabled:opacity-40";
 
   const formatTributeDate = (value: string) => {
     const d = new Date(value);
@@ -787,25 +812,119 @@ export function SingleMemorialClient({
         </section>
 
         {/* Actions bar */}
-        <footer className="border-t border-slate-100 pt-5 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={handleShare}
-              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
-            >
+        <footer className="border-t border-slate-100 pt-5 flex flex-col gap-4">
+          <div>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
               Share
-            </button>
-            <button
-              type="button"
-              onClick={handleGetQR}
-              disabled={qrLoading}
-              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-60"
-            >
-              {qrLoading ? "Generating..." : "Get QR Code"}
-            </button>
-            {qrError && (
-              <p className="w-full text-xs text-red-500">{qrError}</p>
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href={
+                  shareUrl
+                    ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
+                    : undefined
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className={shareIconClass}
+                aria-label="Share on Facebook"
+                onClick={(e) => {
+                  if (!shareUrl) e.preventDefault();
+                }}
+              >
+                <Facebook className="h-4 w-4" aria-hidden />
+              </a>
+              <button
+                type="button"
+                className={shareIconClass}
+                aria-label="Copy link for Instagram"
+                title="Instagram has no web share URL — copy the link, then paste in Stories or a post"
+                onClick={() =>
+                  copyPageLink(
+                    "Link copied — open Instagram and paste in your Story or caption."
+                  )
+                }
+                disabled={!shareUrl}
+              >
+                <Instagram className="h-4 w-4" aria-hidden />
+              </button>
+              <a
+                href={
+                  shareUrl
+                    ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`
+                    : undefined
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className={shareIconClass}
+                aria-label="Share on X (Twitter)"
+                onClick={(e) => {
+                  if (!shareUrl) e.preventDefault();
+                }}
+              >
+                <Twitter className="h-4 w-4" aria-hidden />
+              </a>
+              <a
+                href={
+                  shareUrl
+                    ? `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`${shareTitle}\n\n${shareUrl}`)}`
+                    : undefined
+                }
+                className={shareIconClass}
+                aria-label="Share by email"
+                onClick={(e) => {
+                  if (!shareUrl) e.preventDefault();
+                }}
+              >
+                <Mail className="h-4 w-4" aria-hidden />
+              </a>
+              <a
+                href={
+                  shareUrl
+                    ? `https://wa.me/?text=${encodeURIComponent(`${shareTitle}\n${shareUrl}`)}`
+                    : undefined
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${shareIconClass} text-emerald-700 hover:text-emerald-800`}
+                aria-label="Share on WhatsApp"
+                onClick={(e) => {
+                  if (!shareUrl) e.preventDefault();
+                }}
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden />
+              </a>
+              <button
+                type="button"
+                className={shareIconClass}
+                aria-label="Copy memorial link"
+                onClick={() => copyPageLink("Link copied to clipboard.")}
+                disabled={!shareUrl}
+              >
+                <Link2 className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+            {shareToast && (
+              <p className="mt-2 text-xs text-emerald-600">{shareToast}</p>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+            {canViewQrSection && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleGetQR}
+                  disabled={qrLoading}
+                  className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-60"
+                >
+                  {qrLoading ? "Generating..." : "Get QR Code"}
+                </button>
+                {qrError && (
+                  <p className="w-full text-xs text-red-500">{qrError}</p>
+                )}
+              </>
             )}
             {canEdit && (
               <Link
@@ -815,13 +934,11 @@ export function SingleMemorialClient({
                 Edit memorial
               </Link>
             )}
+            </div>
           </div>
-          {copied && (
-            <p className="text-xs text-emerald-600">Link copied!</p>
-          )}
         </footer>
 
-        {showQr && qrDataUrl && (
+        {canViewQrSection && showQr && qrDataUrl && (
           <div className="relative mt-4 rounded-xl border border-slate-100 bg-white p-6 text-center shadow-sm">
             <button
               type="button"

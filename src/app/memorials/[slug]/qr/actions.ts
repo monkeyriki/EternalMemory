@@ -29,7 +29,38 @@ export async function generateQRAction(
     return { ok: false, error: "You must be signed in." };
   }
 
-  const memorialUrl = `${BASE_URL}/memorials/${input.slug}`;
+  const slugNorm = input.slug.trim().toLowerCase();
+  const { data: memorial } = await supabase
+    .from("memorials")
+    .select("id, slug, owner_id")
+    .eq("id", input.memorial_id)
+    .maybeSingle();
+
+  if (!memorial) {
+    return { ok: false, error: "Memorial not found." };
+  }
+
+  if (memorial.slug.toLowerCase() !== slugNorm) {
+    return { ok: false, error: "Invalid memorial." };
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const isAdmin = profile?.role === "admin";
+  const isOwner = memorial.owner_id === user.id;
+
+  if (!isOwner && !isAdmin) {
+    return {
+      ok: false,
+      error: "You do not have permission to generate this QR code."
+    };
+  }
+
+  const memorialUrl = `${BASE_URL}/memorials/${slugNorm}`;
 
   let dataUrl: string;
   try {
