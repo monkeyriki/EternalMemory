@@ -109,8 +109,14 @@ Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`
 - Migration `supabase/migrations/20260317000000_ads_free_ad_slots.sql`: `memorials.ads_free` (default `false`), `ad_slots` table + RLS (public read, admin write), seed rows `memorial_top` / `memorial_bottom`. **Apply on Supabase** before using ads.
 - Global toggle: `platform_settings.key = ads_enabled` with value `true` / `false` (also editable under **Admin → Settings**). **Admin → Ads** toggles the same key and edits slot HTML/snippets.
 - Memorial UI: fixed slots **below the header** (`memorial_top`) and **above the share/footer** (`memorial_bottom`). Scripts in snippets run client-side via `AdSenseSlot`.
-- **Premium / no ads**: create/edit memorial → “Premium memorial (no ads)” sets `ads_free`; those pages never load slots while global ads are on.
+- **Basic vs paid hosting**: On **Basic**, owners can still use “Hide platform ads (manual)” (`ads_free`). **Premium** and **Lifetime** remove platform ads via plan (`src/lib/memorialHostingPlan.ts` + `memorialAds`).
 - If Content-Security-Policy blocks third-party scripts, relax policy for AdSense domains as needed.
+
+## Consumer memorial hosting (Basic / Premium / Lifetime)
+- Migration `supabase/migrations/20260328_memorial_hosting_plans.sql`: enum `memorial_hosting_plan`, columns `hosting_plan`, `plan_expires_at`, `stripe_subscription_id`, `last_hosting_checkout_session_id` on `memorials`.
+- Checkout: `POST /api/stripe/memorial-plan-checkout` with body `{ memorial_id, memorial_slug, plan: "premium_monthly" | "premium_yearly" | "lifetime" }`. Env: `STRIPE_PRICE_MEMORIAL_PREMIUM_MONTHLY`, `STRIPE_PRICE_MEMORIAL_PREMIUM_YEARLY`, `STRIPE_PRICE_MEMORIAL_LIFETIME`.
+- Owner UI: `/memorials/[slug]/upgrade`; marketing compare table: `/plans`.
+- Webhook `POST /api/stripe/webhook`: `checkout.session.completed` with `metadata.checkout_kind = memorial_hosting` updates the memorial (idempotent via `last_hosting_checkout_session_id`); `customer.subscription.updated` / `deleted` sync Premium expiry / downgrade.
 
 ## B2B Partner (MVP demo — implemented in app)
 - Migration `supabase/migrations/20260317200000_b2b_partner.sql`: `memorials.managed_by_partner_id`, RLS (insert WITH CHECK for partner column, select/update/delete for managed memorials), unique index on `b2b_subscriptions(provider_subscription_id)` for webhook upserts. **Run this SQL on Supabase before using B2B.**

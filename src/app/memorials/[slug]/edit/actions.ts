@@ -3,6 +3,7 @@
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { replaceMemorialGalleryRows } from "@/app/memorials/actions/syncMemorialGallery";
 import { normalizeTagArray } from "@/lib/memorialTags";
+import { memorialPaidHostingActive } from "@/lib/memorialHostingPlan";
 
 type UpdateMemorialInput = {
   id: string;
@@ -41,7 +42,7 @@ export async function updateMemorialAction(
 
   const { data: existing, error: fetchError } = await supabase
     .from("memorials")
-    .select("id, owner_id")
+    .select("id, owner_id, hosting_plan, plan_expires_at")
     .eq("id", input.id)
     .maybeSingle();
 
@@ -74,7 +75,15 @@ export async function updateMemorialAction(
   updates.date_of_death = input.dateOfDeath ?? null;
   updates.city = input.city ?? null;
   updates.tags = normalizeTagArray(input.tags);
-  updates.ads_free = input.adsFree === true;
+  // Paid hosting already removes platform ads; don't overwrite `ads_free` from the hidden control.
+  if (
+    !memorialPaidHostingActive({
+      hosting_plan: existing.hosting_plan,
+      plan_expires_at: existing.plan_expires_at
+    })
+  ) {
+    updates.ads_free = input.adsFree === true;
+  }
 
   const { error: updateError } = await supabase
     .from("memorials")

@@ -17,7 +17,7 @@ export default async function EditMemorialPage({
   const { data: memorial } = await supabase
     .from("memorials")
     .select(
-      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, tags"
+      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, tags, ads_free, hosting_plan, plan_expires_at"
     )
     .eq("slug", slug)
     .maybeSingle();

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { buildMemorialAdsPayload } from "@/lib/memorialAds";
+import { maxGalleryImagesForMemorial } from "@/lib/memorialHostingPlan";
 import { SingleMemorialClient } from "@/components/memorial/SingleMemorialClient";
 import { PasswordGateWrapper } from "@/components/memorial/PasswordGateWrapper";
 import type { Metadata } from "next";
@@ -169,7 +170,7 @@ export default async function MemorialSlugPage({
   const { data: memorial } = await supabase
     .from("memorials")
     .select(
-      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, password_hash, ads_free"
+      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, password_hash, ads_free, hosting_plan, plan_expires_at"
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -211,6 +212,13 @@ export default async function MemorialSlugPage({
       .eq("memorial_id", memorial.id)
       .order("sort_order", { ascending: true });
     galleryMedia = galleryRows ?? [];
+    const maxGal = maxGalleryImagesForMemorial({
+      hosting_plan: memorial.hosting_plan as string | null | undefined,
+      plan_expires_at: memorial.plan_expires_at as string | null | undefined
+    });
+    if (!isOwner && !isAdmin && galleryMedia.length > maxGal) {
+      galleryMedia = galleryMedia.slice(0, maxGal);
+    }
   }
 
   // Pending guest tributes: only owner/admin should receive them (privacy).

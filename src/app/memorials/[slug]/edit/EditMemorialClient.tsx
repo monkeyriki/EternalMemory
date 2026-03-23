@@ -23,6 +23,8 @@ type EditMemorialClientProps = {
     gallery_image_urls?: string[] | null;
     tags?: string[] | null;
     ads_free?: boolean | null;
+    hosting_plan?: string | null;
+    plan_expires_at?: string | null;
   };
 };
 

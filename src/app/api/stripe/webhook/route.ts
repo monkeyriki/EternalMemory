@@ -3,6 +3,12 @@ import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { stripe } from "@/lib/stripe";
 import { sendTransactionalEmail } from "@/lib/resendEmail";
 import {
+  MEMORIAL_HOSTING_CHECKOUT_KIND,
+  applyMemorialHostingFromCheckoutSession,
+  syncMemorialPremiumFromSubscription
+} from "@/lib/memorialStripeHosting";
+import type Stripe from "stripe";
+import {
   tributePurchasedOwnerEmail,
   tributeReceiptEmail
 } from "@/lib/emailTemplates";
@@ -41,11 +47,34 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const supabase = getSupabaseAdminClient() as any;
+
+    if (
+      event.type === "customer.subscription.updated" ||
+      event.type === "customer.subscription.deleted"
+    ) {
+      const sub = event.data.object as Stripe.Subscription;
+      await syncMemorialPremiumFromSubscription(sub, supabase);
+      return NextResponse.json({ received: true }, { status: 200 });
+    }
+
     if (event.type !== "checkout.session.completed") {
       return NextResponse.json({ received: true }, { status: 200 });
     }
 
-    const session = event.data.object;
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    if (session.metadata?.checkout_kind === MEMORIAL_HOSTING_CHECKOUT_KIND) {
+      const hostingResult = await applyMemorialHostingFromCheckoutSession(
+        session,
+        supabase
+      );
+      if (!hostingResult.ok) {
+        console.error("Memorial hosting checkout webhook:", hostingResult.error);
+      }
+      return NextResponse.json({ received: true }, { status: 200 });
+    }
+
     const providerSessionId = session?.id as string | undefined;
     if (!providerSessionId) {
       return NextResponse.json({ ok: false, error: "Missing provider_session_id" }, { status: 400 });
@@ -72,8 +101,6 @@ export async function POST(req: NextRequest) {
 
     const buyerEmail = session.customer_details?.email ?? null;
     const purchaserUserId = purchaserId !== "guest" ? purchaserId : null;
-
-    const supabase = getSupabaseAdminClient() as any;
 
     // Idempotency: only insert once per Stripe checkout session.
     const { data: existingOrder, error: existingErr } = await supabase

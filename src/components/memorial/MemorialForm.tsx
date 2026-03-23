@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import Link from "next/link";
 import {
   User,
   PawPrint,
@@ -18,6 +19,11 @@ import { sanitizeMemorialStory } from "@/lib/sanitizeMemorialStory";
 import MemorialStoryEditor, {
   type MemorialStoryEditorHandle
 } from "@/components/memorial/MemorialStoryEditor";
+import {
+  BASIC_PLAN_MAX_GALLERY_IMAGES,
+  getEffectiveHostingPlan,
+  maxGalleryImagesForMemorial
+} from "@/lib/memorialHostingPlan";
 
 export interface MemorialFormData {
   type: "human" | "pet";
@@ -55,6 +61,8 @@ type MemorialInitialData = {
   cover_image_url: string | null;
   gallery_image_urls?: string[] | null;
   ads_free?: boolean | null;
+  hosting_plan?: string | null;
+  plan_expires_at?: string | null;
 };
 
 interface MemorialFormProps {
@@ -63,8 +71,6 @@ interface MemorialFormProps {
   onSubmit: (data: MemorialFormData) => void | Promise<void>;
   isLoading: boolean;
 }
-
-const MAX_GALLERY_IMAGES = 24;
 
 function generateSlug(name: string): string {
   return name
@@ -106,6 +112,26 @@ export default function MemorialForm({
   const [adsFree, setAdsFree] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const maxGalleryImages = useMemo(() => {
+    if (isEdit && initialData) {
+      return maxGalleryImagesForMemorial({
+        hosting_plan: initialData.hosting_plan,
+        plan_expires_at: initialData.plan_expires_at
+      });
+    }
+    return BASIC_PLAN_MAX_GALLERY_IMAGES;
+  }, [isEdit, initialData]);
+
+  const effectiveHostingPlan = useMemo(() => {
+    if (isEdit && initialData) {
+      return getEffectiveHostingPlan({
+        hosting_plan: initialData.hosting_plan,
+        plan_expires_at: initialData.plan_expires_at
+      });
+    }
+    return "basic" as const;
+  }, [isEdit, initialData]);
 
   useEffect(() => {
     if (isEdit && initialData) {
@@ -421,23 +447,28 @@ export default function MemorialForm({
                 More photos (gallery)
               </label>
               <p className="mb-2 text-xs text-stone-500">
-                Up to {MAX_GALLERY_IMAGES} images in addition to the cover. Shown on the memorial
-                page in a grid.
+                Up to {maxGalleryImages} images in addition to the cover
+                {maxGalleryImages <= BASIC_PLAN_MAX_GALLERY_IMAGES
+                  ? " on the Basic plan"
+                  : ""}
+                . Upgrade for more. Shown on the memorial page in a grid.
               </p>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
                 multiple
-                disabled={isLoading || galleryUploadLoading || galleryUrls.length >= MAX_GALLERY_IMAGES}
+                disabled={
+                  isLoading || galleryUploadLoading || galleryUrls.length >= maxGalleryImages
+                }
                 className="block w-full text-sm text-stone-500 file:mr-4 file:rounded-lg file:border-0 file:bg-amber-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber-700 hover:file:bg-amber-100"
                 onChange={async (e) => {
                   const files = Array.from(e.target.files ?? []);
                   e.target.value = "";
                   if (files.length === 0) return;
                   setGalleryError(null);
-                  const room = MAX_GALLERY_IMAGES - galleryUrls.length;
+                  const room = maxGalleryImages - galleryUrls.length;
                   if (room <= 0) {
-                    setGalleryError(`Maximum ${MAX_GALLERY_IMAGES} gallery photos.`);
+                    setGalleryError(`Maximum ${maxGalleryImages} gallery photos.`);
                     return;
                   }
                   const toUpload = files.slice(0, room);
@@ -455,7 +486,7 @@ export default function MemorialForm({
                         break;
                       }
                     }
-                    setGalleryUrls(next.slice(0, MAX_GALLERY_IMAGES));
+                    setGalleryUrls(next.slice(0, maxGalleryImages));
                   } finally {
                     setGalleryUploadLoading(false);
                   }
@@ -575,25 +606,62 @@ export default function MemorialForm({
 
           <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm space-y-3">
             <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
-              Ads &amp; premium
+              Ads &amp; plans
             </p>
-            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-stone-200 p-3 transition-colors hover:bg-stone-50">
-              <input
-                type="checkbox"
-                checked={adsFree}
-                onChange={(e) => setAdsFree(e.target.checked)}
-                disabled={isLoading}
-                className="mt-1 h-4 w-4 rounded border-stone-300 text-amber-700 focus:ring-amber-500"
-              />
-              <span>
-                <span className="block text-sm font-medium text-stone-800">
-                  Premium memorial (no ads)
-                </span>
-                <span className="mt-0.5 block text-xs text-stone-500">
-                  When enabled, platform advertising is not shown on this page.
-                </span>
-              </span>
-            </label>
+            {effectiveHostingPlan !== "basic" ? (
+              <div className="rounded-lg border border-emerald-100 bg-emerald-50/80 p-3 text-sm text-emerald-900">
+                <p className="font-medium">
+                  {effectiveHostingPlan === "lifetime" ? "Lifetime" : "Premium"} plan
+                </p>
+                <p className="mt-1 text-xs text-emerald-800">
+                  Platform ads are not shown on this memorial. Manage billing from{" "}
+                  <Link
+                    href={`/memorials/${slug}/upgrade`}
+                    className="font-medium underline underline-offset-2"
+                  >
+                    Upgrade plan
+                  </Link>
+                  .
+                </p>
+              </div>
+            ) : (
+              <>
+                <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-stone-200 p-3 transition-colors hover:bg-stone-50">
+                  <input
+                    type="checkbox"
+                    checked={adsFree}
+                    onChange={(e) => setAdsFree(e.target.checked)}
+                    disabled={isLoading}
+                    className="mt-1 h-4 w-4 rounded border-stone-300 text-amber-700 focus:ring-amber-500"
+                  />
+                  <span>
+                    <span className="block text-sm font-medium text-stone-800">
+                      Hide platform ads (manual)
+                    </span>
+                    <span className="mt-0.5 block text-xs text-stone-500">
+                      When enabled, AdSense slots are hidden even on the Basic plan. For unlimited
+                      gallery + no ads, consider{" "}
+                      {isEdit && slug.trim() ? (
+                        <Link
+                          href={`/memorials/${slug.trim()}/upgrade`}
+                          className="font-medium text-amber-800 underline underline-offset-2"
+                        >
+                          upgrading
+                        </Link>
+                      ) : (
+                        <Link
+                          href="/plans"
+                          className="font-medium text-amber-800 underline underline-offset-2"
+                        >
+                          a paid plan
+                        </Link>
+                      )}
+                      .
+                    </span>
+                  </span>
+                </label>
+              </>
+            )}
           </section>
 
           <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">

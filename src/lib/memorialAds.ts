@@ -1,19 +1,25 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { memorialEligibleForPlatformAds } from "@/lib/memorialHostingPlan";
 
 export type MemorialAdsForClient =
   | { show: false }
   | { show: true; topHtml: string | null; bottomHtml: string | null };
 
-type MemorialAdsRow = { ads_free?: boolean | null };
+type MemorialAdsRow = {
+  ads_free?: boolean | null;
+  hosting_plan?: string | null;
+  plan_expires_at?: string | null;
+};
 
 /**
- * Loads global ads toggle + active slots. Skips ads when memorial.ads_free is true.
+ * Loads global ads toggle + active slots.
+ * Basic plan: may show platform ads (unless ads_free). Premium/Lifetime: no platform ads.
  */
 export async function buildMemorialAdsPayload(
   supabase: SupabaseClient,
   memorial: MemorialAdsRow
 ): Promise<MemorialAdsForClient> {
-  if (memorial.ads_free === true) {
+  if (!memorialEligibleForPlatformAds(memorial)) {
     return { show: false };
   }
 

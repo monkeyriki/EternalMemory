@@ -187,6 +187,7 @@ export type Database = {
           date_of_birth: string | null
           date_of_death: string | null
           death_year: number | null
+          ads_free: boolean
           full_name: string
           id: string
           is_draft: boolean
@@ -194,6 +195,10 @@ export type Database = {
           owner_id: string
           password_hash: string | null
           slug: string
+          hosting_plan: Database["public"]["Enums"]["memorial_hosting_plan"]
+          plan_expires_at: string | null
+          stripe_subscription_id: string | null
+          last_hosting_checkout_session_id: string | null
           state: string | null
           story: string | null
           tags: string[]
@@ -215,6 +220,11 @@ export type Database = {
           owner_id: string
           password_hash?: string | null
           slug: string
+          ads_free?: boolean
+          hosting_plan?: Database["public"]["Enums"]["memorial_hosting_plan"]
+          plan_expires_at?: string | null
+          stripe_subscription_id?: string | null
+          last_hosting_checkout_session_id?: string | null
           state?: string | null
           story?: string | null
           type: Database["public"]["Enums"]["memorial_type"]
@@ -235,6 +245,11 @@ export type Database = {
           owner_id?: string
           password_hash?: string | null
           slug?: string
+          ads_free?: boolean
+          hosting_plan?: Database["public"]["Enums"]["memorial_hosting_plan"]
+          plan_expires_at?: string | null
+          stripe_subscription_id?: string | null
+          last_hosting_checkout_session_id?: string | null
           state?: string | null
           story?: string | null
           tags?: string[]
@@ -572,6 +587,7 @@ export type Database = {
       guestbook_status: "pending" | "approved" | "rejected"
       memorial_type: "human" | "pet"
       memorial_visibility: "public" | "unlisted" | "password_protected"
+      memorial_hosting_plan: "basic" | "premium" | "lifetime"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -702,6 +718,7 @@ export const Constants = {
       guestbook_status: ["pending", "approved", "rejected"],
       memorial_type: ["human", "pet"],
       memorial_visibility: ["public", "unlisted", "password_protected"],
+      memorial_hosting_plan: ["basic", "premium", "lifetime"],
     },
   },
 } as const
