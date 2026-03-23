@@ -52,7 +52,7 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-4 md:flex">
           <AuthLinks />
           <Link href="/memorials/new">
             <Button variant="accent" className="px-5 py-2 text-xs">
@@ -93,8 +93,8 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
                 {item.label}
               </Link>
             ))}
-            <div className="flex flex-col items-stretch gap-2 border-t border-slate-200 pt-3">
-              <div className="flex justify-center" onClick={() => setMobileOpen(false)}>
+            <div className="flex flex-col items-stretch gap-3 border-t border-slate-200 pt-3">
+              <div className="flex w-full flex-wrap items-center justify-center gap-3" onClick={() => setMobileOpen(false)}>
                 <AuthLinks />
               </div>
               <Link href="/memorials/new" onClick={() => setMobileOpen(false)}>

@@ -31,22 +31,34 @@ export function AuthLinks() {
   }
 
   if (isLoggedIn === null) {
-    return (
-      <span className="text-sm text-slate-500">Loading…</span>
-    );
+    return <span className="inline-block h-9 w-24 animate-pulse rounded-lg bg-slate-100" aria-hidden />;
   }
 
   if (isLoggedIn) {
     return (
-      <Button variant="secondary" type="button" onClick={handleLogout}>
-        Esci
-      </Button>
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="text-sm font-medium text-slate-600 underline-offset-4 transition-colors hover:text-slate-900 hover:underline"
+      >
+        Sign out
+      </button>
     );
   }
 
   return (
-    <Link href="/auth/login">
-      <Button variant="secondary">Sign in</Button>
-    </Link>
+    <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
+      <Link
+        href="/auth/login"
+        className="text-sm font-semibold uppercase tracking-wide text-slate-600 transition-colors hover:text-slate-900"
+      >
+        Sign in
+      </Link>
+      <Link href="/auth/signup">
+        <Button variant="accent" className="px-4 py-2 text-xs font-semibold uppercase tracking-wide">
+          Sign up
+        </Button>
+      </Link>
+    </div>
   );
 }
