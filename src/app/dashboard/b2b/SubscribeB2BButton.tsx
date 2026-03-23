@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/Button";
 
 export function SubscribeB2BButton() {
   const [loading, setLoading] = useState(false);
@@ -37,15 +38,14 @@ export function SubscribeB2BButton() {
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={subscribe}
-        disabled={loading}
-        className="inline-flex items-center justify-center rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-amber-700 disabled:opacity-60"
-      >
+      <Button type="button" variant="accent" onClick={subscribe} disabled={loading} className="px-6 py-2.5 text-sm">
         {loading ? "Redirecting…" : "Subscribe now"}
-      </button>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      </Button>
+      {error && (
+        <p className="mt-3 rounded-xl border border-red-200/90 bg-red-50/90 px-3 py-2 text-sm text-red-800" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
+import { Button } from "@/components/Button";
 import { BulkCreateClient } from "./BulkCreateClient";
 import { SubscribeB2BButton } from "./SubscribeB2BButton";
 
@@ -25,34 +27,30 @@ export default async function DashboardB2BPage() {
 
   if (!activeSub) {
     return (
-      <div className="min-h-screen bg-slate-50 px-4 py-10">
-        <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <Link
-            href="/dashboard"
-            className="text-sm text-amber-700 hover:underline"
-          >
-            ← Back to dashboard
-          </Link>
-          <h1 className="mt-4 text-2xl font-semibold text-slate-900">
-            B2B Partner Program
-          </h1>
-          <p className="mt-2 text-slate-600">
-            Create and manage bulk memorials for your clients — funeral homes,
-            pet crematoriums, and care providers.
-          </p>
-          <ul className="mt-6 list-inside list-disc space-y-2 text-sm text-slate-700">
+      <MemorialPageShell
+        title="B2B partner program"
+        subtitle="Create and manage bulk memorials for funeral homes, pet crematoriums, and care providers."
+        maxWidth="3xl"
+        contentClassName="mt-6 space-y-6"
+      >
+        <Link
+          href="/dashboard"
+          className="inline-block text-sm font-medium text-amber-800 underline-offset-4 hover:underline"
+        >
+          ← Back to dashboard
+        </Link>
+        <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-6 shadow-md shadow-slate-400/10 backdrop-blur sm:p-8">
+          <ul className="list-inside list-disc space-y-2 text-sm text-slate-700">
             <li>Unlimited memorials for your clients (fair use)</li>
             <li>Bulk creation tools</li>
             <li>Dedicated B2B dashboard</li>
           </ul>
-          <p className="mt-6 text-lg font-semibold text-slate-900">
-            $29.99/month
-          </p>
+          <p className="mt-6 font-serif text-xl font-semibold text-slate-900">$29.99/month</p>
           <div className="mt-4">
             <SubscribeB2BButton />
           </div>
         </div>
-      </div>
+      </MemorialPageShell>
     );
   }
 
@@ -72,75 +70,58 @@ export default async function DashboardB2BPage() {
     : "—";
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto max-w-4xl space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <Link
-              href="/dashboard"
-              className="text-sm text-amber-700 hover:underline"
-            >
-              ← Back to dashboard
-            </Link>
-            <h1 className="mt-2 text-2xl font-semibold text-slate-900">
-              B2B dashboard
-            </h1>
-            <p className="mt-1 text-sm text-slate-600">
-              Subscription:{" "}
-              <span className="font-medium capitalize text-green-700">
-                {activeSub.status}
-              </span>
-              {" · "}
-              Renews / ends: {periodEnd}
-            </p>
-            <p className="mt-1 text-xs text-slate-500">
-              {activeSub.plan_name} —{" "}
-              {(activeSub.price_cents / 100).toFixed(2)}{" "}
-              {activeSub.currency?.toUpperCase() ?? "USD"}
-            </p>
-          </div>
-        </div>
-
-        <BulkCreateClient />
-
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">
-            Memorials you manage
-          </h2>
-          {list.length === 0 ? (
-            <p className="mt-3 text-sm text-slate-500">
-              No client memorials yet. Use bulk create above.
-            </p>
-          ) : (
-            <ul className="mt-4 divide-y divide-slate-100">
-              {list.map((m) => (
-                <li
-                  key={m.id}
-                  className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm"
-                >
-                  <span className="font-medium text-slate-900">
-                    {m.full_name}
-                  </span>
-                  <div className="flex gap-3">
-                    <Link
-                      href={`/memorials/${m.slug}`}
-                      className="text-amber-700 hover:underline"
-                    >
-                      View
-                    </Link>
-                    <Link
-                      href={`/memorials/${m.slug}/edit`}
-                      className="text-amber-700 hover:underline"
-                    >
-                      Edit
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+    <MemorialPageShell
+      title="B2B dashboard"
+      subtitle={`Subscription ${activeSub.status} · Renews or ends ${periodEnd}`}
+      maxWidth="5xl"
+      contentClassName="mt-6 space-y-8"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <Link
+          href="/dashboard"
+          className="text-sm font-medium text-amber-800 underline-offset-4 hover:underline"
+        >
+          ← Back to dashboard
+        </Link>
+        <p className="text-xs text-slate-500">
+          {activeSub.plan_name} — {(activeSub.price_cents / 100).toFixed(2)}{" "}
+          {activeSub.currency?.toUpperCase() ?? "USD"}
+        </p>
       </div>
-    </div>
+
+      <BulkCreateClient />
+
+      <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-6 shadow-md shadow-slate-400/10 backdrop-blur">
+        <h2 className="font-serif text-lg font-semibold text-slate-900">Memorials you manage</h2>
+        {list.length === 0 ? (
+          <p className="mt-3 text-sm text-slate-500">
+            No client memorials yet. Use bulk create above.
+          </p>
+        ) : (
+          <ul className="mt-4 space-y-2">
+            {list.map((m) => (
+              <li
+                key={m.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3 text-sm"
+              >
+                <span className="font-serif font-medium text-slate-900">{m.full_name}</span>
+                <div className="flex flex-wrap gap-2">
+                  <Link href={`/memorials/${m.slug}`}>
+                    <Button variant="secondary" className="px-3 py-1.5 text-xs">
+                      View
+                    </Button>
+                  </Link>
+                  <Link href={`/memorials/${m.slug}/edit`}>
+                    <Button variant="accent" className="px-3 py-1.5 text-xs">
+                      Edit
+                    </Button>
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </MemorialPageShell>
   );
 }

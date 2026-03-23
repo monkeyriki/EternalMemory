@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/Button";
 import {
   bulkCreateMemorialsAction,
   type BulkMemorialRow
@@ -69,27 +70,28 @@ export function BulkCreateClient() {
   return (
     <form
       onSubmit={onSubmit}
-      className="mt-6 space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="space-y-4 rounded-2xl border border-slate-200/90 bg-white/95 p-6 shadow-md shadow-slate-400/10 backdrop-blur sm:p-8"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-slate-900">
+        <h2 className="font-serif text-lg font-semibold text-slate-900">
           Bulk create (max 10)
         </h2>
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={addRow}
           disabled={rows.length >= 10}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          className="px-4 py-2 text-xs"
         >
           + Add row
-        </button>
+        </Button>
       </div>
 
       <div className="space-y-4">
         {rows.map((row, idx) => (
           <div
             key={row.key}
-            className="grid gap-3 rounded-lg border border-slate-100 bg-slate-50/80 p-4 sm:grid-cols-2 lg:grid-cols-3"
+            className="grid gap-3 rounded-xl border border-slate-200/80 bg-slate-50/60 p-4 sm:grid-cols-2 lg:grid-cols-3"
           >
             <div className="sm:col-span-2 lg:col-span-1">
               <label className="text-xs font-medium text-slate-600">
@@ -97,7 +99,7 @@ export function BulkCreateClient() {
               </label>
               <input
                 required
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
                 value={row.full_name}
                 onChange={(e) =>
                   updateRow(row.key, { full_name: e.target.value })
@@ -108,7 +110,7 @@ export function BulkCreateClient() {
             <div>
               <label className="text-xs font-medium text-slate-600">Type</label>
               <select
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
                 value={row.type}
                 onChange={(e) =>
                   updateRow(row.key, {
@@ -125,7 +127,7 @@ export function BulkCreateClient() {
                 Visibility
               </label>
               <select
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
                 value={row.visibility}
                 onChange={(e) =>
                   updateRow(row.key, {
@@ -143,7 +145,7 @@ export function BulkCreateClient() {
               </label>
               <input
                 type="date"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
                 value={row.date_of_birth ?? ""}
                 onChange={(e) =>
                   updateRow(row.key, { date_of_birth: e.target.value })
@@ -156,7 +158,7 @@ export function BulkCreateClient() {
               </label>
               <input
                 type="date"
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
                 value={row.date_of_death || ""}
                 onChange={(e) =>
                   updateRow(row.key, { date_of_death: e.target.value })
@@ -168,7 +170,7 @@ export function BulkCreateClient() {
                 City (optional)
               </label>
               <input
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/40"
                 value={row.city ?? ""}
                 onChange={(e) => updateRow(row.key, { city: e.target.value })}
                 placeholder="City"
@@ -190,21 +192,20 @@ export function BulkCreateClient() {
 
       {message && (
         <p
-          className={`text-sm ${
-            message.startsWith("Created") ? "text-green-700" : "text-red-600"
+          className={`rounded-xl border px-3 py-2 text-sm ${
+            message.startsWith("Created")
+              ? "border-emerald-200/90 bg-emerald-50/90 text-emerald-900"
+              : "border-red-200/90 bg-red-50/90 text-red-800"
           }`}
+          role="status"
         >
           {message}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-60"
-      >
+      <Button type="submit" variant="accent" disabled={pending} className="px-6 py-2.5 text-sm">
         {pending ? "Creating…" : "Create memorials"}
-      </button>
+      </Button>
     </form>
   );
 }
