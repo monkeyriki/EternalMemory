@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/Button";
 
 export default function HomePage() {
@@ -26,6 +27,16 @@ export default function HomePage() {
             <Link href="/memorials">
               <Button variant="secondary">Browse memorials</Button>
             </Link>
+          </div>
+          <div className="mx-auto mt-10 max-w-4xl">
+            <Image
+              src="/memorial-hero.svg"
+              alt="Preview of a modern digital memorial page"
+              width={1200}
+              height={720}
+              className="h-auto w-full rounded-2xl border border-slate-200/80 shadow-md shadow-slate-300/20"
+              priority
+            />
           </div>
           <div className="mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-3 text-sm text-slate-600 sm:grid-cols-3">
             <p className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 text-center shadow-sm">

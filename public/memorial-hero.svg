@@ -1,0 +1,39 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E0E7FF"/>
+      <stop offset="1" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(300 180) rotate(90) scale(180 300)">
+      <stop stop-color="#C7D2FE" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#C7D2FE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(940 520) rotate(90) scale(160 280)">
+      <stop stop-color="#BAE6FD" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#BAE6FD" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card" x1="220" y1="140" x2="980" y2="580" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F8FAFC"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="720" rx="40" fill="url(#bg)"/>
+  <ellipse cx="300" cy="180" rx="300" ry="180" fill="url(#glow1)"/>
+  <ellipse cx="940" cy="520" rx="280" ry="160" fill="url(#glow2)"/>
+
+  <rect x="220" y="140" width="760" height="440" rx="32" fill="url(#card)" stroke="#E2E8F0"/>
+  <rect x="280" y="210" width="270" height="18" rx="9" fill="#CBD5E1"/>
+  <rect x="280" y="250" width="510" height="20" rx="10" fill="#94A3B8"/>
+  <rect x="280" y="286" width="420" height="18" rx="9" fill="#CBD5E1"/>
+
+  <rect x="280" y="354" width="170" height="44" rx="14" fill="#0F172A"/>
+  <rect x="466" y="354" width="180" height="44" rx="14" fill="#FFFFFF" stroke="#CBD5E1"/>
+
+  <rect x="280" y="434" width="200" height="60" rx="18" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <rect x="500" y="434" width="200" height="60" rx="18" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <rect x="720" y="434" width="200" height="60" rx="18" fill="#FFFFFF" stroke="#E2E8F0"/>
+
+  <circle cx="905" cy="242" r="42" fill="#EEF2FF" stroke="#C7D2FE"/>
+  <path d="M905 216C915 231 920 242 905 269C890 242 895 231 905 216Z" fill="#6366F1"/>
+</svg>
