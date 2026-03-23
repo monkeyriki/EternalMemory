@@ -93,10 +93,10 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
                 {item.label}
               </Link>
             ))}
-            <div className="flex flex-col gap-2 border-t border-slate-200 pt-3">
-              <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="px-3 py-2 text-center text-sm text-slate-600">
-                Sign in
-              </Link>
+            <div className="flex flex-col items-stretch gap-2 border-t border-slate-200 pt-3">
+              <div className="flex justify-center" onClick={() => setMobileOpen(false)}>
+                <AuthLinks />
+              </div>
               <Link href="/memorials/new" onClick={() => setMobileOpen(false)}>
                 <Button variant="accent" className="w-full py-2 text-xs">
                   Create Memorial
