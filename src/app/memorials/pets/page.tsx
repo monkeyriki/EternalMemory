@@ -1,6 +1,7 @@
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import MemorialCard from "@/components/memorial/MemorialCard";
 import DirectoryFilters from "@/components/memorial/DirectoryFilters";
+import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -72,15 +73,12 @@ export default async function MemorialsPetsPage({
     directoryHasAdvancedFilters(searchParams);
 
   return (
-    <div className="min-h-[60vh] bg-slate-50 px-4 py-8 sm:py-12">
-      <div className="mx-auto max-w-5xl">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-          Pet memorials
-        </h1>
-        <p className="mt-2 text-slate-600">
-          Browse public, published memorials.
-        </p>
-
+    <MemorialPageShell
+      title="Pet memorials"
+      subtitle="Browse public, published memorials. Refine your search with the filters below."
+      maxWidth="5xl"
+      contentClassName="mt-6"
+    >
         <DirectoryFilters
           currentSearch={searchParams?.search}
           currentCity={searchParams?.city}
@@ -93,13 +91,13 @@ export default async function MemorialsPetsPage({
         />
 
         {memorials.length === 0 ? (
-          <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+          <div className="mt-6 rounded-2xl border border-slate-200/90 bg-white/95 p-8 text-center shadow-md shadow-slate-400/10 backdrop-blur">
             {hasFilters ? (
               <>
                 <p className="text-slate-600">No memorials match your search.</p>
                 <Link
                   href={basePath}
-                  className="mt-2 inline-block text-sm text-slate-500 underline hover:text-slate-700"
+                  className="mt-2 inline-block text-sm font-medium text-amber-800 underline-offset-4 hover:underline"
                 >
                   Clear filters
                 </Link>
@@ -126,7 +124,7 @@ export default async function MemorialsPetsPage({
         )}
 
         <nav
-          className="mt-8 flex items-center justify-between border-t border-slate-200 pt-6"
+          className="mt-10 flex items-center justify-between border-t border-slate-200/80 pt-8"
           aria-label="Pagination"
         >
           <div>
@@ -136,12 +134,12 @@ export default async function MemorialsPetsPage({
                   searchParams ?? {},
                   page - 1
                 )}`}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50"
               >
                 Previous
               </Link>
             ) : (
-              <span className="inline-block rounded-lg border border-slate-100 bg-slate-50 px-4 py-2 text-sm text-slate-400">
+              <span className="inline-block rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400">
                 Previous
               </span>
             )}
@@ -153,18 +151,17 @@ export default async function MemorialsPetsPage({
                   searchParams ?? {},
                   page + 1
                 )}`}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50"
               >
                 Next
               </Link>
             ) : (
-              <span className="inline-block rounded-lg border border-slate-100 bg-slate-50 px-4 py-2 text-sm text-slate-400">
+              <span className="inline-block rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400">
                 Next
               </span>
             )}
           </div>
         </nav>
-      </div>
-    </div>
+    </MemorialPageShell>
   );
 }

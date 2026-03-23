@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 import UpgradeMemorialClient from "./UpgradeMemorialClient";
 
 export default async function MemorialUpgradePage({
@@ -52,28 +53,28 @@ export default async function MemorialUpgradePage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-            Memorial hosting
-          </h1>
-          <Link
-            href={`/memorials/${slug}/edit`}
-            className="text-sm font-medium text-sky-700 underline underline-offset-2"
-          >
-            Back to edit
-          </Link>
-        </div>
-        <UpgradeMemorialClient
-          memorialId={memorial.id}
-          slug={memorial.slug}
-          fullName={memorial.full_name}
-          hostingPlan={memorial.hosting_plan as string | null}
-          planExpiresAt={memorial.plan_expires_at}
-          checkout={checkout}
-        />
+    <MemorialPageShell
+      title="Memorial hosting"
+      subtitle="Upgrade gallery limits and remove platform ads for this memorial."
+      maxWidth="5xl"
+      contentClassName="mt-6"
+    >
+      <div className="mb-6 flex justify-end">
+        <Link
+          href={`/memorials/${slug}/edit`}
+          className="text-sm font-medium text-amber-800 underline-offset-4 hover:underline"
+        >
+          ← Back to edit
+        </Link>
       </div>
-    </div>
+      <UpgradeMemorialClient
+        memorialId={memorial.id}
+        slug={memorial.slug}
+        fullName={memorial.full_name}
+        hostingPlan={memorial.hosting_plan as string | null}
+        planExpiresAt={memorial.plan_expires_at}
+        checkout={checkout}
+      />
+    </MemorialPageShell>
   );
 }

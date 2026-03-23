@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
+import { Button } from "@/components/Button";
 
 export default async function DashboardPage() {
   const supabase = await getSupabaseServerClient();
@@ -29,10 +31,14 @@ export default async function DashboardPage() {
   const showB2BBanner = profile?.role !== "b2b";
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto max-w-4xl space-y-6">
+    <MemorialPageShell
+      title="My memorials"
+      subtitle="Create, edit, and share the memorials you manage."
+      maxWidth="5xl"
+      contentClassName="mt-6 space-y-6"
+    >
         {showB2BBanner && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 shadow-sm">
+          <div className="rounded-2xl border border-amber-200/90 bg-amber-50/80 px-5 py-4 shadow-sm backdrop-blur">
             <p className="text-sm font-medium text-amber-950">
               Are you a funeral home or pet crematorium? Join our B2B program.
             </p>
@@ -47,38 +53,34 @@ export default async function DashboardPage() {
             </Link>
           </div>
         )}
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-              My Memorials
-            </h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Manage your memorials.
-            </p>
-          </div>
-          <Link
-            href="/memorials/new"
-            className="inline-flex items-center justify-center rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-amber-700"
-          >
-            + Create memorial
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <p className="text-sm text-slate-600">
+            Your memorials appear below. Need another page?{" "}
+            <Link href="/memorials" className="font-medium text-amber-800 underline-offset-4 hover:underline">
+              Browse directory
+            </Link>
+          </p>
+          <Link href="/memorials/new">
+            <Button variant="accent" className="px-5 py-2 text-xs font-semibold uppercase tracking-wide">
+              + Create memorial
+            </Button>
           </Link>
         </div>
 
         {!hasMemorials ? (
-          <div className="mt-6 rounded-xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+          <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-10 text-center shadow-md shadow-slate-400/10 backdrop-blur">
             <div className="mb-3 text-3xl">🕯️</div>
-            <h2 className="text-lg font-semibold text-slate-900">
+            <h2 className="font-serif text-xl font-semibold text-slate-900">
               No memorials yet
             </h2>
             <p className="mt-1 text-sm text-slate-500">
               Create your first memorial to get started.
             </p>
             <div className="mt-4">
-              <Link
-                href="/memorials/new"
-                className="inline-flex items-center justify-center rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-amber-700"
-              >
-                Create a memorial
+              <Link href="/memorials/new">
+                <Button variant="accent" className="px-6 py-2.5 text-sm">
+                  Create a memorial
+                </Button>
               </Link>
             </div>
           </div>
@@ -143,7 +145,6 @@ export default async function DashboardPage() {
             })}
           </div>
         )}
-      </div>
-    </div>
+    </MemorialPageShell>
   );
 }

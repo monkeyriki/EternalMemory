@@ -128,8 +128,8 @@ export default function DirectoryFilters({
   };
 
   return (
-    <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+    <div className="mb-6 rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-md shadow-slate-400/10 backdrop-blur">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
         Search & filters
       </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -143,7 +143,7 @@ export default function DirectoryFilters({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300"
+            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
           />
         </div>
         <div>
@@ -156,7 +156,7 @@ export default function DirectoryFilters({
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="Filter by city..."
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300"
+            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
           />
         </div>
       </div>
@@ -178,7 +178,7 @@ export default function DirectoryFilters({
             placeholder="e.g. 1940"
             value={birthYearMin}
             onChange={(e) => setBirthYearMin(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300"
+            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
           />
         </div>
         <div>
@@ -197,7 +197,7 @@ export default function DirectoryFilters({
             placeholder="e.g. 1960"
             value={birthYearMax}
             onChange={(e) => setBirthYearMax(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300"
+            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
           />
         </div>
         <div>
@@ -216,7 +216,7 @@ export default function DirectoryFilters({
             placeholder="e.g. 2020"
             value={deathYearMin}
             onChange={(e) => setDeathYearMin(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300"
+            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
           />
         </div>
         <div>
@@ -235,7 +235,7 @@ export default function DirectoryFilters({
             placeholder="e.g. 2024"
             value={deathYearMax}
             onChange={(e) => setDeathYearMax(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300"
+            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
           />
         </div>
       </div>
@@ -250,7 +250,7 @@ export default function DirectoryFilters({
           value={tags}
           onChange={(e) => setTags(e.target.value)}
           placeholder="e.g. veteran, golden-retriever, acme-funeral"
-          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300"
+          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
         />
         <p className="mt-1 text-xs text-slate-500">
           Comma-separated. Shows memorials that include at least one of these tags.
@@ -265,7 +265,7 @@ export default function DirectoryFilters({
           id="dir-sort"
           value={sort}
           onChange={handleSortChange}
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300"
+          className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
         >
           <option value="recent">Recently added</option>
           <option value="updated">Recently updated</option>
@@ -275,7 +275,7 @@ export default function DirectoryFilters({
           <button
             type="button"
             onClick={handleReset}
-            className="text-sm text-slate-500 underline hover:text-slate-700"
+            className="text-sm font-medium text-amber-800 underline-offset-4 hover:underline"
           >
             Clear filters
           </button>

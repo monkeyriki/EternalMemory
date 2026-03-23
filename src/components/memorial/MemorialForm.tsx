@@ -24,6 +24,7 @@ import {
   getEffectiveHostingPlan,
   maxGalleryImagesForMemorial
 } from "@/lib/memorialHostingPlan";
+import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 
 export interface MemorialFormData {
   type: "human" | "pet";
@@ -70,6 +71,8 @@ interface MemorialFormProps {
   initialData?: MemorialInitialData;
   onSubmit: (data: MemorialFormData) => void | Promise<void>;
   isLoading: boolean;
+  /** Server-side error (e.g. create/update action) shown inside the page shell */
+  serverBanner?: string | null;
 }
 
 function generateSlug(name: string): string {
@@ -85,7 +88,8 @@ export default function MemorialForm({
   mode,
   initialData,
   onSubmit,
-  isLoading
+  isLoading,
+  serverBanner = null
 }: MemorialFormProps) {
   const isEdit = mode === "edit";
   const [type, setType] = useState<"human" | "pet">("human");
@@ -213,20 +217,23 @@ export default function MemorialForm({
   };
 
   return (
-    <div className="min-h-[60vh] bg-stone-50 py-8 px-4 sm:py-12">
-      <div className="mx-auto max-w-xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-light tracking-tight text-stone-800 sm:text-3xl">
-            {isEdit ? "Edit memorial" : "Create a memorial"}
-          </h1>
-          <p className="mt-2 text-sm text-stone-500">
-            Honor and remember those who meant so much
-          </p>
-        </div>
-
+    <MemorialPageShell
+      title={isEdit ? "Edit memorial" : "Create a memorial"}
+      subtitle="Honor and remember those who meant so much."
+      maxWidth="xl"
+      contentClassName="mt-6"
+    >
+        {serverBanner ? (
+          <div
+            className="mb-6 rounded-2xl border border-red-200/90 bg-red-50/95 px-4 py-3 text-sm text-red-800 shadow-sm backdrop-blur"
+            role="alert"
+          >
+            {serverBanner}
+          </div>
+        ) : null}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
-            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-stone-500">
+          <section className="rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
+            <p className="mb-3 text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
               Memorial type
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -234,10 +241,10 @@ export default function MemorialForm({
                 type="button"
                 onClick={() => setType("human")}
                 aria-pressed={type === "human"}
-                className={`flex items-center justify-center gap-2 rounded-xl border-2 py-3.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${
+                className={`flex items-center justify-center gap-2 rounded-xl border-2 py-3.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
                   type === "human"
                     ? "border-amber-600 bg-amber-600 text-white shadow-md ring-2 ring-amber-400/50 ring-offset-2"
-                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 <User className="h-5 w-5" aria-hidden />
@@ -250,10 +257,10 @@ export default function MemorialForm({
                 type="button"
                 onClick={() => setType("pet")}
                 aria-pressed={type === "pet"}
-                className={`flex items-center justify-center gap-2 rounded-xl border-2 py-3.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2 ${
+                className={`flex items-center justify-center gap-2 rounded-xl border-2 py-3.5 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
                   type === "pet"
                     ? "border-amber-600 bg-amber-600 text-white shadow-md ring-2 ring-amber-400/50 ring-offset-2"
-                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 <PawPrint className="h-5 w-5" aria-hidden />
@@ -265,19 +272,19 @@ export default function MemorialForm({
             </div>
           </section>
 
-          <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm space-y-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
+          <section className="space-y-4 rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
+            <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
               Basic information
             </p>
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Full name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-stone-900 placeholder:text-stone-400 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
                 placeholder="Mario Rossi"
                 disabled={isLoading}
               />
@@ -286,23 +293,23 @@ export default function MemorialForm({
               )}
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Memorial URL <span className="text-red-500">*</span>
               </label>
-              <div className="flex items-center gap-2 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2">
-                <span className="shrink-0 text-sm text-stone-500">
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                <span className="shrink-0 text-sm text-slate-500">
                   /memorials/
                 </span>
                 <input
                   type="text"
                   value={slug}
                   onChange={(e) => handleSlugChange(e.target.value)}
-                  className="min-w-0 flex-1 border-0 bg-transparent p-0 text-stone-900 focus:outline-none focus:ring-0"
+                  className="min-w-0 flex-1 border-0 bg-transparent p-0 text-slate-900 focus:outline-none focus:ring-0"
                   placeholder="mario-rossi"
                   disabled={isLoading}
                 />
               </div>
-              <p className="mt-1 text-xs text-stone-500">
+              <p className="mt-1 text-xs text-slate-500">
                 Auto-generated from name; you can edit it
               </p>
               {errors.slug && (
@@ -311,63 +318,63 @@ export default function MemorialForm({
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-stone-700">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
                   Date of birth
                 </label>
                 <input
                   type="date"
                   value={dateOfBirth}
                   onChange={(e) => setDateOfBirth(e.target.value)}
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
                   disabled={isLoading}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-stone-700">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
                   Date of death
                 </label>
                 <input
                   type="date"
                   value={dateOfDeath}
                   onChange={(e) => setDateOfDeath(e.target.value)}
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
                   disabled={isLoading}
                 />
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 City
               </label>
               <input
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-stone-900 placeholder:text-stone-400 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
                 placeholder="e.g. London"
                 disabled={isLoading}
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
-                Tags <span className="font-normal text-stone-500">(optional)</span>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Tags <span className="font-normal text-slate-500">(optional)</span>
               </label>
               <input
                 type="text"
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
-                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
                 placeholder="e.g. veteran, golden-retriever, acme-funeral-home"
                 disabled={isLoading}
               />
-              <p className="mt-1 text-xs text-stone-500">
+              <p className="mt-1 text-xs text-slate-500">
                 Comma-separated. Used for directory search (e.g. breed, organization, military).
               </p>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Story{" "}
-                <span className="font-normal text-stone-500">
+                <span className="font-normal text-slate-500">
                   (rich text, YouTube &amp; Vimeo)
                 </span>
               </label>
@@ -379,14 +386,14 @@ export default function MemorialForm({
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-700">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 Cover photo
               </label>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
                 disabled={isLoading || coverUploadLoading}
-                className="block w-full text-sm text-stone-500 file:mr-4 file:rounded-lg file:border-0 file:bg-amber-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber-700 hover:file:bg-amber-100"
+                className="block w-full text-sm text-slate-500 file:mr-4 file:rounded-lg file:border-0 file:bg-amber-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber-700 hover:file:bg-amber-100"
                 onChange={async (e) => {
                   const f = e.target.files?.[0];
                   if (!f) return;
@@ -405,12 +412,12 @@ export default function MemorialForm({
                 }}
               />
               {coverUploadLoading && (
-                <p className="mt-1 text-sm text-stone-500">Uploading...</p>
+                <p className="mt-1 text-sm text-slate-500">Uploading...</p>
               )}
               {coverUploadError && (
                 <p className="mt-1 text-sm text-red-600">{coverUploadError}</p>
               )}
-              <label className="mt-2 mb-1 block text-xs font-medium text-stone-500">
+              <label className="mt-2 mb-1 block text-xs font-medium text-slate-500">
                 Or paste image URL
               </label>
               <input
@@ -420,7 +427,7 @@ export default function MemorialForm({
                   setCoverImageUrl(e.target.value);
                   setCoverUploadError(null);
                 }}
-                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
                 placeholder="https://..."
                 disabled={isLoading}
               />
@@ -429,7 +436,7 @@ export default function MemorialForm({
                   <img
                     src={coverImageUrl}
                     alt="Cover preview"
-                    className="h-32 w-full rounded-lg border border-stone-200 object-cover"
+                    className="h-32 w-full rounded-lg border border-slate-200 object-cover"
                   />
                   <button
                     type="button"
@@ -442,11 +449,11 @@ export default function MemorialForm({
               )}
             </div>
 
-            <div className="mt-6 border-t border-stone-100 pt-6">
-              <label className="mb-1 block text-sm font-medium text-stone-700">
+            <div className="mt-6 border-t border-slate-100 pt-6">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
                 More photos (gallery)
               </label>
-              <p className="mb-2 text-xs text-stone-500">
+              <p className="mb-2 text-xs text-slate-500">
                 Up to {maxGalleryImages} images in addition to the cover
                 {maxGalleryImages <= BASIC_PLAN_MAX_GALLERY_IMAGES
                   ? " on the Basic plan"
@@ -460,7 +467,7 @@ export default function MemorialForm({
                 disabled={
                   isLoading || galleryUploadLoading || galleryUrls.length >= maxGalleryImages
                 }
-                className="block w-full text-sm text-stone-500 file:mr-4 file:rounded-lg file:border-0 file:bg-amber-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber-700 hover:file:bg-amber-100"
+                className="block w-full text-sm text-slate-500 file:mr-4 file:rounded-lg file:border-0 file:bg-amber-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber-700 hover:file:bg-amber-100"
                 onChange={async (e) => {
                   const files = Array.from(e.target.files ?? []);
                   e.target.value = "";
@@ -493,7 +500,7 @@ export default function MemorialForm({
                 }}
               />
               {galleryUploadLoading && (
-                <p className="mt-1 text-sm text-stone-500">Uploading gallery…</p>
+                <p className="mt-1 text-sm text-slate-500">Uploading gallery…</p>
               )}
               {galleryError && (
                 <p className="mt-1 text-sm text-red-600">{galleryError}</p>
@@ -506,7 +513,7 @@ export default function MemorialForm({
                       <img
                         src={url}
                         alt=""
-                        className="h-24 w-full rounded-lg border border-stone-200 object-cover"
+                        className="h-24 w-full rounded-lg border border-slate-200 object-cover"
                       />
                       <button
                         type="button"
@@ -524,8 +531,8 @@ export default function MemorialForm({
             </div>
           </section>
 
-          <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm space-y-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
+          <section className="space-y-3 rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
+            <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
               Visibility
             </p>
             <div className="space-y-2">
@@ -555,39 +562,39 @@ export default function MemorialForm({
                   key={key}
                   type="button"
                   onClick={() => setVisibility(key)}
-                  className={`flex w-full items-start gap-3 rounded-lg border-2 p-3 text-left transition-colors ${
+                  className={`flex w-full items-start gap-3 rounded-xl border-2 p-3 text-left transition-colors ${
                     visibility === key
-                      ? "border-stone-800 bg-stone-50"
-                      : "border-stone-200 hover:border-stone-300"
+                      ? "border-amber-700/90 bg-amber-50/80"
+                      : "border-slate-200 hover:border-amber-200/60"
                   }`}
                   disabled={isLoading}
                 >
-                  <Icon className="mt-0.5 h-5 w-5 shrink-0 text-stone-600" />
+                  <Icon className="mt-0.5 h-5 w-5 shrink-0 text-slate-600" />
                   <div>
-                    <p className="font-medium text-stone-800">{label}</p>
-                    <p className="text-xs text-stone-500">{desc}</p>
+                    <p className="font-medium text-slate-800">{label}</p>
+                    <p className="text-xs text-slate-500">{desc}</p>
                   </div>
                 </button>
               ))}
             </div>
             {visibility === "password_protected" && (
               <div className="pt-2">
-                <label className="mb-1 block text-sm font-medium text-stone-700">
+                <label className="mb-1 block text-sm font-medium text-slate-700">
                   Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-lg border border-stone-200 py-2 pl-10 pr-10 text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                    className="w-full rounded-lg border border-slate-200 py-2 pl-10 pr-10 text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
                     disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
                     tabIndex={-1}
                   >
                     {showPassword ? (
@@ -604,8 +611,8 @@ export default function MemorialForm({
             )}
           </section>
 
-          <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm space-y-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
+          <section className="space-y-3 rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
+            <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
               Ads &amp; plans
             </p>
             {effectiveHostingPlan !== "basic" ? (
@@ -626,19 +633,19 @@ export default function MemorialForm({
               </div>
             ) : (
               <>
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-stone-200 p-3 transition-colors hover:bg-stone-50">
+                <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-3 transition-colors hover:bg-slate-50">
                   <input
                     type="checkbox"
                     checked={adsFree}
                     onChange={(e) => setAdsFree(e.target.checked)}
                     disabled={isLoading}
-                    className="mt-1 h-4 w-4 rounded border-stone-300 text-amber-700 focus:ring-amber-500"
+                    className="mt-1 h-4 w-4 rounded border-slate-300 text-amber-700 focus:ring-amber-500"
                   />
                   <span>
-                    <span className="block text-sm font-medium text-stone-800">
+                    <span className="block text-sm font-medium text-slate-800">
                       Hide platform ads (manual)
                     </span>
-                    <span className="mt-0.5 block text-xs text-stone-500">
+                    <span className="mt-0.5 block text-xs text-slate-500">
                       When enabled, AdSense slots are hidden even on the Basic plan. For unlimited
                       gallery + no ads, consider{" "}
                       {isEdit && slug.trim() ? (
@@ -664,8 +671,8 @@ export default function MemorialForm({
             )}
           </section>
 
-          <section className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
-            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-stone-500">
+          <section className="rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
+            <p className="mb-3 text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
               Status
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -673,10 +680,10 @@ export default function MemorialForm({
                 type="button"
                 onClick={() => setStatus("draft")}
                 disabled={isLoading}
-                className={`flex items-center justify-center rounded-lg border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
+                className={`flex items-center justify-center rounded-xl border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
                   status === "draft"
-                    ? "border-stone-900 bg-stone-800 text-white shadow-sm ring-2 ring-stone-800/20"
-                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+                    ? "border-slate-800 bg-slate-800 text-white shadow-sm ring-2 ring-slate-800/20"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 Draft
@@ -685,17 +692,17 @@ export default function MemorialForm({
                 type="button"
                 onClick={() => setStatus("publish")}
                 disabled={isLoading}
-                className={`flex items-center justify-center rounded-lg border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
+                className={`flex items-center justify-center rounded-xl border-2 py-3 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
                   status === "publish"
-                    ? "border-stone-900 bg-stone-800 text-white shadow-sm ring-2 ring-stone-800/20"
-                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+                    ? "border-amber-700 bg-amber-700 text-white shadow-sm ring-2 ring-amber-600/30"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 Publish
               </button>
             </div>
 
-            <p className="mt-3 text-xs text-stone-500">
+            <p className="mt-3 text-xs text-slate-500">
               {status === "draft"
                 ? "Save and continue later"
                 : "Visible according to your visibility settings"}
@@ -705,7 +712,7 @@ export default function MemorialForm({
           <button
             type="submit"
             disabled={isLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-stone-800 py-3 text-sm font-medium text-white transition-colors hover:bg-stone-900 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-700 py-3.5 text-sm font-semibold text-white shadow-md shadow-amber-900/15 transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading ? (
               <>
@@ -720,7 +727,6 @@ export default function MemorialForm({
             <p className="mt-2 text-sm text-red-500">{submitError}</p>
           )}
         </form>
-      </div>
-    </div>
+    </MemorialPageShell>
   );
 }

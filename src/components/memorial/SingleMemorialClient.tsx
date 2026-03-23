@@ -415,13 +415,18 @@ export function SingleMemorialClient({
   const story = memorial.story ?? null;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4">
-      <div className="mx-auto max-w-2xl rounded-2xl border border-slate-100 bg-white p-8 shadow-sm space-y-8">
+    <div className="relative min-h-screen overflow-hidden px-4 py-10">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-amber-100/35 via-sky-50/15 to-transparent"
+        aria-hidden
+      />
+      <div className="relative mx-auto max-w-2xl space-y-8 rounded-[2rem] border border-slate-200/90 bg-white/95 p-8 shadow-xl shadow-slate-400/10 backdrop-blur">
         {/* Hero */}
         <header className="space-y-3 border-b border-slate-100 pb-6">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">In loving memory</p>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="truncate text-3xl font-bold tracking-tight text-slate-900">
+              <h1 className="truncate font-serif text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
                 {memorial.full_name}
               </h1>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
@@ -488,7 +493,7 @@ export function SingleMemorialClient({
         {/* Gallery (additional photos) */}
         {galleryMedia.length > 0 && (
           <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-slate-800">Gallery</h2>
+            <h2 className="font-serif text-xl font-semibold text-slate-900">Gallery</h2>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
               {galleryMedia.map((item) => (
                 <div
@@ -510,7 +515,7 @@ export function SingleMemorialClient({
 
         {/* Story / About */}
         <section>
-          <h2 className="mb-3 text-lg font-semibold text-slate-800">About</h2>
+          <h2 className="mb-3 font-serif text-xl font-semibold text-slate-900">About</h2>
           {story && story.trim().length > 0 ? (
             <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
               <MemorialStoryContent html={story} />

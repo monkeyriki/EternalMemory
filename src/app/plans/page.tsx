@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/Button";
+import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 
 export const metadata = {
   title: "Plans — EternalMemory",
@@ -8,27 +9,26 @@ export const metadata = {
 
 export default function PlansPage() {
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-12">
-      <div className="mx-auto max-w-4xl space-y-10">
-        <div className="text-center">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-            Memorial hosting plans
-          </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-600 sm:text-base">
-            Choose how you want to host a memorial. Upgrade anytime from your memorial&apos;s edit
-            page after it is created.
-          </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+    <MemorialPageShell
+      title="Memorial hosting plans"
+      subtitle="Choose how you want to host a memorial. Upgrade anytime from your memorial's edit page after it is created."
+      maxWidth="5xl"
+      contentClassName="mt-6 space-y-10"
+    >
+        <div className="flex flex-wrap justify-center gap-3">
             <Link href="/memorials/new">
-              <Button>Create a memorial</Button>
+              <Button variant="accent" className="px-6 py-2.5 text-sm">
+                Create a memorial
+              </Button>
             </Link>
             <Link href="/memorials">
-              <Button variant="secondary">Browse memorials</Button>
+              <Button variant="secondary" className="px-6 py-2.5 text-sm">
+                Browse memorials
+              </Button>
             </Link>
-          </div>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200/90 bg-white/95 shadow-md shadow-slate-400/10 backdrop-blur">
           <table className="w-full min-w-[600px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/80">
@@ -74,7 +74,6 @@ export default function PlansPage() {
           </code>
           .
         </p>
-      </div>
-    </div>
+    </MemorialPageShell>
   );
 }

@@ -81,20 +81,20 @@ export default function UpgradeMemorialClient({
   return (
     <div className="space-y-8">
       {checkout === "success" && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+        <div className="rounded-2xl border border-emerald-200/90 bg-emerald-50/95 px-4 py-3 text-sm text-emerald-900 shadow-sm backdrop-blur">
           Payment received. Your memorial plan updates in a few seconds once Stripe confirms the
           webhook. Refresh this page if it does not change.
         </div>
       )}
       {checkout === "cancelled" && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="rounded-2xl border border-amber-200/90 bg-amber-50/95 px-4 py-3 text-sm text-amber-900 shadow-sm backdrop-blur">
           Checkout was cancelled. You can choose a plan again whenever you are ready.
         </div>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Memorial</p>
-        <p className="mt-1 text-lg font-semibold text-slate-900">{fullName}</p>
+      <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-6 shadow-md shadow-slate-400/10 backdrop-blur">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Memorial</p>
+        <p className="mt-1 font-serif text-xl font-semibold text-slate-900">{fullName}</p>
         <p className="mt-2 text-sm text-slate-600">
           Current plan:{" "}
           <span className="font-medium text-slate-800">{planLabel(effective)}</span>
@@ -103,18 +103,18 @@ export default function UpgradeMemorialClient({
           ) : null}
         </p>
         <p className="mt-3 text-sm text-slate-500">
-          <Link href={`/memorials/${slug}`} className="font-medium text-sky-700 underline">
+          <Link href={`/memorials/${slug}`} className="font-medium text-amber-800 underline-offset-4 hover:underline">
             View public page
           </Link>
           {" · "}
-          <Link href={`/memorials/${slug}/edit`} className="font-medium text-sky-700 underline">
+          <Link href={`/memorials/${slug}/edit`} className="font-medium text-amber-800 underline-offset-4 hover:underline">
             Edit memorial
           </Link>
         </p>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-2xl border border-red-200/90 bg-red-50/95 px-4 py-3 text-sm text-red-800 shadow-sm backdrop-blur">
           {error}
         </div>
       )}
@@ -125,8 +125,8 @@ export default function UpgradeMemorialClient({
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
-          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-5">
-            <h2 className="text-base font-semibold text-slate-900">Premium — Monthly</h2>
+          <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
+            <h2 className="font-serif text-base font-semibold text-slate-900">Premium — Monthly</h2>
             <p className="mt-2 text-sm text-slate-600">
               Larger gallery, no platform ads, ongoing updates while subscribed.
             </p>
@@ -134,13 +134,13 @@ export default function UpgradeMemorialClient({
               type="button"
               disabled={paidActive || loadingSku !== null}
               onClick={() => startCheckout("premium_monthly")}
-              className="mt-4 w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 w-full rounded-xl bg-amber-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-amber-900/15 transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loadingSku === "premium_monthly" ? "Redirecting…" : "Subscribe monthly"}
             </button>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-5">
-            <h2 className="text-base font-semibold text-slate-900">Premium — Yearly</h2>
+          <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
+            <h2 className="font-serif text-base font-semibold text-slate-900">Premium — Yearly</h2>
             <p className="mt-2 text-sm text-slate-600">
               Same benefits as monthly, billed once per year.
             </p>
@@ -148,13 +148,13 @@ export default function UpgradeMemorialClient({
               type="button"
               disabled={paidActive || loadingSku !== null}
               onClick={() => startCheckout("premium_yearly")}
-              className="mt-4 w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 w-full rounded-xl bg-amber-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-amber-900/15 transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loadingSku === "premium_yearly" ? "Redirecting…" : "Subscribe yearly"}
             </button>
           </div>
-          <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-5">
-            <h2 className="text-base font-semibold text-slate-900">Lifetime</h2>
+          <div className="rounded-2xl border border-amber-200/90 bg-amber-50/50 p-5 shadow-sm backdrop-blur ring-1 ring-amber-200/60">
+            <h2 className="font-serif text-base font-semibold text-slate-900">Lifetime</h2>
             <p className="mt-2 text-sm text-slate-600">
               One-time payment. Keep expanded gallery and no platform ads permanently for this
               memorial.
@@ -163,7 +163,7 @@ export default function UpgradeMemorialClient({
               type="button"
               disabled={loadingSku !== null}
               onClick={() => startCheckout("lifetime")}
-              className="mt-4 w-full rounded-lg bg-amber-800 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 w-full rounded-xl bg-amber-800 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-amber-900/20 transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loadingSku === "lifetime" ? "Redirecting…" : "Buy lifetime"}
             </button>
@@ -173,7 +173,7 @@ export default function UpgradeMemorialClient({
 
       <p className="text-center text-xs text-slate-500">
         Compare features on the{" "}
-        <Link href="/plans" className="font-medium text-sky-700 underline">
+        <Link href="/plans" className="font-medium text-amber-800 underline-offset-4 hover:underline">
           plans page
         </Link>
         .

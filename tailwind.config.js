@@ -6,7 +6,11 @@ module.exports = {
     "./src/lib/**/*.{js,ts,jsx,tsx,mdx}"
   ],
   theme: {
-    extend: {}
+    extend: {
+      fontFamily: {
+        serif: ["var(--font-playfair)", "Georgia", "Cambria", "Times New Roman", "serif"]
+      }
+    }
   },
   plugins: []
 };
