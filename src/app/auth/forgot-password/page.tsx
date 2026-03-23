@@ -2,40 +2,43 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { Button } from "@/components/Button";
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setLoading(true);
+
     const supabase = getSupabaseBrowserClient();
-    const { error: err } = await supabase.auth.signInWithPassword({
-      email,
-      password
+    const base =
+      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? window.location.origin;
+    const redirectTo = `${base}/auth/callback?next=/auth/update-password`;
+
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo
     });
+
     setLoading(false);
     if (err) {
       setError(err.message);
       return;
     }
-    router.push("/");
-    router.refresh();
+    setSuccess("Recovery email sent. Check your inbox to reset your password.");
   }
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm space-y-6">
         <h1 className="text-2xl font-semibold text-slate-900 text-center">
-          Sign in
+          Reset password
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -55,42 +58,24 @@ export default function LoginPage() {
               autoComplete="email"
             />
           </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-slate-700 mb-1"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-500"
-              autoComplete="current-password"
-            />
-          </div>
           {error && (
             <p className="text-sm text-red-600" role="alert">
               {error}
             </p>
           )}
+          {success && (
+            <p className="text-sm text-emerald-700" role="status">
+              {success}
+            </p>
+          )}
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Signing in…" : "Sign in"}
+            {loading ? "Sending…" : "Send recovery email"}
           </Button>
         </form>
         <p className="text-center text-sm text-slate-600">
-          Don&apos;t have an account?{" "}
-          <Link href="/auth/signup" className="text-slate-900 underline">
-            Sign up
-          </Link>
-        </p>
-        <p className="text-center text-sm text-slate-600">
-          Forgot your password?{" "}
-          <Link href="/auth/forgot-password" className="text-slate-900 underline">
-            Reset it
+          Back to{" "}
+          <Link href="/auth/login" className="text-slate-900 underline">
+            Sign in
           </Link>
         </p>
       </div>

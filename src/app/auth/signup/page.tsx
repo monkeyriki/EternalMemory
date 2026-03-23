@@ -11,18 +11,23 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setLoading(true);
     const supabase = getSupabaseBrowserClient();
+    const base =
+      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? window.location.origin;
     const { error: err } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: `${base}/auth/callback?next=/`,
         data: { display_name: displayName || undefined }
       }
     });
@@ -31,7 +36,10 @@ export default function SignupPage() {
       setError(err.message);
       return;
     }
-    router.push("/");
+    setSuccess("Account created. Check your email to verify your account.");
+    setEmail("");
+    setPassword("");
+    setDisplayName("");
     router.refresh();
   }
 
@@ -96,6 +104,11 @@ export default function SignupPage() {
           {error && (
             <p className="text-sm text-red-600" role="alert">
               {error}
+            </p>
+          )}
+          {success && (
+            <p className="text-sm text-emerald-700" role="status">
+              {success}
             </p>
           )}
           <Button type="submit" disabled={loading} className="w-full">

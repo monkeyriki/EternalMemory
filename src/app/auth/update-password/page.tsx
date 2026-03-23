@@ -6,61 +6,58 @@ import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabaseBrowser";
 import { Button } from "@/components/Button";
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
+export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
     const supabase = getSupabaseBrowserClient();
-    const { error: err } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    const { error: err } = await supabase.auth.updateUser({ password });
     setLoading(false);
+
     if (err) {
       setError(err.message);
       return;
     }
-    router.push("/");
-    router.refresh();
+
+    setSuccess("Password updated. Redirecting to sign in…");
+    setTimeout(() => {
+      router.push("/auth/login");
+      router.refresh();
+    }, 900);
   }
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm space-y-6">
         <h1 className="text-2xl font-semibold text-slate-900 text-center">
-          Sign in
+          Set new password
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-slate-700 mb-1"
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-500"
-              autoComplete="email"
-            />
-          </div>
           <div>
             <label
               htmlFor="password"
               className="block text-sm font-medium text-slate-700 mb-1"
             >
-              Password
+              New password
             </label>
             <input
               id="password"
@@ -68,8 +65,27 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-500"
-              autoComplete="current-password"
+              autoComplete="new-password"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-slate-700 mb-1"
+            >
+              Confirm new password
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={6}
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-500"
+              autoComplete="new-password"
             />
           </div>
           {error && (
@@ -77,20 +93,19 @@ export default function LoginPage() {
               {error}
             </p>
           )}
+          {success && (
+            <p className="text-sm text-emerald-700" role="status">
+              {success}
+            </p>
+          )}
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Signing in…" : "Sign in"}
+            {loading ? "Updating…" : "Update password"}
           </Button>
         </form>
         <p className="text-center text-sm text-slate-600">
-          Don&apos;t have an account?{" "}
-          <Link href="/auth/signup" className="text-slate-900 underline">
-            Sign up
-          </Link>
-        </p>
-        <p className="text-center text-sm text-slate-600">
-          Forgot your password?{" "}
-          <Link href="/auth/forgot-password" className="text-slate-900 underline">
-            Reset it
+          Back to{" "}
+          <Link href="/auth/login" className="text-slate-900 underline">
+            Sign in
           </Link>
         </p>
       </div>
