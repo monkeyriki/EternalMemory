@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { stripe } from "@/lib/stripe";
+import { sendTransactionalEmail } from "@/lib/resendEmail";
+import { b2bSubscriptionRenewalEmail } from "@/lib/emailTemplates";
 
 export const runtime = "nodejs";
 
@@ -196,7 +198,7 @@ export async function POST(req: NextRequest) {
 
       const { data: row } = await admin
         .from("b2b_subscriptions")
-        .select("account_id")
+        .select("account_id, current_period_end")
         .eq("provider_subscription_id", sub.id)
         .maybeSingle();
 
@@ -215,6 +217,9 @@ export async function POST(req: NextRequest) {
         (price && typeof price === "object" && "nickname" in price && price.nickname) ||
         "B2B Monthly";
 
+      const previousEnd = row?.current_period_end ? String(row.current_period_end) : null;
+      const endChanged = previousEnd ? previousEnd !== end : false;
+
       await upsertSubscriptionFromStripe(admin, {
         accountId,
         providerSubscriptionId: sub.id,
@@ -225,6 +230,51 @@ export async function POST(req: NextRequest) {
         currentPeriodStart: start,
         currentPeriodEnd: end
       });
+
+      // System email: notify owner on renewal (only when end date changes and subscription is still active/trialing)
+      if (
+        endChanged &&
+        (status === "active" || status === "trialing")
+      ) {
+        try {
+          const { data: ownerAuth, error: ownerAuthErr } =
+            await admin.auth.admin.getUserById(accountId);
+          if (ownerAuthErr) {
+            console.error("b2b-webhook renewal email: getUserById failed:", ownerAuthErr);
+          } else {
+            const ownerUser = ownerAuth?.user;
+            const ownerEmail = ownerUser?.email?.trim();
+            if (ownerEmail) {
+              const meta = ownerUser?.user_metadata as
+                | { full_name?: string }
+                | undefined;
+              const ownerName =
+                meta?.full_name?.trim() ||
+                ownerUser?.email?.split("@")[0] ||
+                "there";
+              const appUrl =
+                process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://eternalmemory.app";
+              const content = b2bSubscriptionRenewalEmail({
+                ownerName,
+                planName,
+                currentPeriodEndIso: end,
+                appUrl
+              });
+              const send = await sendTransactionalEmail({
+                to: ownerEmail,
+                subject: content.subject,
+                html: content.html,
+                text: content.text
+              });
+              if (!send.ok && !send.skipped) {
+                console.error("b2b-webhook renewal email failed:", send.error);
+              }
+            }
+          }
+        } catch (emailErr) {
+          console.error("b2b-webhook renewal email block error:", emailErr);
+        }
+      }
 
       if (shouldDemoteRole(sub.status)) {
         await maybeDemoteToUser(admin, accountId);

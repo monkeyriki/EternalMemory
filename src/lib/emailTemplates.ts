@@ -166,3 +166,42 @@ ${target}. Reason: ${reasonLabel}.
 ${reporterNote?.trim() ? `Note from reporter:\n${reporterNote.trim()}\n\n` : ""}View your memorial: ${link}`;
   return { subject, html, text };
 }
+
+function formatPrettyDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+  } catch {
+    return iso;
+  }
+}
+
+export function b2bSubscriptionRenewalEmail({
+  ownerName,
+  planName,
+  currentPeriodEndIso,
+  appUrl
+}: {
+  ownerName: string;
+  planName: string;
+  currentPeriodEndIso: string;
+  appUrl: string;
+}): EmailContent {
+  const safeOwner = escapeHtml(ownerName);
+  const safePlan = escapeHtml(planName);
+  const prettyEnd = formatPrettyDate(currentPeriodEndIso);
+  const endBlock = escapeHtml(prettyEnd);
+  const dashboardUrl = `${baseUrl(appUrl)}/dashboard/b2b`;
+
+  const subject = `Your B2B subscription renewed — ${planName}`;
+  const html = `<p>Hi ${safeOwner},</p>
+<p>Your <strong>${safePlan}</strong> subscription has been renewed.</p>
+<p>Next billing period ends on <strong>${endBlock}</strong>.</p>
+<p><a href="${escapeHtml(dashboardUrl)}">Manage your subscription</a></p>`;
+  const text = `Hi ${ownerName},\n\nYour ${planName} subscription has been renewed.\nNext billing period ends on ${prettyEnd}.\n\nManage your subscription: ${dashboardUrl}`;
+
+  return { subject, html, text };
+}
