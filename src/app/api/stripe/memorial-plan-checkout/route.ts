@@ -81,6 +81,12 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    const isAdmin = profile?.role === "admin";
 
     const { data: memorial, error: memErr } = await supabase
       .from("memorials")
@@ -95,9 +101,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (memorial.owner_id !== user.id) {
+    if (memorial.owner_id !== user.id && !isAdmin) {
       return NextResponse.json(
-        { ok: false, error: "Only the memorial owner can upgrade hosting." },
+        { ok: false, error: "Only the memorial owner or an admin can upgrade hosting." },
         { status: 403 }
       );
     }
@@ -146,7 +152,7 @@ export async function POST(req: NextRequest) {
         checkout_kind: MEMORIAL_HOSTING_CHECKOUT_KIND,
         memorial_id: memorialId,
         memorial_slug: memorialSlug,
-        owner_id: user.id,
+        owner_id: memorial.owner_id,
         hosting_target: hostingTarget,
         plan_sku: sku
       },
@@ -156,7 +162,7 @@ export async function POST(req: NextRequest) {
               metadata: {
                 checkout_kind: MEMORIAL_HOSTING_CHECKOUT_KIND,
                 memorial_id: memorialId,
-                owner_id: user.id
+                owner_id: memorial.owner_id
               }
             }
           }
