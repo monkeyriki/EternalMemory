@@ -7,13 +7,13 @@ type ButtonProps = {
 
 export function Button({ children, variant = "primary", className = "", ...props }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
+    "inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
 
   const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
     primary:
-      "bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-slate-500 disabled:bg-slate-400 disabled:cursor-not-allowed",
+      "bg-slate-900 text-white shadow-sm hover:bg-slate-800 focus-visible:ring-slate-500 disabled:bg-slate-400 disabled:cursor-not-allowed",
     secondary:
-      "bg-white text-slate-900 border border-slate-300 hover:bg-slate-50 focus-visible:ring-slate-400 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+      "bg-white text-slate-900 border border-slate-300 shadow-sm hover:bg-slate-50 focus-visible:ring-slate-400 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
   };
 
   return (
