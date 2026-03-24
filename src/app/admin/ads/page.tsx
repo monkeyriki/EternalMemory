@@ -39,13 +39,15 @@ export default async function AdminAdsPage() {
     adsEnabledInitial === "yes";
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Ads</h1>
-      <p className="mt-2 text-sm text-slate-600">
+    <div className="space-y-6">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
+        Ads
+      </h1>
+      <p className="text-sm text-slate-600">
         Google AdSense (or similar) in fixed slots on memorial pages. Premium memorials skip ads
         when &quot;Premium memorial (no ads)&quot; is set on the memorial.
       </p>
-      <div className="mt-6">
+      <div>
         <AdsAdminClient initialSlots={(slots ?? []) as any} adsEnabledInitial={adsOn} />
       </div>
     </div>

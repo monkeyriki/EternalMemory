@@ -72,7 +72,7 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
             type="text"
             name="search"
             placeholder="Find a memorial..."
-            className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none"
+            className="min-w-0 flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none"
           />
         </form>
 
@@ -130,7 +130,7 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
                 type="text"
                 name="search"
                 placeholder="Find a memorial..."
-                className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none"
+                className="min-w-0 flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none"
               />
             </form>
             {navItems.map((item) => (

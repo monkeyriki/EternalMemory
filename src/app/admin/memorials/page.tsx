@@ -39,15 +39,15 @@ export default async function AdminMemorialsPage({
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+    <div className="space-y-6">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
         Memorials (takedown)
       </h1>
-      <p className="mt-2 text-sm text-slate-600">
+      <p className="text-sm text-slate-600">
         Search all memorials and permanently delete abusive pages. This cannot be undone.
       </p>
 
-      <div className="mt-6">
+      <div>
         <MemorialsAdminClient
           initialMemorials={memorials}
           total={total}
@@ -57,9 +57,12 @@ export default async function AdminMemorialsPage({
         />
       </div>
 
-      <p className="mt-8 text-xs text-slate-500">
+      <p className="text-xs text-slate-500">
         Tip: you can also remove a memorial from{" "}
-        <Link href="/admin/reports" className="text-amber-700 underline">
+        <Link
+          href="/admin/reports"
+          className="rounded-md text-amber-700 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+        >
           Reports
         </Link>{" "}
         when it was flagged.

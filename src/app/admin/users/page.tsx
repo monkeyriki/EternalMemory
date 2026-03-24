@@ -11,8 +11,10 @@ export default async function AdminUsersPage() {
 
   if (error) {
     return (
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Users</h1>
+      <div className="space-y-6">
+        <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
+          Users
+        </h1>
         <p className="mt-2 text-red-600">Failed to load profiles.</p>
       </div>
     );
@@ -26,15 +28,17 @@ export default async function AdminUsersPage() {
   }));
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Users</h1>
-      <p className="mt-2 text-sm text-slate-600">
+    <div className="space-y-6">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
+        Users
+      </h1>
+      <p className="text-sm text-slate-600">
         Promote accounts to B2B for testing. Creates an active{" "}
         <code className="rounded bg-slate-100 px-1">b2b_subscriptions</code> row
         with <code className="rounded bg-slate-100 px-1">admin_grant:&lt;id&gt;</code>
         .
       </p>
-      <div className="mt-6">
+      <div>
         <UsersAdminClient profiles={rows} />
       </div>
     </div>

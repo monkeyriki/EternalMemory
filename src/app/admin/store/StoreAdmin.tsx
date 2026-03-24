@@ -141,7 +141,7 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
             Store items
           </h1>
           <p className="mt-1 text-sm text-slate-600">
@@ -152,7 +152,7 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
         <button
           type="button"
           onClick={startNew}
-          className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-amber-700"
+          className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-amber-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
         >
           + New item
         </button>
@@ -173,7 +173,7 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
             <button
               type="button"
               onClick={cancel}
-              className="text-sm text-slate-500 hover:underline"
+              className="rounded-md text-sm text-slate-500 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
               Cancel
             </button>

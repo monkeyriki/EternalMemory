@@ -96,7 +96,10 @@ export function LoginForm() {
         </form>
         <p className="text-center text-sm text-slate-600">
           Don&apos;t have an account?{" "}
-          <Link href={signupHref} className="text-slate-900 underline">
+          <Link
+            href={signupHref}
+            className="rounded-md text-slate-900 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+          >
             Sign up
           </Link>
         </p>
@@ -104,7 +107,7 @@ export function LoginForm() {
           Forgot your password?{" "}
           <Link
             href="/auth/forgot-password"
-            className="text-slate-900 underline"
+            className="rounded-md text-slate-900 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
           >
             Reset it
           </Link>

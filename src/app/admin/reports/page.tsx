@@ -64,15 +64,15 @@ export default async function AdminReportsPage() {
   }));
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+    <div className="space-y-6">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
         Content reports
       </h1>
-      <p className="mt-2 text-sm text-slate-600">
+      <p className="text-sm text-slate-600">
         User-submitted flags for memorial pages and guestbook entries. Open reports are listed first.
       </p>
 
-      <div className="mt-6">
+      <div>
         <ReportsQueueClient
           initialReports={reports}
           reasonLabels={CONTENT_REPORT_REASON_LABELS as Record<ContentReportReason, string>}

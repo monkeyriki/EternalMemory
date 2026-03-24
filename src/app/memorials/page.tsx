@@ -12,7 +12,7 @@ export default function MemorialsIndexPage() {
       <div className="flex flex-col justify-center gap-4 sm:flex-row sm:gap-6">
         <Link
           href="/memorials/humans"
-          className="group flex flex-1 items-center justify-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-6 py-8 text-center shadow-md shadow-slate-400/10 backdrop-blur transition hover:border-amber-300/80 hover:shadow-lg hover:shadow-amber-900/5"
+          className="group flex flex-1 items-center justify-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-6 py-8 text-center shadow-md shadow-slate-400/10 backdrop-blur transition hover:border-amber-300/80 hover:shadow-lg hover:shadow-amber-900/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
         >
           <User className="h-8 w-8 shrink-0 text-amber-700 transition group-hover:scale-105" strokeWidth={1.5} />
           <div className="text-left">
@@ -22,7 +22,7 @@ export default function MemorialsIndexPage() {
         </Link>
         <Link
           href="/memorials/pets"
-          className="group flex flex-1 items-center justify-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-6 py-8 text-center shadow-md shadow-slate-400/10 backdrop-blur transition hover:border-amber-300/80 hover:shadow-lg hover:shadow-amber-900/5"
+          className="group flex flex-1 items-center justify-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-6 py-8 text-center shadow-md shadow-slate-400/10 backdrop-blur transition hover:border-amber-300/80 hover:shadow-lg hover:shadow-amber-900/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
         >
           <PawPrint className="h-8 w-8 shrink-0 text-amber-700 transition group-hover:scale-105" strokeWidth={1.5} />
           <div className="text-left">
@@ -33,7 +33,10 @@ export default function MemorialsIndexPage() {
       </div>
       <p className="mt-8 text-center text-sm text-slate-500">
         Want to add a memorial?{" "}
-        <Link href="/memorials/new" className="font-medium text-amber-800 underline-offset-4 hover:underline">
+        <Link
+          href="/memorials/new"
+          className="rounded-md font-medium text-amber-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+        >
           Create one
         </Link>
       </p>

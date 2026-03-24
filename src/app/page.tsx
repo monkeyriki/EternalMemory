@@ -50,7 +50,10 @@ export default function HomePage() {
               </Button>
             </div>
             <div className="mt-5 border-t border-slate-200 pt-4 text-center">
-              <Link href="/memorials" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+              <Link
+                href="/memorials"
+                className="rounded-md text-sm text-slate-600 hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+              >
                 About online memorials <span className="text-amber-700">›</span>
               </Link>
             </div>

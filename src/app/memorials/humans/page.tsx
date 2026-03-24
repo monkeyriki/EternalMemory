@@ -97,7 +97,7 @@ export default async function MemorialsHumansPage({
                 <p className="text-slate-600">No memorials match your search.</p>
                 <Link
                   href={basePath}
-                  className="mt-2 inline-block text-sm font-medium text-amber-800 underline-offset-4 hover:underline"
+                  className="mt-2 inline-block rounded-md text-sm font-medium text-amber-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
                 >
                   Clear filters
                 </Link>
@@ -134,7 +134,7 @@ export default async function MemorialsHumansPage({
                   searchParams ?? {},
                   page - 1
                 )}`}
-                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50"
+                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
               >
                 Previous
               </Link>
@@ -151,7 +151,7 @@ export default async function MemorialsHumansPage({
                   searchParams ?? {},
                   page + 1
                 )}`}
-                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50"
+                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
               >
                 Next
               </Link>

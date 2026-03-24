@@ -9,15 +9,15 @@ export default async function AdminSettingsPage() {
     .order("key", { ascending: true });
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+    <div className="space-y-6">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
         Platform settings
       </h1>
-      <p className="mt-2 text-sm text-slate-600">
+      <p className="text-sm text-slate-600">
         Manage global configuration values.
       </p>
 
-      <div className="mt-6">
+      <div>
         <SettingsClient initial={(settings ?? []) as any} />
       </div>
     </div>

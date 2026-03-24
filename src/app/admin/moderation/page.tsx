@@ -15,15 +15,15 @@ export default async function AdminModerationPage() {
   const approved = tributes.filter((t: { is_approved: boolean }) => t.is_approved !== false);
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+    <div className="space-y-6">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
         Moderation
       </h1>
-      <p className="mt-2 text-sm text-slate-600">
+      <p className="text-sm text-slate-600">
         Review and remove recent tributes. Approve pending guest tributes.
       </p>
 
-      <div className="mt-6">
+      <div>
         <ModerationClient pending={pending} approved={approved} />
       </div>
     </div>

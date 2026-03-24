@@ -132,7 +132,10 @@ export function SignupForm() {
         </form>
         <p className="text-center text-sm text-slate-600">
           Already have an account?{" "}
-          <Link href={loginHref} className="text-slate-900 underline">
+          <Link
+            href={loginHref}
+            className="rounded-md text-slate-900 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+          >
             Sign in
           </Link>
         </p>
