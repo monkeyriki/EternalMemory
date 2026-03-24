@@ -1,16 +1,19 @@
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
+import { getPrivacyEmail } from "@/lib/privacyContact";
 
 export const metadata = {
   title: "Privacy Policy - EternalMemory",
   description:
-    "How EternalMemory collects, uses, stores, and protects personal data."
+    "How EternalMemory collects, uses, stores, and protects personal data (GDPR and California / CCPA)."
 };
 
 export default function PrivacyPage() {
+  const privacyEmail = getPrivacyEmail();
+
   return (
     <MemorialPageShell
       title="Privacy Policy"
-      subtitle="How we process personal data for EternalMemory services, including GDPR rights and memorial-specific content handling."
+      subtitle="How we process personal data for EternalMemory services, including GDPR and California privacy rights (CCPA), plus memorial-specific content handling."
       maxWidth="3xl"
       contentClassName="mt-8"
     >
@@ -23,10 +26,10 @@ export default function PrivacyPage() {
             EternalMemory acts as data controller for account and platform data.
             For privacy requests, contact{" "}
             <a
-              href="mailto:privacy@eternalmemory.example"
+              href={`mailto:${privacyEmail}`}
               className="rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
-              privacy@eternalmemory.example
+              {privacyEmail}
             </a>
             .
           </p>
@@ -149,6 +152,65 @@ export default function PrivacyPage() {
             retention requirements.
           </p>
         </section>
+        <section id="ccpa-california">
+          <h2 className="font-serif text-xl font-semibold text-slate-900">
+            8b. California residents (CCPA / CPRA)
+          </h2>
+          <p className="mt-2">
+            If you are a California resident, the California Consumer Privacy Act
+            (CCPA), as amended by the California Privacy Rights Act (CPRA), may
+            provide additional rights regarding personal information we collect.
+          </p>
+          <ul className="mt-2 list-disc space-y-1 pl-5">
+            <li>
+              <strong>Right to know:</strong> You may request the categories and
+              specific pieces of personal information we have collected, the
+              categories of sources, and the business or commercial purposes for
+              collection.
+            </li>
+            <li>
+              <strong>Right to delete:</strong> You may request deletion of personal
+              information we hold, subject to legal exceptions (for example records
+              we must retain for security, legal compliance, or transaction
+              completion).
+            </li>
+            <li>
+              <strong>Right to correct:</strong> You may request correction of
+              inaccurate personal information, where applicable.
+            </li>
+            <li>
+              <strong>Right to opt out of sale or sharing:</strong> We do{" "}
+              <strong>not</strong> sell personal information. We do not use or
+              disclose sensitive personal information for purposes that require an
+              opt-out under applicable California law beyond what is necessary to
+              provide the service.
+            </li>
+            <li>
+              <strong>Non-discrimination:</strong> We will not discriminate against
+              you for exercising these rights.
+            </li>
+          </ul>
+          <p className="mt-2">
+            To submit a request, contact us at{" "}
+            <a
+              href={`mailto:${privacyEmail}?subject=California%20privacy%20request`}
+              className="rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+            >
+              {privacyEmail}
+            </a>{" "}
+            or use{" "}
+            <a
+              href="/account/delete"
+              className="rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+            >
+              account deletion
+            </a>{" "}
+            where applicable. We may verify your identity before fulfilling a
+            request. You may designate an authorized agent to make a request on
+            your behalf where permitted by law; we may require proof of
+            authorization.
+          </p>
+        </section>
         <section>
           <h2 className="font-serif text-xl font-semibold text-slate-900">
             9. Memorial content and moderation
@@ -166,10 +228,10 @@ export default function PrivacyPage() {
           <p className="mt-2">
             For privacy requests or data rights inquiries, contact{" "}
             <a
-              href="mailto:privacy@eternalmemory.example"
+              href={`mailto:${privacyEmail}`}
               className="rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
-              privacy@eternalmemory.example
+              {privacyEmail}
             </a>
             .
           </p>

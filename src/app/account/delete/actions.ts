@@ -2,6 +2,7 @@
 
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { sendTransactionalEmail } from "@/lib/resendEmail";
+import { getPrivacyEmail } from "@/lib/privacyContact";
 
 type RequestDeletionResult = { ok: true } | { ok: false; error: string };
 
@@ -41,7 +42,7 @@ export async function requestAccountDeletionAction(
 
   // Optional ops notification; non-blocking if email provider missing.
   await sendTransactionalEmail({
-    to: "privacy@eternalmemory.example",
+    to: getPrivacyEmail(),
     subject: "New account deletion request",
     html: `
       <p>A user requested account deletion.</p>

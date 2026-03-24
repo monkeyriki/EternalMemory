@@ -3,7 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/Button";
+import { getPrivacyEmail } from "@/lib/privacyContact";
 import { requestAccountDeletionAction } from "./actions";
+
+const privacyEmail = getPrivacyEmail();
 
 export function DeleteAccountRequestForm() {
   const [reason, setReason] = useState("");
@@ -45,10 +48,10 @@ export function DeleteAccountRequestForm() {
       <p className="text-xs text-slate-500">
         This creates a tracked request. For immediate support, contact{" "}
         <a
-          href="mailto:privacy@eternalmemory.example"
+          href={`mailto:${privacyEmail}`}
           className="rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
         >
-          privacy@eternalmemory.example
+          {privacyEmail}
         </a>
         .
       </p>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
+import { getPrivacyEmail } from "@/lib/privacyContact";
 
 export const metadata = {
   title: "Contact & Support - EternalMemory",
@@ -8,6 +9,8 @@ export const metadata = {
 };
 
 export default function ContactPage() {
+  const privacyEmail = getPrivacyEmail();
+
   return (
     <MemorialPageShell
       title="Contact & Support"
@@ -62,11 +65,19 @@ export default function ContactPage() {
               Access, correction, deletion, or data portability requests:
             </p>
             <a
-              href="mailto:privacy@eternalmemory.example"
+              href={`mailto:${privacyEmail}`}
               className="mt-1 inline-block rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
-              privacy@eternalmemory.example
+              {privacyEmail}
             </a>
+            . See also our{" "}
+            <Link
+              href="/privacy#ccpa-california"
+              className="rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+            >
+              California privacy notice
+            </Link>
+            .
           </div>
         </div>
 

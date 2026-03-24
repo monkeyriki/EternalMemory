@@ -1,7 +1,24 @@
 import Link from "next/link";
 import { Button } from "@/components/Button";
+import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import MemorialCard from "@/components/memorial/MemorialCard";
 
-export default function HomePage() {
+const HOME_MEMORIAL_LIMIT = 4;
+
+export default async function HomePage() {
+  const supabase = await getSupabaseServerClient();
+  const { data: memorialRows } = await supabase
+    .from("memorials")
+    .select(
+      "slug, type, full_name, date_of_birth, date_of_death, city, tags"
+    )
+    .eq("visibility", "public")
+    .eq("is_draft", false)
+    .order("created_at", { ascending: false })
+    .limit(HOME_MEMORIAL_LIMIT);
+
+  const memorials = memorialRows ?? [];
+
   return (
     <div className="relative overflow-hidden pb-12">
       <section className="relative min-h-[78vh] overflow-hidden">
@@ -74,6 +91,60 @@ export default function HomePage() {
           <h2 className="text-lg font-semibold text-slate-900">Respectful and private</h2>
           <p className="mt-1 text-sm text-slate-600">Control visibility and keep memories in one safe place.</p>
         </article>
+      </section>
+
+      <section
+        className="mx-auto mt-12 max-w-6xl px-4"
+        aria-labelledby="home-memorials-heading"
+      >
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2
+              id="home-memorials-heading"
+              className="font-serif text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
+            >
+              Public memorials
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Recently published pages (up to {HOME_MEMORIAL_LIMIT}). Humans and pets.
+            </p>
+          </div>
+          <Link
+            href="/memorials"
+            className="shrink-0 rounded-md text-sm font-semibold text-amber-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+          >
+            Browse all memorials
+          </Link>
+        </div>
+
+        {memorials.length === 0 ? (
+          <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-white/80 p-8 text-center text-sm text-slate-600">
+            <p>No public memorials yet.</p>
+            <p className="mt-2">
+              <Link
+                href="/memorials/new"
+                className="font-medium text-amber-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+              >
+                Create the first memorial
+              </Link>
+            </p>
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {memorials.map((m) => (
+              <MemorialCard
+                key={m.slug}
+                slug={m.slug}
+                name={m.full_name}
+                type={m.type === "pet" ? "pet" : "human"}
+                dateOfBirth={m.date_of_birth}
+                dateOfDeath={m.date_of_death}
+                city={m.city}
+                tags={m.tags ?? []}
+              />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
