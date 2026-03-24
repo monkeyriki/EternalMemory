@@ -12,7 +12,8 @@ type SiteHeaderProps = {
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Memorials", href: "/memorials" },
-  { label: "Plans & Features", href: "/plans" }
+  { label: "Plans & Features", href: "/plans" },
+  { label: "About", href: "/about" }
 ];
 
 export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {

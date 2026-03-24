@@ -37,6 +37,12 @@ export default function RootLayout({
             </div>
             <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
               <Link
+                href="/about"
+                className="rounded-md transition hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+              >
+                About
+              </Link>
+              <Link
                 href="/plans"
                 className="rounded-md transition hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
               >
