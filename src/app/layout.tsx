@@ -40,7 +40,7 @@ export default function RootLayout({
                 href="/about"
                 className="rounded-md transition hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
               >
-                About
+                About us
               </Link>
               <Link
                 href="/plans"

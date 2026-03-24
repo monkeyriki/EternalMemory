@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, User } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 import { Button } from "@/components/Button";
 
@@ -22,11 +23,14 @@ export default function AboutPage() {
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
           <aside className="lg:col-span-4">
             <div className="mx-auto max-w-xs lg:mx-0">
-              <div className="flex aspect-[3/4] w-full items-center justify-center rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-100 via-slate-50 to-amber-50/40">
-                <User
-                  className="h-24 w-24 text-slate-300"
-                  strokeWidth={1.25}
-                  aria-hidden
+              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100 shadow-inner">
+                <Image
+                  src="/founder.png"
+                  alt="EternalMemory founder and site owner"
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 1024px) 100vw, 320px"
+                  priority
                 />
               </div>
               <p className="mt-4 text-center font-serif text-lg font-semibold text-slate-900 lg:text-left">
