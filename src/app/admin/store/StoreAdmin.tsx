@@ -105,7 +105,7 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
   const handleDeleteItem = async (id: string) => {
     if (
       !window.confirm(
-        "Delete this store item permanently? This cannot be undone if the item has no tribute history."
+        "Permanently delete this store item? This will also remove all guestbook entries and order records linked to this item. This cannot be undone."
       )
     ) {
       return;

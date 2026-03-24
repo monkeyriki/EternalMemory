@@ -121,21 +121,49 @@ export async function deleteStoreItemAction(id: string) {
     return { ok: false as const, error: "Item not found" };
   }
 
-  const { count, error: countErr } = await guard.supabase
+  const { data: linkedTributes, error: linkErr } = await guard.supabase
     .from("virtual_tributes")
-    .select("id", { count: "exact", head: true })
+    .select("id, order_id")
     .eq("store_item_id", id);
 
-  if (countErr) {
-    return { ok: false as const, error: "Could not verify tribute history" };
+  if (linkErr) {
+    return { ok: false as const, error: "Could not load linked tributes." };
   }
 
-  if ((count ?? 0) > 0) {
-    return {
-      ok: false as const,
-      error:
-        "This item cannot be deleted because it is linked to existing tributes or purchases. Deactivate it instead."
-    };
+  const orderIds = [
+    ...new Set(
+      (linkedTributes ?? [])
+        .map((t) => t.order_id)
+        .filter((oid): oid is string => typeof oid === "string" && oid.length > 0)
+    )
+  ];
+
+  if ((linkedTributes?.length ?? 0) > 0) {
+    const { error: tributeDelErr } = await guard.supabase
+      .from("virtual_tributes")
+      .delete()
+      .eq("store_item_id", id);
+
+    if (tributeDelErr) {
+      console.error("[deleteStoreItem] virtual_tributes delete:", tributeDelErr);
+      return { ok: false as const, error: "Failed to remove linked guestbook purchases." };
+    }
+  }
+
+  if (orderIds.length > 0) {
+    const { error: ordersDelErr } = await guard.supabase
+      .from("orders")
+      .delete()
+      .in("id", orderIds);
+
+    if (ordersDelErr) {
+      console.error("[deleteStoreItem] orders delete:", ordersDelErr);
+      return {
+        ok: false as const,
+        error:
+          "Store item tributes were removed but some order rows could not be deleted. Check the database."
+      };
+    }
   }
 
   const { error: delErr } = await guard.supabase.from("store_items").delete().eq("id", id);
