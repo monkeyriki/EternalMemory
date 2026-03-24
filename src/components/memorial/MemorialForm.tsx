@@ -181,10 +181,10 @@ export default function MemorialForm({
     const newErrors: Record<string, string> = {};
     if (!fullName.trim()) newErrors.fullName = "Full name is required";
     if (!slug.trim()) newErrors.slug = "Memorial URL is required";
-    if (
+    const requiresPasswordForProtection =
       visibility === "password_protected" &&
-      !password.trim()
-    ) {
+      (!isEdit || initialData?.visibility !== "password_protected");
+    if (requiresPasswordForProtection && !password.trim()) {
       newErrors.password =
         "Password is required for password-protected memorials";
     }
@@ -207,7 +207,9 @@ export default function MemorialForm({
     if (dateOfBirth) data.dateOfBirth = dateOfBirth;
     if (dateOfDeath) data.dateOfDeath = dateOfDeath;
     if (city.trim()) data.city = city.trim();
-    if (visibility === "password_protected") data.password = password;
+    if (visibility === "password_protected" && password.trim()) {
+      data.password = password;
+    }
     const rawStory = storyEditorRef.current?.getHTML() ?? "";
     const hasStory = storyEditorRef.current
       ? !storyEditorRef.current.isEmpty()

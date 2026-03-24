@@ -46,6 +46,7 @@ export default function EditMemorialClient({ memorial }: EditMemorialClientProps
       dateOfDeath: data.dateOfDeath,
       city: data.city,
       visibility: data.visibility,
+      password: data.password,
       status: data.status,
       story: data.story ?? null,
       coverImageUrl: data.coverImageUrl ?? null,

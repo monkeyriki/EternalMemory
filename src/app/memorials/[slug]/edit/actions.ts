@@ -1,5 +1,6 @@
 "use server";
 
+import bcrypt from "bcryptjs";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { replaceMemorialGalleryRows } from "@/app/memorials/actions/syncMemorialGallery";
 import { normalizeTagArray } from "@/lib/memorialTags";
@@ -14,6 +15,7 @@ type UpdateMemorialInput = {
   dateOfDeath?: string;
   city?: string;
   visibility: "public" | "unlisted" | "password_protected";
+  password?: string;
   status: "draft" | "publish";
   story: string | null;
   coverImageUrl: string | null;
@@ -21,6 +23,8 @@ type UpdateMemorialInput = {
   tags?: string[];
   adsFree?: boolean;
 };
+
+const BCRYPT_ROUNDS = 12;
 
 type UpdateMemorialResult = {
   ok: boolean;
@@ -42,7 +46,7 @@ export async function updateMemorialAction(
 
   const { data: existing, error: fetchError } = await supabase
     .from("memorials")
-    .select("id, owner_id, hosting_plan, plan_expires_at")
+    .select("id, owner_id, visibility, password_hash, hosting_plan, plan_expires_at")
     .eq("id", input.id)
     .maybeSingle();
 
@@ -75,6 +79,26 @@ export async function updateMemorialAction(
   updates.date_of_death = input.dateOfDeath ?? null;
   updates.city = input.city ?? null;
   updates.tags = normalizeTagArray(input.tags);
+
+  const nextVisibility = input.visibility;
+  const prevVisibility = existing.visibility;
+  const nextPassword = input.password?.trim();
+
+  if (nextVisibility === "password_protected") {
+    if (nextPassword) {
+      updates.password_hash = await bcrypt.hash(nextPassword, BCRYPT_ROUNDS);
+    } else if (!existing.password_hash) {
+      return {
+        ok: false,
+        error: "Password is required when enabling password protection."
+      };
+    }
+    // If no new password and an existing hash is present, keep existing password_hash.
+  } else if (prevVisibility === "password_protected") {
+    // Leaving protected mode: clear password hash.
+    updates.password_hash = null;
+  }
+
   // Paid hosting already removes platform ads; don't overwrite `ads_free` from the hidden control.
   if (
     !memorialPaidHostingActive({
