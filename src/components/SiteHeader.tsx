@@ -41,10 +41,10 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 md:py-4">
+      <div className="mx-auto flex w-full max-w-6xl flex-nowrap items-center justify-between gap-2 px-4 py-3 sm:gap-3 md:py-4">
         <Link
           href="/"
-          className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+          className="flex shrink-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
         >
           <Heart className="h-6 w-6 text-amber-600" strokeWidth={1.8} />
           <span className={`${logoFontClassName} text-xl font-semibold tracking-tight text-slate-900 md:text-2xl`}>
@@ -76,7 +76,7 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
           />
         </form>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden shrink-0 items-center gap-1 lg:flex">
           {navItems.map((item) => (
             <Link
               key={item.label}
@@ -88,10 +88,10 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden shrink-0 flex-nowrap items-center gap-2 md:flex md:gap-3 lg:gap-4">
           <AuthLinks />
-          <Link href="/memorials/new">
-            <Button variant="accent" className="px-5 py-2 text-xs">
+          <Link href="/memorials/new" className="inline-flex shrink-0">
+            <Button variant="accent" className="min-h-10 whitespace-nowrap px-4 py-2 text-xs sm:px-5">
               Create Memorial
             </Button>
           </Link>
@@ -99,7 +99,7 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
 
         <button
           onClick={() => setMobileOpen((v) => !v)}
-          className="rounded-md p-1 text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 lg:hidden"
+          className="shrink-0 rounded-md p-1 text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 lg:hidden"
           aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
           type="button"
         >
@@ -144,7 +144,10 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
               </Link>
             ))}
             <div className="flex flex-col items-stretch gap-3 border-t border-slate-200 pt-3">
-              <div className="flex w-full flex-wrap items-center justify-center gap-3" onClick={() => setMobileOpen(false)}>
+              <div
+                className="flex w-full flex-nowrap items-center justify-center gap-3"
+                onClick={() => setMobileOpen(false)}
+              >
                 <AuthLinks />
               </div>
               <Link href="/memorials/new" onClick={() => setMobileOpen(false)}>
