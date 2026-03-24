@@ -7,7 +7,13 @@ import MemorialForm, {
 } from "@/components/memorial/MemorialForm";
 import { createMemorialAction } from "./actions";
 
-export default function MemorialNewClient() {
+type MemorialNewClientProps = {
+  initialFullName?: string;
+};
+
+export default function MemorialNewClient({
+  initialFullName
+}: MemorialNewClientProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -52,6 +58,7 @@ export default function MemorialNewClient() {
   return (
     <MemorialForm
       mode="create"
+      initialFullName={initialFullName}
       onSubmit={handleSubmit}
       isLoading={isLoading}
       serverBanner={serverError}

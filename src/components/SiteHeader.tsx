@@ -30,11 +30,15 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
           </span>
         </Link>
 
-        <form action="/memorials" method="get" className="hidden min-w-[220px] items-center gap-2 rounded-full bg-slate-100 px-4 py-2 md:flex">
+        <form
+          action="/memorials/humans"
+          method="get"
+          className="hidden min-w-[220px] items-center gap-2 rounded-full bg-slate-100 px-4 py-2 md:flex"
+        >
           <Search className="h-4 w-4 text-slate-500" />
           <input
             type="text"
-            name="q"
+            name="search"
             placeholder="Find a memorial..."
             className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none"
           />
@@ -74,11 +78,15 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
       {mobileOpen && (
         <div className="border-t border-slate-200 bg-white lg:hidden">
           <div className="space-y-3 px-4 py-4">
-            <form action="/memorials" method="get" className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2">
+            <form
+              action="/memorials/humans"
+              method="get"
+              className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2"
+            >
               <Search className="h-4 w-4 text-slate-500" />
               <input
                 type="text"
-                name="q"
+                name="search"
                 placeholder="Find a memorial..."
                 className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none"
               />

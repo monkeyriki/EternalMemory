@@ -69,6 +69,8 @@ type MemorialInitialData = {
 interface MemorialFormProps {
   mode: MemorialFormMode;
   initialData?: MemorialInitialData;
+  /** Optional create-mode prefill, e.g. from homepage hero first/last name */
+  initialFullName?: string;
   onSubmit: (data: MemorialFormData) => void | Promise<void>;
   isLoading: boolean;
   /** Server-side error (e.g. create/update action) shown inside the page shell */
@@ -91,15 +93,20 @@ const DEFAULT_SHELL_SUBTITLE = "Honor and remember those who meant so much.";
 export default function MemorialForm({
   mode,
   initialData,
+  initialFullName,
   onSubmit,
   isLoading,
   serverBanner = null,
   shellSubtitle
 }: MemorialFormProps) {
   const isEdit = mode === "edit";
+  const createSeedName =
+    mode === "create" ? (initialFullName?.trim() ?? "") : "";
   const [type, setType] = useState<"human" | "pet">("human");
-  const [fullName, setFullName] = useState("");
-  const [slug, setSlug] = useState("");
+  const [fullName, setFullName] = useState(createSeedName);
+  const [slug, setSlug] = useState(
+    createSeedName ? generateSlug(createSeedName) : ""
+  );
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [dateOfDeath, setDateOfDeath] = useState("");
