@@ -12,6 +12,7 @@ const links = [
   { href: "/admin/account-deletion-requests", label: "Deletion requests" },
   { href: "/admin/memorials", label: "Memorials" },
   { href: "/admin/ip-bans", label: "IP bans" },
+  { href: "/admin/blocked-words", label: "Blocked words" },
   { href: "/admin/ads", label: "Ads" },
   { href: "/admin/settings", label: "Settings" }
 ] as const;
