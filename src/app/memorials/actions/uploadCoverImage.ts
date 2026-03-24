@@ -1,6 +1,10 @@
 "use server";
 
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import {
+  compressImageBuffer,
+  isCompressibleRasterContentType
+} from "@/lib/imageCompression";
 
 const BUCKET = "memorial-photos";
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
@@ -45,12 +49,36 @@ export async function uploadCoverImageAction(
   }
 
   const safeName = file.name.replace(/[^a-z0-9.]/gi, "_");
-  const filename = `${user.id}/${Date.now()}-${safeName}`;
+  const base = `${user.id}/${Date.now()}-${safeName}`.replace(/\.[^.]+$/, "");
+
+  let payload: File | Uint8Array = file;
+  let contentType = file.type;
+  let finalPath = `${user.id}/${Date.now()}-${safeName}`;
+
+  if (isCompressibleRasterContentType(file.type)) {
+    try {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const compressed = await compressImageBuffer(buffer, {
+        maxWidth: 2048,
+        maxHeight: 2048,
+        quality: 82,
+        format: "webp"
+      });
+      payload = compressed.bytes;
+      contentType = compressed.contentType;
+      finalPath = `${base}.${compressed.extension}`;
+    } catch {
+      // Compression is best-effort; fallback to original file upload.
+      payload = file;
+      contentType = file.type;
+      finalPath = `${user.id}/${Date.now()}-${safeName}`;
+    }
+  }
 
   const { error } = await supabase.storage
     .from(BUCKET)
-    .upload(filename, file, {
-      contentType: file.type,
+    .upload(finalPath, payload, {
+      contentType,
       upsert: false
     });
 
@@ -60,7 +88,7 @@ export async function uploadCoverImageAction(
 
   const {
     data: { publicUrl }
-  } = supabase.storage.from(BUCKET).getPublicUrl(filename);
+  } = supabase.storage.from(BUCKET).getPublicUrl(finalPath);
 
   return { ok: true, url: publicUrl };
 }

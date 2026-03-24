@@ -3,6 +3,10 @@
 import { randomUUID } from "crypto";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { STORE_ITEMS_BUCKET } from "@/lib/storeItemStorage";
+import {
+  compressImageBuffer,
+  isCompressibleRasterContentType
+} from "@/lib/imageCompression";
 
 const MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2MB — icons / SVG
 
@@ -67,18 +71,40 @@ export async function uploadStoreItemImageAction(
   }
 
   const safeName = file.name.replace(/[^a-z0-9.]/gi, "_").slice(0, 80);
-  const filename = `icons/${randomUUID()}-${safeName || "asset"}`;
+  const baseName = `icons/${randomUUID()}-${safeName || "asset"}`.replace(
+    /\.[^.]+$/,
+    ""
+  );
 
-  const contentType =
+  let payload: File | Uint8Array = file;
+  let contentType =
     file.type && ALLOWED_TYPES.has(file.type)
       ? file.type
       : isLikelySvg(file)
         ? "image/svg+xml"
         : "image/png";
+  let filename = `${baseName}.${safeName.split(".").pop()?.toLowerCase() || "png"}`;
+
+  if (isCompressibleRasterContentType(contentType)) {
+    try {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const compressed = await compressImageBuffer(buffer, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        quality: 84,
+        format: "webp"
+      });
+      payload = compressed.bytes;
+      contentType = compressed.contentType;
+      filename = `${baseName}.${compressed.extension}`;
+    } catch {
+      payload = file;
+    }
+  }
 
   const { error } = await supabase.storage
     .from(STORE_ITEMS_BUCKET)
-    .upload(filename, file, {
+    .upload(filename, payload, {
       contentType,
       upsert: false
     });
