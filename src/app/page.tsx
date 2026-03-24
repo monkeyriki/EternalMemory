@@ -10,7 +10,7 @@ export default async function HomePage() {
   const { data: memorialRows } = await supabase
     .from("memorials")
     .select(
-      "slug, type, full_name, date_of_birth, date_of_death, city, tags"
+      "slug, type, full_name, date_of_birth, date_of_death, city, tags, cover_image_url"
     )
     .eq("visibility", "public")
     .eq("is_draft", false)
@@ -141,6 +141,7 @@ export default async function HomePage() {
                 dateOfDeath={m.date_of_death}
                 city={m.city}
                 tags={m.tags ?? []}
+                coverImageUrl={m.cover_image_url}
               />
             ))}
           </div>

@@ -26,7 +26,7 @@ export default async function MemorialsHumansPage({
   let query = supabase
     .from("memorials")
     .select(
-      "id, slug, type, full_name, date_of_birth, date_of_death, city, state, tags"
+      "id, slug, type, full_name, date_of_birth, date_of_death, city, state, tags, cover_image_url"
     )
     .eq("type", "human")
     .eq("visibility", "public")
@@ -123,6 +123,7 @@ export default async function MemorialsHumansPage({
                 city={m.city}
                 slug={m.slug}
                 tags={m.tags ?? []}
+                coverImageUrl={m.cover_image_url}
               />
             ))}
           </div>
