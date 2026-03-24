@@ -73,6 +73,8 @@ interface MemorialFormProps {
   isLoading: boolean;
   /** Server-side error (e.g. create/update action) shown inside the page shell */
   serverBanner?: string | null;
+  /** Overrides default shell subtitle (e.g. memorial name on edit) */
+  shellSubtitle?: string;
 }
 
 function generateSlug(name: string): string {
@@ -84,12 +86,15 @@ function generateSlug(name: string): string {
     .replace(/-+/g, "-");
 }
 
+const DEFAULT_SHELL_SUBTITLE = "Honor and remember those who meant so much.";
+
 export default function MemorialForm({
   mode,
   initialData,
   onSubmit,
   isLoading,
-  serverBanner = null
+  serverBanner = null,
+  shellSubtitle
 }: MemorialFormProps) {
   const isEdit = mode === "edit";
   const [type, setType] = useState<"human" | "pet">("human");
@@ -219,7 +224,7 @@ export default function MemorialForm({
   return (
     <MemorialPageShell
       title={isEdit ? "Edit memorial" : "Create a memorial"}
-      subtitle="Honor and remember those who meant so much."
+      subtitle={shellSubtitle ?? DEFAULT_SHELL_SUBTITLE}
       maxWidth="xl"
       contentClassName="mt-6"
     >

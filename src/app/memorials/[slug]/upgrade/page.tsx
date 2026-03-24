@@ -48,6 +48,13 @@ export default async function MemorialUpgradePage({
   const isOwner = !!user && memorial.owner_id === user.id;
   const isAdmin = role === "admin";
 
+  if (!user) {
+    const upgradePath =
+      `/memorials/${slug}/upgrade` +
+      (checkout ? `?checkout=${encodeURIComponent(checkout)}` : "");
+    redirect(`/auth/login?next=${encodeURIComponent(upgradePath)}`);
+  }
+
   if (!isOwner && !isAdmin) {
     redirect(`/memorials/${slug}`);
   }

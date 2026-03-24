@@ -71,6 +71,7 @@ export default function EditMemorialClient({ memorial }: EditMemorialClientProps
       onSubmit={handleSubmit}
       isLoading={isLoading}
       serverBanner={serverError}
+      shellSubtitle={`${memorial.full_name} · /memorials/${memorial.slug}`}
     />
   );
 }

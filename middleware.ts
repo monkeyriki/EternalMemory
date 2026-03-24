@@ -36,6 +36,19 @@ export async function middleware(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
+  const path = request.nextUrl.pathname;
+  if (
+    !user &&
+    (path.startsWith("/admin") || path.startsWith("/dashboard"))
+  ) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/auth/login";
+    loginUrl.search = "";
+    const nextPath = path + request.nextUrl.search;
+    loginUrl.searchParams.set("next", nextPath);
+    return NextResponse.redirect(loginUrl);
+  }
+
   const clientIp = getClientIpFromHeaders(request.headers);
   if (clientIp) {
     const skip = await shouldSkipIpBanForRequest(supabase, clientIp, user);

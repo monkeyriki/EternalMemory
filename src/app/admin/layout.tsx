@@ -13,7 +13,8 @@ export default async function AdminLayout({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/auth/login");
+    // Middleware normally sends unauthenticated users to /auth/login?next=…
+    redirect("/auth/login?next=/admin");
   }
 
   const { data: profile } = await supabase

@@ -40,8 +40,14 @@ export default async function EditMemorialPage({
   const isOwner = !!user && memorial.owner_id === user.id;
   const isAdmin = role === "admin";
 
+  if (!user) {
+    redirect(
+      `/auth/login?next=${encodeURIComponent(`/memorials/${slug}/edit`)}`
+    );
+  }
+
   if (!isOwner && !isAdmin) {
-    redirect("/memorials/humans");
+    redirect(`/memorials/${slug}`);
   }
 
   const { data: galleryRows } = await supabase
@@ -55,15 +61,6 @@ export default async function EditMemorialPage({
     gallery_image_urls: galleryRows?.map((r) => r.image_url) ?? []
   };
 
-  return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto max-w-2xl">
-        <h1 className="mb-6 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-          Edit memorial
-        </h1>
-        <EditMemorialClient memorial={memorialWithGallery as any} />
-      </div>
-    </div>
-  );
+  return <EditMemorialClient memorial={memorialWithGallery as any} />;
 }
 

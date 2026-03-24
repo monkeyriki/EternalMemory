@@ -124,6 +124,13 @@ Tables exist for: `profiles`, `memorials`, `memorial_media`, `guestbook_entries`
 - Dashboard `/dashboard/b2b`: subscribe CTA or bulk-create memorials (max 10) when subscription `active`.
 - Admin `/admin/users`: **Make B2B** sets `profiles.role = b2b` and upserts an active `b2b_subscriptions` row with `provider_subscription_id = admin_grant:<user_id>` for testing.
 
+## Auth redirects (post-login `next`)
+- **`safeAuthRedirectPath`** (`src/lib/safeAuthRedirect.ts`): only allows in-app paths (blocks `//`, `://`, etc.) for `next` query values.
+- **Email/password sign-in** (`/auth/login`): after success, redirects to `next` when valid; **Sign up** link preserves `next`. **Sign up** uses the same `next` for `emailRedirectTo` → `/auth/callback?next=…`.
+- **OAuth callback** (`/auth/callback`): applies the same sanitizer before redirect.
+- **Middleware**: unauthenticated visits to `/admin/*` or `/dashboard/*` redirect to `/auth/login?next=<original path + query>`.
+- **Memorial owner flows**: `/memorials/[slug]/edit` → login with `next` when signed out; signed-in non-owners go to the public memorial. `/memorials/[slug]/upgrade` → login with `next` (including `checkout` query when present) when signed out.
+
 ## Current app routing skeleton
 See `src/app/*` for placeholders (home, auth pages, memorials sections, dashboard, admin sections).
 

@@ -13,7 +13,7 @@ export default async function DashboardB2BPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/auth/login");
+    redirect("/auth/login?next=/dashboard/b2b");
   }
 
   const { data: activeSub } = await supabase
