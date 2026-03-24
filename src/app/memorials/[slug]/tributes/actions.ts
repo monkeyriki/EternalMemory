@@ -21,6 +21,8 @@ type CreateTributeInput = {
 type TributeActionResult = {
   ok: boolean;
   error?: string;
+  /** Free-text posts await owner approval unless the poster owns the memorial. */
+  pending_moderation?: boolean;
 };
 
 export async function createTributeAction(
@@ -70,36 +72,57 @@ export async function createTributeAction(
     return { ok: false, error: PROFANITY_BLOCKED_MESSAGE };
   }
 
-  if (user) {
-    const { error } = await supabase.from("virtual_tributes").insert({
-      memorial_id: input.memorial_id,
-      purchaser_id: user.id,
-      message,
-      order_id: null,
-      store_item_id: null,
-      guest_name: null,
-      is_approved: true
-    });
-    if (error) {
-      return { ok: false, error: "Failed to post tribute. Please try again." };
-    }
-    return { ok: true };
-  }
+  const { data: memorialOwnerRow } = await supabase
+    .from("memorials")
+    .select("owner_id")
+    .eq("id", input.memorial_id)
+    .maybeSingle();
 
-  const { error } = await supabase.from("virtual_tributes").insert({
-    memorial_id: input.memorial_id,
-    purchaser_id: null,
-    message,
-    order_id: null,
-    store_item_id: null,
-    guest_name: guestName || "Anonymous",
-    is_approved: false
-  });
+  const isOwnerFreePost =
+    !!user &&
+    memorialOwnerRow?.owner_id != null &&
+    memorialOwnerRow.owner_id === user.id;
+
+  const contributorLabelForEmail = user
+    ? (() => {
+        const meta = user.user_metadata as { full_name?: string } | undefined;
+        const base =
+          meta?.full_name?.trim() ||
+          user.email?.split("@")[0]?.trim() ||
+          "A signed-in visitor";
+        return `${base} (signed-in)`;
+      })()
+    : guestName || "Anonymous";
+
+  const insertRow = user
+    ? {
+        memorial_id: input.memorial_id,
+        purchaser_id: user.id,
+        message,
+        order_id: null,
+        store_item_id: null,
+        guest_name: null,
+        is_approved: isOwnerFreePost
+      }
+    : {
+        memorial_id: input.memorial_id,
+        purchaser_id: null,
+        message,
+        order_id: null,
+        store_item_id: null,
+        guest_name: guestName || "Anonymous",
+        is_approved: false
+      };
+
+  const { error } = await supabase.from("virtual_tributes").insert(insertRow);
   if (error) {
     return { ok: false, error: "Failed to post tribute. Please try again." };
   }
 
-  const displayGuestName = guestName || "Anonymous";
+  if (isOwnerFreePost) {
+    return { ok: true, pending_moderation: false };
+  }
+
   try {
     const appUrl =
       process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://eternalmemory.app";
@@ -132,7 +155,7 @@ export async function createTributeAction(
           const memorialName = memorial.full_name?.trim() || "Memorial";
           const content = guestTributePendingOwnerEmail({
             ownerName,
-            guestName: displayGuestName,
+            contributorLabel: contributorLabelForEmail,
             memorialName,
             appUrl
           });
@@ -153,16 +176,16 @@ export async function createTributeAction(
     }
   } catch (emailErr) {
     console.error(
-      "[createTributeAction] guest tribute owner notification error:",
+      "[createTributeAction] pending tribute owner notification error:",
       emailErr
     );
   }
 
-  return { ok: true };
+  return { ok: true, pending_moderation: true };
 }
 
 /**
- * Approve a pending (guest) free-text tribute.
+ * Approve a pending free-text tribute (guest or signed-in).
  * Allowed for: memorial owner or platform admin.
  */
 export async function approveTributeAction(

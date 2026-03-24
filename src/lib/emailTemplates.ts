@@ -100,26 +100,27 @@ View the memorial: ${link}`;
 
 export function guestTributePendingOwnerEmail({
   ownerName,
-  guestName,
+  contributorLabel,
   memorialName,
   appUrl
 }: {
   ownerName: string;
-  guestName: string;
+  /** Display name for the poster, e.g. guest name, Anonymous, or "Alex (signed-in)". */
+  contributorLabel: string;
   memorialName: string;
   appUrl: string;
 }): EmailContent {
   const modLink = moderationLink(appUrl);
   const safeOwner = escapeHtml(ownerName);
-  const safeGuest = escapeHtml(guestName);
+  const safeContributor = escapeHtml(contributorLabel);
   const safeMemorial = escapeHtml(memorialName);
-  const subject = `A guest left a condolence on ${memorialName} — pending approval`;
+  const subject = `New guestbook message on ${memorialName} — pending approval`;
   const html = `<p>Hi ${safeOwner},</p>
-<p>A guest (<strong>${safeGuest}</strong>) left a condolence on <strong>${safeMemorial}</strong>.</p>
+<p><strong>${safeContributor}</strong> left a condolence on <strong>${safeMemorial}</strong>.</p>
 <p><a href="${escapeHtml(modLink)}">Review and approve it in your admin panel</a></p>`;
   const text = `Hi ${ownerName},
 
-A guest (${guestName}) left a condolence on ${memorialName}.
+${contributorLabel} left a condolence on ${memorialName}.
 
 Review and approve it in your admin panel: ${modLink}`;
   return { subject, html, text };

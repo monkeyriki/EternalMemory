@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   MapPin,
   Facebook,
@@ -142,6 +142,7 @@ export function SingleMemorialClient({
   const [tributeMessage, setTributeMessage] = useState("");
   const [tributeGuestName, setTributeGuestName] = useState("");
   const [tributeError, setTributeError] = useState<string | null>(null);
+  const [freeTributeNotice, setFreeTributeNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tributes, setTributes] = useState<TributeItem[]>(initialTributes ?? []);
   const [approveLoadingId, setApproveLoadingId] = useState<string | null>(null);
@@ -152,6 +153,7 @@ export function SingleMemorialClient({
   const [reportModal, setReportModal] = useState<
     null | { scope: "memorial" } | { scope: "tribute"; tributeId: string }
   >(null);
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -165,6 +167,12 @@ export function SingleMemorialClient({
     const t = setTimeout(() => setShareToast(null), 3500);
     return () => clearTimeout(t);
   }, [shareToast]);
+
+  useEffect(() => {
+    if (!freeTributeNotice) return;
+    const t = setTimeout(() => setFreeTributeNotice(null), 10000);
+    return () => clearTimeout(t);
+  }, [freeTributeNotice]);
 
   useEffect(() => {
     if (!payModalItemId) return;
@@ -190,8 +198,8 @@ export function SingleMemorialClient({
     [tributes]
   );
 
-  /** Guest free-text tributes awaiting approval (not paid store items). */
-  const pendingGuestTributes = useMemo(
+  /** Free-text tributes awaiting approval (not paid store items). */
+  const pendingFreeTributes = useMemo(
     () => tributes.filter((t) => !t.is_approved && !t.store_item_id),
     [tributes]
   );
@@ -295,23 +303,14 @@ export function SingleMemorialClient({
       return;
     }
 
-    const now = new Date().toISOString();
-    if (isAuthenticated) {
-      setTributes((prev) => [
-        {
-          id: `optimistic-${now}`,
-          message: tributeMessage.trim(),
-          created_at: now,
-          purchaser_id: "me",
-          guest_name: null,
-          is_approved: true,
-          store_item_id: null,
-          highlight_until: null
-        },
-        ...prev
-      ]);
+    if (result.pending_moderation === false) {
+      setFreeTributeNotice(null);
+      router.refresh();
+    } else {
+      setFreeTributeNotice(
+        "Thank you. Your message was submitted and is pending approval by the memorial owner."
+      );
     }
-    // Guest posts stay pending until owner/admin approves — do not add optimistically.
     setTributeMessage("");
     setTributeGuestName("");
     setShowForm(false);
@@ -658,24 +657,33 @@ export function SingleMemorialClient({
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                 {approvedTributes.length} published
               </span>
-              {canModerate && pendingGuestTributes.length > 0 && (
+              {canModerate && pendingFreeTributes.length > 0 && (
                 <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-                  {pendingGuestTributes.length} pending
+                  {pendingFreeTributes.length} pending
                 </span>
               )}
             </div>
           </div>
 
-          {canModerate && pendingGuestTributes.length > 0 && (
+          {freeTributeNotice && (
+            <div
+              className="mb-4 rounded-xl border border-amber-200 bg-amber-50/90 p-3 text-sm text-amber-950"
+              role="status"
+            >
+              {freeTributeNotice}
+            </div>
+          )}
+
+          {canModerate && pendingFreeTributes.length > 0 && (
             <div className="mb-5 space-y-3 rounded-xl border border-amber-200 bg-amber-50/80 p-4">
               <h3 className="text-sm font-semibold text-amber-900">
-                Pending approval (guest messages)
+                Pending approval (free messages)
               </h3>
               <p className="text-xs text-amber-800/90">
                 Only you and admins can see these until you approve them.
               </p>
               <div className="space-y-3">
-                {pendingGuestTributes.map((t) => (
+                {pendingFreeTributes.map((t) => (
                   <div
                     key={t.id}
                     className="rounded-xl border border-amber-200 bg-white p-4 text-sm text-slate-700"
@@ -710,7 +718,7 @@ export function SingleMemorialClient({
             </div>
           )}
 
-          {approvedTributes.length === 0 && pendingGuestTributes.length === 0 ? (
+          {approvedTributes.length === 0 && pendingFreeTributes.length === 0 ? (
             <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm">
               No guestbook entries yet. Leave a free message or purchase a virtual tribute above.
             </div>
@@ -718,7 +726,7 @@ export function SingleMemorialClient({
             <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm">
               No published guestbook entries yet.
               {!canModerate &&
-                pendingGuestTributes.length > 0 &&
+                pendingFreeTributes.length > 0 &&
                 " Messages may appear after the memorial owner approves them."}
             </div>
           ) : (
