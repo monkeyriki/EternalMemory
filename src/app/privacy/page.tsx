@@ -135,6 +135,22 @@ export default function PrivacyPage() {
         </section>
         <section>
           <h2 className="font-serif text-xl font-semibold text-slate-900">
+            8a. Account deletion requests
+          </h2>
+          <p className="mt-2">
+            You can submit a deletion request directly from your account at{" "}
+            <a
+              href="/account/delete"
+              className="rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+            >
+              /account/delete
+            </a>
+            . We review and process requests according to legal obligations and
+            retention requirements.
+          </p>
+        </section>
+        <section>
+          <h2 className="font-serif text-xl font-semibold text-slate-900">
             9. Memorial content and moderation
           </h2>
           <p className="mt-2">

@@ -87,8 +87,20 @@ export default async function DashboardPage() {
           </div>
         </Link>
         <Link
+          href="/account/delete"
+          className="flex items-center gap-3 rounded-2xl border border-red-200/80 bg-red-50/70 px-4 py-4 shadow-sm backdrop-blur transition hover:border-red-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/70 focus-visible:ring-offset-2 sm:col-span-2 lg:col-span-1"
+        >
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-red-700 ring-1 ring-red-200">
+            <Heart className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+          </span>
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Delete account</p>
+            <p className="text-xs text-slate-600">Privacy request</p>
+          </div>
+        </Link>
+        <Link
           href="/memorials"
-          className="group flex items-center gap-3 rounded-2xl border border-dashed border-slate-300/90 bg-slate-50/80 px-4 py-4 text-sm font-medium text-slate-600 transition hover:border-amber-200 hover:bg-amber-50/40 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 sm:col-span-2 lg:col-span-1"
+          className="group flex items-center gap-3 rounded-2xl border border-dashed border-slate-300/90 bg-slate-50/80 px-4 py-4 text-sm font-medium text-slate-600 transition hover:border-amber-200 hover:bg-amber-50/40 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 sm:col-span-2 lg:col-span-2"
         >
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-amber-700 ring-1 ring-slate-200 transition group-hover:ring-amber-200">
             <Heart className="h-5 w-5" strokeWidth={1.75} aria-hidden />
