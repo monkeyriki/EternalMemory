@@ -25,14 +25,10 @@ export async function generateQRAction(
     data: { user }
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return { ok: false, error: "You must be signed in." };
-  }
-
   const slugNorm = input.slug.trim().toLowerCase();
   const { data: memorial } = await supabase
     .from("memorials")
-    .select("id, slug, owner_id")
+    .select("id, slug, owner_id, is_draft")
     .eq("id", input.memorial_id)
     .maybeSingle();
 
@@ -44,19 +40,22 @@ export async function generateQRAction(
     return { ok: false, error: "Invalid memorial." };
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    isAdmin = profile?.role === "admin";
+  }
 
-  const isAdmin = profile?.role === "admin";
-  const isOwner = memorial.owner_id === user.id;
+  const isOwner = !!user && memorial.owner_id === user.id;
 
-  if (!isOwner && !isAdmin) {
+  if (memorial.is_draft && !isOwner && !isAdmin) {
     return {
       ok: false,
-      error: "You do not have permission to generate this QR code."
+      error: "QR codes are available after the memorial is published."
     };
   }
 
@@ -73,14 +72,19 @@ export async function generateQRAction(
     return { ok: false, error: "Failed to generate QR code." };
   }
 
-  await supabase.from("qr_codes").upsert(
-    {
-      memorial_id: input.memorial_id,
-      code_value: memorialUrl,
-      image_url: dataUrl
-    },
-    { onConflict: "memorial_id" }
-  );
+  if (isOwner || isAdmin) {
+    const { error: qrErr } = await supabase.from("qr_codes").upsert(
+      {
+        memorial_id: input.memorial_id,
+        code_value: memorialUrl,
+        image_url: dataUrl
+      },
+      { onConflict: "memorial_id" }
+    );
+    if (qrErr) {
+      console.error("generateQRAction qr_codes upsert:", qrErr);
+    }
+  }
 
   return { ok: true, dataUrl };
 }

@@ -9,6 +9,20 @@ import type { Metadata } from "next";
 const BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://eternalmemory.app";
 
+function absoluteSiteUrl(path: string): string {
+  const base = BASE_URL.replace(/\/$/, "");
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${p}`;
+}
+
+/** Memorial images from DB may be absolute (storage) or site-relative. */
+function absoluteOgImageUrl(url: string): string {
+  const u = url.trim();
+  if (!u) return absoluteSiteUrl("/og-default.png");
+  if (u.startsWith("http://") || u.startsWith("https://")) return u;
+  return absoluteSiteUrl(u);
+}
+
 function formatYear(date: string | null | undefined): string | null {
   if (!date || typeof date !== "string") return null;
   const s = date.trim();
@@ -89,38 +103,54 @@ export async function generateMetadata({
   const canonicalUrl = `${BASE_URL}/memorials/${memorial.slug}`;
   const desc160 = description.slice(0, 160);
 
-  const cover =
+  const coverRaw =
     memorial.cover_image_url && memorial.cover_image_url.trim().length > 0
       ? memorial.cover_image_url.trim()
       : null;
+
+  let ogImageUrl: string | null = coverRaw ? absoluteOgImageUrl(coverRaw) : null;
+
+  if (!ogImageUrl) {
+    const { data: firstMedia } = await supabase
+      .from("memorial_media")
+      .select("image_url")
+      .eq("memorial_id", memorial.id)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    const galleryUrl = firstMedia?.image_url?.trim();
+    if (galleryUrl) {
+      ogImageUrl = absoluteOgImageUrl(galleryUrl);
+    }
+  }
+
+  if (!ogImageUrl) {
+    ogImageUrl = absoluteSiteUrl("/og-default.png");
+  }
 
   const openGraph: Metadata["openGraph"] = {
     title,
     description: desc160,
     type: "website",
-    url: canonicalUrl
-  };
-  if (cover) {
-    openGraph.images = [
+    url: canonicalUrl,
+    images: [
       {
-        url: cover,
+        url: ogImageUrl,
         width: 1200,
         height: 630,
         alt: memorial.full_name
       }
-    ];
-  }
+    ]
+  };
 
-  const twitterImages = cover
-    ? [
-        {
-          url: cover,
-          width: 1200,
-          height: 630,
-          alt: memorial.full_name
-        }
-      ]
-    : undefined;
+  const twitterImages = [
+    {
+      url: ogImageUrl,
+      width: 1200,
+      height: 630,
+      alt: memorial.full_name
+    }
+  ];
 
   const isPublic = memorial.visibility === "public";
   const robots: Metadata["robots"] = isPublic
@@ -136,10 +166,10 @@ export async function generateMetadata({
     description: desc160,
     openGraph,
     twitter: {
-      card: cover ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title,
       description: desc160,
-      ...(twitterImages ? { images: twitterImages } : {})
+      images: twitterImages
     },
     robots
   };

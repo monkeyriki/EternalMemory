@@ -184,8 +184,6 @@ export function SingleMemorialClient({
   }, [storeItems]);
 
   const canModerate = isOwner || isAdmin;
-  /** QR generate/download: owner or admin only (PRD / privacy). */
-  const canViewQrSection = isOwner || isAdmin;
 
   const approvedTributes = useMemo(
     () => tributes.filter((t) => t.is_approved),
@@ -1038,21 +1036,19 @@ export function SingleMemorialClient({
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
-            {canViewQrSection && (
-              <>
-                <button
-                  type="button"
-                  onClick={handleGetQR}
-                  disabled={qrLoading}
-                  className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-60"
-                >
-                  {qrLoading ? "Generating..." : "Get QR Code"}
-                </button>
-                {qrError && (
-                  <p className="w-full text-xs text-red-500">{qrError}</p>
-                )}
-              </>
-            )}
+            <>
+              <button
+                type="button"
+                onClick={handleGetQR}
+                disabled={qrLoading}
+                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 disabled:opacity-60"
+              >
+                {qrLoading ? "Generating..." : "Get QR Code"}
+              </button>
+              {qrError && (
+                <p className="w-full text-xs text-red-500">{qrError}</p>
+              )}
+            </>
             {canEdit && (
               <Link
                 href={`/memorials/${memorial.slug}/edit`}
@@ -1065,7 +1061,7 @@ export function SingleMemorialClient({
           </div>
         </footer>
 
-        {canViewQrSection && showQr && qrDataUrl && (
+        {showQr && qrDataUrl && (
           <div className="relative mt-4 rounded-xl border border-slate-100 bg-white p-6 text-center shadow-sm">
             <button
               type="button"
