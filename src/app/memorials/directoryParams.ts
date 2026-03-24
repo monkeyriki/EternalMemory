@@ -3,6 +3,7 @@ import { normalizeTagToken } from "@/lib/memorialTags";
 export type MemorialDirectorySearchParams = {
   search?: string;
   city?: string;
+  state?: string;
   sort?: string;
   page?: string;
   birth_year_min?: string;
@@ -45,6 +46,7 @@ export function buildMemorialDirectoryQueryString(
   const q = new URLSearchParams();
   if (params.search?.trim()) q.set("search", params.search.trim());
   if (params.city?.trim()) q.set("city", params.city.trim());
+  if (params.state?.trim()) q.set("state", params.state.trim());
   if (params.sort && params.sort !== "recent") q.set("sort", params.sort);
   if (params.birth_year_min?.trim())
     q.set("birth_year_min", params.birth_year_min.trim());
@@ -65,6 +67,7 @@ export function directoryHasAdvancedFilters(
 ): boolean {
   if (!params) return false;
   return !!(
+    params.state?.trim() ||
     params.birth_year_min?.trim() ||
     params.birth_year_max?.trim() ||
     params.death_year_min?.trim() ||

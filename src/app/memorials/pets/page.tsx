@@ -26,7 +26,7 @@ export default async function MemorialsPetsPage({
   let query = supabase
     .from("memorials")
     .select(
-      "id, slug, type, full_name, date_of_birth, date_of_death, city, tags"
+      "id, slug, type, full_name, date_of_birth, date_of_death, city, state, tags"
     )
     .eq("type", "pet")
     .eq("visibility", "public")
@@ -37,6 +37,9 @@ export default async function MemorialsPetsPage({
   }
   if (searchParams?.city?.trim()) {
     query = query.ilike("city", `%${searchParams.city.trim()}%`);
+  }
+  if (searchParams?.state?.trim()) {
+    query = query.ilike("state", `%${searchParams.state.trim()}%`);
   }
 
   const bMin = parseYearFilter(searchParams?.birth_year_min);
@@ -69,6 +72,7 @@ export default async function MemorialsPetsPage({
   const hasFilters =
     searchParams?.search?.trim() ||
     searchParams?.city?.trim() ||
+    searchParams?.state?.trim() ||
     (searchParams?.sort && searchParams.sort !== "recent") ||
     directoryHasAdvancedFilters(searchParams);
 
@@ -82,6 +86,7 @@ export default async function MemorialsPetsPage({
         <DirectoryFilters
           currentSearch={searchParams?.search}
           currentCity={searchParams?.city}
+          currentState={searchParams?.state}
           currentSort={searchParams?.sort}
           currentBirthYearMin={searchParams?.birth_year_min}
           currentBirthYearMax={searchParams?.birth_year_max}

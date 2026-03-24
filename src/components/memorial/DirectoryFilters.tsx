@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 export type DirectoryFiltersProps = {
   currentSearch?: string;
   currentCity?: string;
+  currentState?: string;
   currentSort?: string;
   currentBirthYearMin?: string;
   currentBirthYearMax?: string;
@@ -19,6 +20,7 @@ const DEBOUNCE_MS = 450;
 export default function DirectoryFilters({
   currentSearch = "",
   currentCity = "",
+  currentState = "",
   currentSort = "recent",
   currentBirthYearMin = "",
   currentBirthYearMax = "",
@@ -30,6 +32,7 @@ export default function DirectoryFilters({
   const router = useRouter();
   const [search, setSearch] = useState(currentSearch);
   const [city, setCity] = useState(currentCity);
+  const [state, setState] = useState(currentState);
   const [sort, setSort] = useState(currentSort ?? "recent");
   const [birthYearMin, setBirthYearMin] = useState(currentBirthYearMin);
   const [birthYearMax, setBirthYearMax] = useState(currentBirthYearMax);
@@ -40,6 +43,7 @@ export default function DirectoryFilters({
   useEffect(() => {
     setSearch(currentSearch);
     setCity(currentCity);
+    setState(currentState);
     setSort(currentSort ?? "recent");
     setBirthYearMin(currentBirthYearMin);
     setBirthYearMax(currentBirthYearMax);
@@ -49,6 +53,7 @@ export default function DirectoryFilters({
   }, [
     currentSearch,
     currentCity,
+    currentState,
     currentSort,
     currentBirthYearMin,
     currentBirthYearMax,
@@ -62,6 +67,7 @@ export default function DirectoryFilters({
       const params = new URLSearchParams();
       if (search.trim()) params.set("search", search.trim());
       if (city.trim()) params.set("city", city.trim());
+      if (state.trim()) params.set("state", state.trim());
       if (sort && sort !== "recent") params.set("sort", sort);
       if (birthYearMin.trim())
         params.set("birth_year_min", birthYearMin.trim());
@@ -79,6 +85,7 @@ export default function DirectoryFilters({
   }, [
     search,
     city,
+    state,
     sort,
     birthYearMin,
     birthYearMax,
@@ -95,6 +102,7 @@ export default function DirectoryFilters({
     const params = new URLSearchParams();
     if (search.trim()) params.set("search", search.trim());
     if (city.trim()) params.set("city", city.trim());
+    if (state.trim()) params.set("state", state.trim());
     if (value && value !== "recent") params.set("sort", value);
     if (birthYearMin.trim()) params.set("birth_year_min", birthYearMin.trim());
     if (birthYearMax.trim()) params.set("birth_year_max", birthYearMax.trim());
@@ -108,6 +116,7 @@ export default function DirectoryFilters({
   const hasActiveFilters =
     (search && search.trim()) ||
     (city && city.trim()) ||
+    (state && state.trim()) ||
     (sort && sort !== "recent") ||
     birthYearMin.trim() ||
     birthYearMax.trim() ||
@@ -118,6 +127,7 @@ export default function DirectoryFilters({
   const handleReset = () => {
     setSearch("");
     setCity("");
+    setState("");
     setSort("recent");
     setBirthYearMin("");
     setBirthYearMax("");
@@ -132,7 +142,7 @@ export default function DirectoryFilters({
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
         Search & filters
       </p>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
           <label htmlFor="dir-search" className="sr-only">
             Search by name
@@ -156,6 +166,19 @@ export default function DirectoryFilters({
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="Filter by city..."
+            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+          />
+        </div>
+        <div>
+          <label htmlFor="dir-state" className="sr-only">
+            Filter by state
+          </label>
+          <input
+            id="dir-state"
+            type="text"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            placeholder="Filter by state..."
             className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-amber-300/80 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
           />
         </div>
