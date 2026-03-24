@@ -35,19 +35,21 @@ export default async function AdminPage() {
   ];
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+    <div className="space-y-6">
+      <header>
+      <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
         Admin dashboard
       </h1>
       <p className="mt-2 text-sm text-slate-600">
         Overview of platform activity.
       </p>
+      </header>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map((s) => (
           <div
             key={s.label}
-            className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+            className="rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm"
           >
             <p className="text-3xl font-bold text-slate-900">{s.value}</p>
             <p className="mt-1 text-sm text-slate-500">{s.label}</p>

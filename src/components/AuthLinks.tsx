@@ -39,7 +39,7 @@ export function AuthLinks() {
       <button
         type="button"
         onClick={handleLogout}
-        className="text-sm font-medium text-slate-600 underline-offset-4 transition-colors hover:text-slate-900 hover:underline"
+        className="rounded-md text-sm font-medium text-slate-600 underline-offset-4 transition-colors hover:text-slate-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
       >
         Sign out
       </button>
@@ -50,7 +50,7 @@ export function AuthLinks() {
     <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
       <Link
         href="/auth/login"
-        className="text-sm font-semibold uppercase tracking-wide text-slate-600 transition-colors hover:text-slate-900"
+        className="rounded-md text-sm font-semibold uppercase tracking-wide text-slate-600 transition-colors hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
       >
         Sign in
       </Link>

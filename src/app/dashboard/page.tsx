@@ -52,7 +52,7 @@ export default async function DashboardPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           href="/memorials/new"
-          className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-4 py-4 shadow-sm backdrop-blur transition hover:border-amber-200/80 hover:shadow-md"
+          className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-4 py-4 shadow-sm backdrop-blur transition hover:border-amber-200/80 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-800 ring-1 ring-amber-200/80">
             <Sparkles className="h-5 w-5" strokeWidth={1.75} aria-hidden />
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
         </Link>
         <Link
           href="/memorials"
-          className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-4 py-4 shadow-sm backdrop-blur transition hover:border-amber-200/80 hover:shadow-md"
+          className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-4 py-4 shadow-sm backdrop-blur transition hover:border-amber-200/80 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700 ring-1 ring-slate-200">
             <LayoutGrid className="h-5 w-5" strokeWidth={1.75} aria-hidden />
@@ -76,7 +76,7 @@ export default async function DashboardPage() {
         </Link>
         <Link
           href="/plans"
-          className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-4 py-4 shadow-sm backdrop-blur transition hover:border-amber-200/80 hover:shadow-md sm:col-span-2 lg:col-span-1"
+          className="flex items-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-4 py-4 shadow-sm backdrop-blur transition hover:border-amber-200/80 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 sm:col-span-2 lg:col-span-1"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-800 ring-1 ring-amber-200/70">
             <CreditCard className="h-5 w-5" strokeWidth={1.75} aria-hidden />
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
         </Link>
         <Link
           href="/memorials"
-          className="group flex items-center gap-3 rounded-2xl border border-dashed border-slate-300/90 bg-slate-50/80 px-4 py-4 text-sm font-medium text-slate-600 transition hover:border-amber-200 hover:bg-amber-50/40 hover:text-slate-900 sm:col-span-2 lg:col-span-1"
+          className="group flex items-center gap-3 rounded-2xl border border-dashed border-slate-300/90 bg-slate-50/80 px-4 py-4 text-sm font-medium text-slate-600 transition hover:border-amber-200 hover:bg-amber-50/40 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 sm:col-span-2 lg:col-span-1"
         >
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-amber-700 ring-1 ring-slate-200 transition group-hover:ring-amber-200">
             <Heart className="h-5 w-5" strokeWidth={1.75} aria-hidden />
@@ -112,7 +112,7 @@ export default async function DashboardPage() {
           </p>
           <Link
             href="/dashboard/b2b"
-            className="mt-3 inline-flex text-sm font-semibold text-amber-800 underline-offset-2 hover:underline"
+            className="mt-3 inline-flex rounded-md text-sm font-semibold text-amber-800 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
           >
             Open B2B dashboard →
           </Link>

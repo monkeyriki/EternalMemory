@@ -27,7 +27,7 @@ export default function AdminNav() {
           <Link
             key={l.href}
             href={l.href}
-            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors md:block ${
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 md:block ${
               active
                 ? "bg-amber-600 text-white"
                 : "text-slate-200 hover:bg-slate-800 hover:text-white"
