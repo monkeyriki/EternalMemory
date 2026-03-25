@@ -290,6 +290,39 @@ export default function PlansPage() {
                 </div>
               ))}
             </div>
+
+            <div className="mt-2 border-t border-slate-200/80 pt-8">
+              <div className="grid grid-cols-[minmax(0,1.45fr)_repeat(3,minmax(0,1fr))] items-end gap-4 sm:gap-6">
+                <div aria-hidden className="min-w-0" />
+                <div className="flex flex-col items-center gap-3 px-0.5">
+                  <p className="text-center text-sm font-semibold text-slate-600">Free</p>
+                  <Link
+                    href="/memorials/new"
+                    className="block w-full max-w-[200px] rounded-xl bg-slate-500 px-4 py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                  >
+                    Select
+                  </Link>
+                </div>
+                <div className="flex flex-col items-center gap-3 px-0.5">
+                  <p className="text-center text-sm font-semibold text-teal-800">Subscription</p>
+                  <Link
+                    href="/plans/continue-checkout?plan=premium"
+                    className="block w-full max-w-[200px] rounded-xl bg-teal-700 px-4 py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-teal-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                  >
+                    Select
+                  </Link>
+                </div>
+                <div className="flex flex-col items-center gap-3 px-0.5">
+                  <p className="text-center text-sm font-semibold text-amber-900">One-time</p>
+                  <Link
+                    href="/plans/continue-checkout?plan=lifetime"
+                    className="block w-full max-w-[200px] rounded-xl bg-amber-800 px-4 py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-amber-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                  >
+                    Select
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
