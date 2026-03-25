@@ -55,18 +55,20 @@ export default function MemorialCard({
 
   return (
     <article className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-md shadow-slate-400/10 backdrop-blur transition hover:border-amber-200/60 hover:shadow-lg hover:shadow-amber-900/5">
-      <div className="relative aspect-[4/3] w-full shrink-0 bg-slate-100">
+      {/* Fixed crop: intrinsic image size must not affect layout (absolute fill + object-cover). */}
+      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-slate-100">
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element -- remote Supabase URLs vary by project
           <img
             src={cover}
             alt=""
             loading="lazy"
-            className="h-full w-full object-cover"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
           <div
-            className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200/90 text-slate-400"
+            className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200/90 text-slate-400"
             aria-hidden
           >
             <span className="font-serif text-sm font-medium tracking-wide">
