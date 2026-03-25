@@ -1,7 +1,14 @@
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { parseMemorialPlanCheckoutSku } from "@/lib/memorialStripeHosting";
+import type { PlansTier } from "@/lib/plansTier";
 import MemorialNewClient from "./MemorialNewClient";
+
+function parseHostingParam(raw: string | string[] | undefined): PlansTier | null {
+  const s = typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] : "";
+  if (s === "premium" || s === "lifetime") return s;
+  return null;
+}
 
 export const metadata = {
   title: "Create memorial | EternalMemory",
@@ -15,6 +22,7 @@ export default async function MemorialNewPage({
     firstName?: string | string[];
     lastName?: string | string[];
     checkoutPlan?: string | string[];
+    hosting?: string | string[];
   };
 }) {
   const firstNameRaw = searchParams?.firstName;
@@ -38,11 +46,15 @@ export default async function MemorialNewPage({
         ? checkoutPlanRaw[0]
         : "";
   const checkoutPlanAfterCreate = parseMemorialPlanCheckoutSku(checkoutPlanStr);
+  const hostingAfterCreate = parseHostingParam(searchParams?.hosting);
 
   const nextPath = (() => {
     const params = new URLSearchParams();
     if (firstName) params.set("firstName", firstName);
     if (lastName) params.set("lastName", lastName);
+    if (hostingAfterCreate) {
+      params.set("hosting", hostingAfterCreate);
+    }
     if (checkoutPlanAfterCreate) {
       params.set("checkoutPlan", checkoutPlanAfterCreate);
     }
@@ -62,6 +74,7 @@ export default async function MemorialNewPage({
   return (
     <MemorialNewClient
       initialFullName={prefillFullName}
+      hostingAfterCreate={hostingAfterCreate}
       checkoutPlanAfterCreate={checkoutPlanAfterCreate}
     />
   );

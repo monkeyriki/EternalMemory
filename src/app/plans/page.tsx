@@ -60,7 +60,7 @@ export default function PlansPage() {
   return (
     <MemorialPageShell
       title="Plans & features"
-      subtitle="Start free on Basic, or go straight to secure checkout for Premium or Lifetime when you are ready. Each paid plan applies to one memorial."
+      subtitle="Start free on Basic, or choose Premium or Lifetime for a single memorial. You will sign in if needed, then choose billing options on the next step."
       maxWidth="5xl"
       contentClassName="mt-6 space-y-12"
     >
@@ -107,7 +107,7 @@ export default function PlansPage() {
                 <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-amber-800">
                   {plan.price}
                 </p>
-                <ul className="mt-4 flex flex-1 flex-col gap-2.5 text-sm text-slate-700">
+                <ul className="mt-4 flex min-h-0 flex-1 flex-col gap-2.5 text-sm text-slate-700">
                   {plan.bullets.map((line) => (
                     <li key={line} className="flex gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden />
@@ -115,7 +115,7 @@ export default function PlansPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-6 space-y-2">
+                <div className="mt-auto space-y-2 pt-6">
                   {plan.cta.kind === "basic" && (
                     <Link href="/memorials/new" className="block w-full">
                       <Button
@@ -129,45 +129,34 @@ export default function PlansPage() {
                   {plan.cta.kind === "premium" && (
                     <>
                       <Link
-                        href="/plans/continue-checkout?sku=premium_monthly"
+                        href="/plans/continue-checkout?plan=premium"
                         className="block w-full"
                       >
                         <Button
                           variant="accent"
                           className="w-full py-2.5 text-sm font-semibold"
                         >
-                          Subscribe monthly (Stripe)
-                        </Button>
-                      </Link>
-                      <Link
-                        href="/plans/continue-checkout?sku=premium_yearly"
-                        className="block w-full"
-                      >
-                        <Button
-                          variant="secondary"
-                          className="w-full py-2.5 text-sm font-semibold"
-                        >
-                          Subscribe yearly (Stripe)
+                          Subscribe
                         </Button>
                       </Link>
                       <p className="text-center text-xs text-slate-500">
-                        Sign in required. If you have several memorials, you will pick which one to
-                        upgrade.
+                        Sign in if prompted. Multiple memorials: you will choose which page to
+                        upgrade; then pick monthly or yearly.
                       </p>
                     </>
                   )}
                   {plan.cta.kind === "lifetime" && (
                     <>
-                      <Link href="/plans/continue-checkout?sku=lifetime" className="block w-full">
+                      <Link href="/plans/continue-checkout?plan=lifetime" className="block w-full">
                         <Button
                           variant="accent"
                           className="w-full py-2.5 text-sm font-semibold"
                         >
-                          Pay once with Stripe
+                          Pay once
                         </Button>
                       </Link>
                       <p className="text-center text-xs text-slate-500">
-                        Sign in required. If you have several memorials, you will pick which one to
+                        Sign in if prompted. Multiple memorials: you will choose which page to
                         upgrade.
                       </p>
                     </>

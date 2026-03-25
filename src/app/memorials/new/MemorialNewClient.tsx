@@ -7,15 +7,19 @@ import MemorialForm, {
 } from "@/components/memorial/MemorialForm";
 import { createMemorialAction } from "./actions";
 import type { MemorialPlanCheckoutSku } from "@/lib/memorialStripeHosting";
+import type { PlansTier } from "@/lib/plansTier";
 
 type MemorialNewClientProps = {
   initialFullName?: string;
-  /** After create, redirect to upgrade with Stripe auto-checkout (from /plans). */
+  /** From /plans flow: open upgrade after create (Premium = choose billing; Lifetime = payment). */
+  hostingAfterCreate?: PlansTier | null;
+  /** Legacy: auto-checkout SKU after create. */
   checkoutPlanAfterCreate?: MemorialPlanCheckoutSku | null;
 };
 
 export default function MemorialNewClient({
   initialFullName,
+  hostingAfterCreate = null,
   checkoutPlanAfterCreate = null
 }: MemorialNewClientProps) {
   const router = useRouter();
@@ -56,19 +60,23 @@ export default function MemorialNewClient({
     }
 
     const slug = result.slug.trim().toLowerCase();
+
+    if (hostingAfterCreate === "premium") {
+      router.push(`/memorials/${slug}/upgrade`);
+      return;
+    }
+    if (hostingAfterCreate === "lifetime") {
+      router.push(`/memorials/${slug}/upgrade?autoCheckout=lifetime`);
+      return;
+    }
+
     if (checkoutPlanAfterCreate) {
-      console.log(
-        "[MemorialNewClient] Redirecting to upgrade + checkout:",
-        slug,
-        checkoutPlanAfterCreate
-      );
       router.push(
         `/memorials/${slug}/upgrade?autoCheckout=${encodeURIComponent(checkoutPlanAfterCreate)}`
       );
       return;
     }
 
-    console.log("[MemorialNewClient] Redirecting to:", `/memorials/${slug}`);
     router.push(`/memorials/${slug}`);
   }
 

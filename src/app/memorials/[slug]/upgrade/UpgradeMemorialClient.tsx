@@ -16,7 +16,7 @@ type UpgradeMemorialClientProps = {
   hostingPlan: string | null;
   planExpiresAt: string | null;
   checkout?: string | null;
-  /** From /plans flow: open Stripe Checkout once on load. */
+  /** From /plans flow: open hosted checkout once on load. */
   autoCheckout?: MemorialPlanCheckoutSku | null;
 };
 
@@ -93,8 +93,8 @@ export default function UpgradeMemorialClient({
     <div className="space-y-8">
       {checkout === "success" && (
         <div className="rounded-2xl border border-emerald-200/90 bg-emerald-50/95 px-4 py-3 text-sm text-emerald-900 shadow-sm backdrop-blur">
-          Payment received. Your memorial plan updates in a few seconds once Stripe confirms the
-          webhook. Refresh this page if it does not change.
+          Payment received. Your memorial plan updates in a few moments once payment is confirmed.
+          Refresh this page if it does not change.
         </div>
       )}
       {checkout === "cancelled" && (

@@ -2,44 +2,33 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
-import {
-  parseMemorialPlanCheckoutSku,
-  type MemorialPlanCheckoutSku
-} from "@/lib/memorialStripeHosting";
+import type { PlansTier } from "@/lib/plansTier";
 
 export const metadata = {
-  title: "Choose memorial — checkout | EternalMemory",
-  description: "Select which memorial to upgrade with your chosen plan."
+  title: "Choose memorial | EternalMemory",
+  description: "Select which memorial to upgrade."
 };
 
-function skuFromSearchParams(searchParams?: {
-  sku?: string | string[];
-}): MemorialPlanCheckoutSku | null {
-  const raw = searchParams?.sku;
-  const s = typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] : "";
-  return parseMemorialPlanCheckoutSku(s);
+function parsePlansTier(searchParams?: {
+  plan?: string | string[];
+}): PlansTier | null {
+  const raw = searchParams?.plan;
+  const p = typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] : "";
+  if (p === "premium" || p === "lifetime") return p;
+  return null;
 }
 
-function planTitle(sku: MemorialPlanCheckoutSku): string {
-  switch (sku) {
-    case "premium_monthly":
-      return "Premium (monthly)";
-    case "premium_yearly":
-      return "Premium (yearly)";
-    case "lifetime":
-      return "Lifetime";
-    default:
-      return "Paid plan";
-  }
+function planTitle(tier: PlansTier): string {
+  return tier === "lifetime" ? "Lifetime" : "Premium";
 }
 
 export default async function PlansSelectMemorialPage({
   searchParams
 }: {
-  searchParams?: { sku?: string | string[] };
+  searchParams?: { plan?: string | string[] };
 }) {
-  const sku = skuFromSearchParams(searchParams);
-  if (!sku) {
+  const tier = parsePlansTier(searchParams);
+  if (!tier) {
     redirect("/plans");
   }
 
@@ -48,7 +37,7 @@ export default async function PlansSelectMemorialPage({
     data: { user }
   } = await supabase.auth.getUser();
 
-  const returnPath = `/plans/select-memorial?sku=${encodeURIComponent(sku)}`;
+  const returnPath = `/plans/select-memorial?plan=${encodeURIComponent(tier)}`;
 
   if (!user) {
     redirect(`/auth/login?next=${encodeURIComponent(returnPath)}`);
@@ -63,21 +52,22 @@ export default async function PlansSelectMemorialPage({
   const list = memorials ?? [];
 
   if (list.length === 0) {
-    redirect(`/memorials/new?checkoutPlan=${encodeURIComponent(sku)}`);
+    redirect(`/memorials/new?hosting=${encodeURIComponent(tier)}`);
   }
 
   if (list.length === 1) {
     const slug = list[0].slug?.trim().toLowerCase();
     if (!slug) redirect("/plans");
-    redirect(
-      `/memorials/${slug}/upgrade?autoCheckout=${encodeURIComponent(sku)}`
-    );
+    if (tier === "premium") {
+      redirect(`/memorials/${slug}/upgrade`);
+    }
+    redirect(`/memorials/${slug}/upgrade?autoCheckout=lifetime`);
   }
 
   return (
     <MemorialPageShell
       title="Which memorial?"
-      subtitle={`Choose a memorial to apply ${planTitle(sku)}. You will be redirected to secure checkout.`}
+      subtitle={`Choose a memorial for ${planTitle(tier)} hosting.`}
       maxWidth="2xl"
       contentClassName="mt-6"
     >
@@ -85,10 +75,14 @@ export default async function PlansSelectMemorialPage({
         {list.map((m) => {
           const slug = m.slug?.trim().toLowerCase();
           if (!slug) return null;
+          const href =
+            tier === "premium"
+              ? `/memorials/${slug}/upgrade`
+              : `/memorials/${slug}/upgrade?autoCheckout=lifetime`;
           return (
             <li key={m.id}>
               <Link
-                href={`/memorials/${slug}/upgrade?autoCheckout=${encodeURIComponent(sku)}`}
+                href={href}
                 className="flex items-center justify-between rounded-2xl border border-slate-200/90 bg-white/95 px-5 py-4 text-left shadow-sm transition hover:border-amber-200/80 hover:shadow-md"
               >
                 <span className="font-serif text-lg font-semibold text-slate-900">

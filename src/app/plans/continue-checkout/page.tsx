@@ -1,29 +1,38 @@
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import {
-  parseMemorialPlanCheckoutSku,
-  type MemorialPlanCheckoutSku
+  parseMemorialPlanCheckoutSku
 } from "@/lib/memorialStripeHosting";
+import type { PlansTier } from "@/lib/plansTier";
 
-function skuFromSearchParams(searchParams?: {
+function parsePlansTier(searchParams?: {
+  plan?: string | string[];
   sku?: string | string[];
-}): MemorialPlanCheckoutSku | null {
-  const raw = searchParams?.sku;
-  const s = typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] : "";
-  return parseMemorialPlanCheckoutSku(s);
+}): PlansTier | null {
+  const rawPlan = searchParams?.plan;
+  const plan =
+    typeof rawPlan === "string" ? rawPlan : Array.isArray(rawPlan) ? rawPlan[0] : "";
+  if (plan === "premium" || plan === "lifetime") return plan;
+
+  const rawSku = searchParams?.sku;
+  const skuStr =
+    typeof rawSku === "string" ? rawSku : Array.isArray(rawSku) ? rawSku[0] : "";
+  const sku = parseMemorialPlanCheckoutSku(skuStr);
+  if (sku === "lifetime") return "lifetime";
+  if (sku === "premium_monthly" || sku === "premium_yearly") return "premium";
+  return null;
 }
 
 /**
- * Entry from /plans paid CTAs: sends the user to Stripe checkout when possible,
- * or through create-memorial → upgrade, or memorial picker when needed.
+ * Entry from /plans: sign-in → create memorial or pick memorial → upgrade (and optional payment).
  */
 export default async function PlansContinueCheckoutPage({
   searchParams
 }: {
-  searchParams?: { sku?: string | string[] };
+  searchParams?: { plan?: string | string[]; sku?: string | string[] };
 }) {
-  const sku = skuFromSearchParams(searchParams);
-  if (!sku) {
+  const tier = parsePlansTier(searchParams);
+  if (!tier) {
     redirect("/plans");
   }
 
@@ -32,7 +41,7 @@ export default async function PlansContinueCheckoutPage({
     data: { user }
   } = await supabase.auth.getUser();
 
-  const selfPath = `/plans/continue-checkout?sku=${encodeURIComponent(sku)}`;
+  const selfPath = `/plans/continue-checkout?plan=${encodeURIComponent(tier)}`;
 
   if (!user) {
     redirect(`/auth/login?next=${encodeURIComponent(selfPath)}`);
@@ -47,16 +56,17 @@ export default async function PlansContinueCheckoutPage({
   const list = memorials ?? [];
 
   if (list.length === 0) {
-    redirect(`/memorials/new?checkoutPlan=${encodeURIComponent(sku)}`);
+    redirect(`/memorials/new?hosting=${encodeURIComponent(tier)}`);
   }
 
   if (list.length === 1) {
     const slug = list[0].slug?.trim().toLowerCase();
     if (!slug) redirect("/plans");
-    redirect(
-      `/memorials/${slug}/upgrade?autoCheckout=${encodeURIComponent(sku)}`
-    );
+    if (tier === "premium") {
+      redirect(`/memorials/${slug}/upgrade`);
+    }
+    redirect(`/memorials/${slug}/upgrade?autoCheckout=lifetime`);
   }
 
-  redirect(`/plans/select-memorial?sku=${encodeURIComponent(sku)}`);
+  redirect(`/plans/select-memorial?plan=${encodeURIComponent(tier)}`);
 }
