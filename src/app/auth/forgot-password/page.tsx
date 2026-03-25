@@ -18,9 +18,8 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     const supabase = getSupabaseBrowserClient();
-    const base =
-      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? window.location.origin;
-    const redirectTo = `${base}/auth/callback?next=/auth/update-password`;
+    // Build redirect from the actual page origin (avoid env mistakes on Vercel previews).
+    const redirectTo = `${window.location.origin}/auth/callback?next=/auth/update-password`;
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo
@@ -28,6 +27,14 @@ export default function ForgotPasswordPage() {
 
     setLoading(false);
     if (err) {
+      console.error("[forgot-password] resetPasswordForEmail error:", err);
+      // Supabase sometimes returns a generic message when the Auth email provider is misconfigured.
+      if (err.message?.toLowerCase().includes("error sending recovery email")) {
+        setError(
+          "Password recovery email failed to send. Check Supabase Auth email provider (SMTP) and allowed redirect URLs."
+        );
+        return;
+      }
       setError(err.message);
       return;
     }

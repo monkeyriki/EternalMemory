@@ -34,9 +34,8 @@ export function SignupForm() {
     setSuccess(null);
     setLoading(true);
     const supabase = getSupabaseBrowserClient();
-    const base =
-      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-      window.location.origin;
+    // Build redirect from the actual page origin (avoid env mistakes on Vercel previews).
+    const base = window.location.origin;
     const nextQ = encodeURIComponent(afterSignupPath);
     const { error: err } = await supabase.auth.signUp({
       email,
