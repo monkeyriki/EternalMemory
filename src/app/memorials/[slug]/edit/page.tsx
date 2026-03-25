@@ -52,13 +52,13 @@ export default async function EditMemorialPage({
 
   const { data: galleryRows } = await supabase
     .from("memorial_media")
-    .select("image_url")
+    .select("url")
     .eq("memorial_id", memorial.id)
-    .order("sort_order", { ascending: true });
+    .order("position", { ascending: true });
 
   const memorialWithGallery = {
     ...memorial,
-    gallery_image_urls: galleryRows?.map((r) => r.image_url) ?? []
+    gallery_image_urls: galleryRows?.map((r) => (r as any).url) ?? []
   };
 
   return <EditMemorialClient memorial={memorialWithGallery as any} />;

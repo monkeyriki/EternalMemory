@@ -32,8 +32,10 @@ export async function replaceMemorialGalleryRows(
 
   const rows = urls.map((image_url, sort_order) => ({
     memorial_id: memorialId,
-    image_url,
-    sort_order
+    url: image_url,
+    position: sort_order,
+    type: "image",
+    thumbnail_url: null
   }));
 
   const { error: insErr } = await supabase.from("memorial_media").insert(rows);

@@ -113,12 +113,12 @@ export async function generateMetadata({
   if (!ogImageUrl) {
     const { data: firstMedia } = await supabase
       .from("memorial_media")
-      .select("image_url")
+      .select("url")
       .eq("memorial_id", memorial.id)
       .order("created_at", { ascending: true })
       .limit(1)
       .maybeSingle();
-    const galleryUrl = firstMedia?.image_url?.trim();
+    const galleryUrl = (firstMedia as any)?.url?.trim();
     if (galleryUrl) {
       ogImageUrl = absoluteOgImageUrl(galleryUrl);
     }
@@ -238,10 +238,13 @@ export default async function MemorialSlugPage({
   if (!skipGalleryForPasswordGuest) {
     const { data: galleryRows } = await supabase
       .from("memorial_media")
-      .select("id, image_url")
+      .select("id, url")
       .eq("memorial_id", memorial.id)
-      .order("sort_order", { ascending: true });
-    galleryMedia = galleryRows ?? [];
+      .order("position", { ascending: true });
+    galleryMedia = (galleryRows ?? []).map((r: any) => ({
+      id: r.id,
+      image_url: r.url
+    }));
     const maxGal = maxGalleryImagesForMemorial({
       hosting_plan: memorial.hosting_plan as string | null | undefined,
       plan_expires_at: memorial.plan_expires_at as string | null | undefined
