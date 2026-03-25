@@ -5,6 +5,7 @@ import {
   MEMORIAL_HOSTING_CHECKOUT_KIND,
   hostingTargetForSku,
   memorialHostingPriceIdForSku,
+  memorialHostingPriceMissingMessage,
   type MemorialPlanCheckoutSku
 } from "@/lib/memorialStripeHosting";
 import { memorialPaidHostingActive } from "@/lib/memorialHostingPlan";
@@ -55,10 +56,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error:
-            "Stripe price not configured. Set STRIPE_PRICE_MEMORIAL_PREMIUM_MONTHLY, STRIPE_PRICE_MEMORIAL_PREMIUM_YEARLY, and STRIPE_PRICE_MEMORIAL_LIFETIME."
+          error: memorialHostingPriceMissingMessage(sku)
         },
-        { status: 500 }
+        { status: 503 }
       );
     }
 

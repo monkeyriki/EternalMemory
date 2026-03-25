@@ -45,6 +45,26 @@ export function memorialHostingPriceIdForSku(
   return lifetime || null;
 }
 
+/** Env var name for the Stripe Price ID for this hosting SKU. */
+export function memorialHostingPriceEnvKey(sku: MemorialPlanCheckoutSku): string {
+  switch (sku) {
+    case "premium_monthly":
+      return "STRIPE_PRICE_MEMORIAL_PREMIUM_MONTHLY";
+    case "premium_yearly":
+      return "STRIPE_PRICE_MEMORIAL_PREMIUM_YEARLY";
+    case "lifetime":
+      return "STRIPE_PRICE_MEMORIAL_LIFETIME";
+  }
+}
+
+/**
+ * Shown when the price ID env var is unset (deployer must add Stripe Price IDs).
+ */
+export function memorialHostingPriceMissingMessage(sku: MemorialPlanCheckoutSku): string {
+  const key = memorialHostingPriceEnvKey(sku);
+  return `Payment is not configured for this option. Add ${key} to your server environment with a Stripe Price ID (price_…) from the Stripe Dashboard, then redeploy.`;
+}
+
 export function hostingTargetForSku(
   sku: MemorialPlanCheckoutSku
 ): MemorialHostingCheckoutTarget {
