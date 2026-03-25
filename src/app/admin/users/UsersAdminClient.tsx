@@ -50,9 +50,14 @@ export function UsersAdminClient({ profiles }: { profiles: ProfileRow[] }) {
                   {p.id}
                 </td>
                 <td className="px-4 py-3 capitalize">{p.role}</td>
-                <td className="px-4 py-3">
+                <td className="max-w-[220px] px-4 py-3">
                   {p.role === "admin" ? (
-                    <span className="text-slate-400">—</span>
+                    <span
+                      className="text-xs leading-snug text-slate-500"
+                      title="Use a normal account (role user), or change this row in the database if you must remove admin first."
+                    >
+                      Not available — admin accounts cannot be set to B2B here.
+                    </span>
                   ) : p.role === "b2b" ? (
                     <span className="text-slate-500">Already B2B</span>
                   ) : (
