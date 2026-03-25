@@ -23,7 +23,7 @@ export async function replaceMemorialGalleryRows(
     .eq("memorial_id", memorialId);
 
   if (delErr) {
-    return { ok: false, error: "Failed to clear gallery." };
+    return { ok: false, error: `Failed to clear gallery: ${delErr.message}` };
   }
 
   if (urls.length === 0) {
@@ -39,7 +39,10 @@ export async function replaceMemorialGalleryRows(
   const { error: insErr } = await supabase.from("memorial_media").insert(rows);
 
   if (insErr) {
-    return { ok: false, error: "Failed to save gallery images." };
+    return {
+      ok: false,
+      error: `Failed to save gallery images: ${insErr.message}`
+    };
   }
 
   return { ok: true };
