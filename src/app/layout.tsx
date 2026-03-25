@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import "./tailwind.generated.css";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SITE_NAME } from "@/lib/site";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -11,7 +12,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "EternalMemory",
+  title: SITE_NAME,
   description: "Digital memorial & obituary platform"
 };
 
@@ -29,7 +30,7 @@ export default function RootLayout({
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-serif text-lg font-semibold text-slate-900">
-                EternalMemory
+                {SITE_NAME}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 A calm digital memorial platform

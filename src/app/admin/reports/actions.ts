@@ -7,6 +7,7 @@ import { contentReportOwnerEmail } from "@/lib/emailTemplates";
 import { CONTENT_REPORT_REASON_LABELS, type ContentReportReason } from "@/lib/contentReport";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { deleteMemorialAsAdminAction } from "@/app/admin/memorials/actions";
+import { SITE_URL_PUBLIC } from "@/lib/site";
 
 export type ReportActionResult =
   | { ok: true }
@@ -142,7 +143,7 @@ export async function notifyOwnerAboutReportAction(reportId: string): Promise<Re
   const ownerName =
     meta?.full_name?.trim() || ownerUser.email?.split("@")[0] || "there";
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://eternalmemory.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || SITE_URL_PUBLIC;
   const isTribute = !!report.tribute_id;
   const snippet =
     typeof report.custom_message === "string" && report.custom_message.trim()

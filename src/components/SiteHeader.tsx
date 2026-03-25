@@ -28,7 +28,7 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
         >
           <Heart className="h-6 w-6 text-amber-600" strokeWidth={1.8} />
           <span className={`${logoFontClassName} text-xl font-semibold tracking-tight text-slate-900 md:text-2xl`}>
-            eternal<span className="text-amber-600">memory</span>
+            ever<span className="text-amber-600">missed</span>
           </span>
         </Link>
 

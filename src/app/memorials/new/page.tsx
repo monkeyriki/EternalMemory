@@ -11,7 +11,7 @@ function parseHostingParam(raw: string | string[] | undefined): PlansTier | null
 }
 
 export const metadata = {
-  title: "Create memorial | EternalMemory",
+  title: "Create memorial | Evermissed",
   description: "Create a new digital memorial"
 };
 

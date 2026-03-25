@@ -3,7 +3,7 @@ import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 import { getPrivacyEmail } from "@/lib/privacyContact";
 
 export const metadata = {
-  title: "Contact & Support - EternalMemory",
+  title: "Contact & Support - Evermissed",
   description:
     "Get support for memorial pages, account access, billing, privacy requests, and moderation."
 };
@@ -29,10 +29,10 @@ export default function ContactPage() {
               Product help, account questions, and memorial management:
             </p>
             <a
-              href="mailto:support@eternalmemory.example"
+              href="mailto:support@evermissed.com"
               className="mt-1 inline-block rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
-              support@eternalmemory.example
+              support@evermissed.com
             </a>
           </div>
           <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
@@ -41,10 +41,10 @@ export default function ContactPage() {
               Premium/lifetime plans, subscription questions, invoices, and refunds:
             </p>
             <a
-              href="mailto:billing@eternalmemory.example"
+              href="mailto:billing@evermissed.com"
               className="mt-1 inline-block rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
-              billing@eternalmemory.example
+              billing@evermissed.com
             </a>
           </div>
           <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
@@ -53,10 +53,10 @@ export default function ContactPage() {
               Urgent moderation issues, impersonation, or harmful content reports:
             </p>
             <a
-              href="mailto:trust@eternalmemory.example"
+              href="mailto:trust@evermissed.com"
               className="mt-1 inline-block rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
-              trust@eternalmemory.example
+              trust@evermissed.com
             </a>
           </div>
           <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">

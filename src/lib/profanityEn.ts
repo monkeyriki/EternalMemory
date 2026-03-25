@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 /** User-facing message when text hits the blocklist (no save). */
 export const PROFANITY_BLOCKED_MESSAGE =
-  "This text contains language that isn’t allowed on EternalMemory. Please revise and try again.";
+  "This text contains language that isn’t allowed on Evermissed. Please revise and try again.";
 
 const CACHE_TTL_MS = 60_000;
 

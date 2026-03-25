@@ -5,7 +5,7 @@ import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 import type { PlansTier } from "@/lib/plansTier";
 
 export const metadata = {
-  title: "Choose memorial | EternalMemory",
+  title: "Choose memorial | Evermissed",
   description: "Select which memorial to upgrade."
 };
 

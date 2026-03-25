@@ -2,9 +2,9 @@ import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 import { getPrivacyEmail } from "@/lib/privacyContact";
 
 export const metadata = {
-  title: "Privacy Policy - EternalMemory",
+  title: "Privacy Policy - Evermissed",
   description:
-    "How EternalMemory collects, uses, stores, and protects personal data (GDPR and California / CCPA)."
+    "How Evermissed collects, uses, stores, and protects personal data (GDPR and California / CCPA)."
 };
 
 export default function PrivacyPage() {
@@ -13,7 +13,7 @@ export default function PrivacyPage() {
   return (
     <MemorialPageShell
       title="Privacy Policy"
-      subtitle="How we process personal data for EternalMemory services, including GDPR and California privacy rights (CCPA), plus memorial-specific content handling."
+      subtitle="How we process personal data for Evermissed services, including GDPR and California privacy rights (CCPA), plus memorial-specific content handling."
       maxWidth="3xl"
       contentClassName="mt-8"
     >
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
             1. Data controller
           </h2>
           <p className="mt-2">
-            EternalMemory acts as data controller for account and platform data.
+            Evermissed acts as data controller for account and platform data.
             For privacy requests, contact{" "}
             <a
               href={`mailto:${privacyEmail}`}

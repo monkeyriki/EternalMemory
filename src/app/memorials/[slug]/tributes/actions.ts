@@ -11,6 +11,7 @@ import {
   textMatchesBlockedTerms
 } from "@/lib/profanityEn";
 import { assertIpNotBanned } from "@/lib/ipBanCheck";
+import { SITE_URL_PUBLIC } from "@/lib/site";
 
 type CreateTributeInput = {
   memorial_id: string;
@@ -125,7 +126,7 @@ export async function createTributeAction(
 
   try {
     const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://eternalmemory.app";
+      process.env.NEXT_PUBLIC_APP_URL?.trim() || SITE_URL_PUBLIC;
     const { data: memorial } = await supabase
       .from("memorials")
       .select("owner_id, full_name, slug")

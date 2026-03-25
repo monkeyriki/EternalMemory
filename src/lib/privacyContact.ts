@@ -1,5 +1,5 @@
 /** Shown in UI and ops emails when NEXT_PUBLIC_PRIVACY_EMAIL is unset. */
-export const PRIVACY_EMAIL_FALLBACK = "privacy@eternalmemory.example";
+export const PRIVACY_EMAIL_FALLBACK = "privacy@evermissed.com";
 
 /**
  * Privacy / data-rights contact (GDPR, CCPA requests). Set NEXT_PUBLIC_PRIVACY_EMAIL in production.

@@ -2,9 +2,9 @@
 
 import QRCode from "qrcode";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { SITE_URL_PUBLIC } from "@/lib/site";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://eternalmemory.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? SITE_URL_PUBLIC;
 
 type GenerateQRInput = {
   memorial_id: string;

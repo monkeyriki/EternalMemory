@@ -4,7 +4,7 @@ import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { DeleteAccountRequestForm } from "./DeleteAccountRequestForm";
 
 export const metadata = {
-  title: "Request account deletion - EternalMemory",
+  title: "Request account deletion - Evermissed",
   description:
     "Submit a GDPR/CCPA-style account deletion request for review and processing."
 };

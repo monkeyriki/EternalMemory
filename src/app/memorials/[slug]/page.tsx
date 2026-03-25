@@ -5,9 +5,9 @@ import { maxGalleryImagesForMemorial } from "@/lib/memorialHostingPlan";
 import { SingleMemorialClient } from "@/components/memorial/SingleMemorialClient";
 import { PasswordGateWrapper } from "@/components/memorial/PasswordGateWrapper";
 import type { Metadata } from "next";
+import { SITE_URL_PUBLIC } from "@/lib/site";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://eternalmemory.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? SITE_URL_PUBLIC;
 
 function absoluteSiteUrl(path: string): string {
   const base = BASE_URL.replace(/\/$/, "");

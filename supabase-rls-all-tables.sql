@@ -1,5 +1,5 @@
 -- =============================================================================
--- EternalMemory: RLS completo su tutte le 11 tabelle
+-- Evermissed: RLS completo su tutte le 11 tabelle
 -- Guest = solo lettura pubblico | User = propri dati | Admin = tutto
 -- Esegui nel SQL Editor di Supabase (una sola volta).
 -- =============================================================================

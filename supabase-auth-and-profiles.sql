@@ -1,5 +1,5 @@
 -- =============================================================================
--- EternalMemory: profiles + RLS + trigger auth.users → profiles
+-- Evermissed: profiles + RLS + trigger auth.users → profiles
 -- Esegui questo script nel SQL Editor di Supabase (una sola volta).
 -- =============================================================================
 

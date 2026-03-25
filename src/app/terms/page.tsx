@@ -1,16 +1,16 @@
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 
 export const metadata = {
-  title: "Terms of Service - EternalMemory",
+  title: "Terms of Service - Evermissed",
   description:
-    "Terms governing use of EternalMemory memorial pages, account features, and paid services."
+    "Terms governing use of Evermissed memorial pages, account features, and paid services."
 };
 
 export default function TermsPage() {
   return (
     <MemorialPageShell
       title="Terms of Service"
-      subtitle="Rules for using EternalMemory safely, respectfully, and lawfully."
+      subtitle="Rules for using Evermissed safely, respectfully, and lawfully."
       maxWidth="3xl"
       contentClassName="mt-8"
     >
@@ -20,7 +20,7 @@ export default function TermsPage() {
             1. Acceptance
           </h2>
           <p className="mt-2">
-            By using EternalMemory, you agree to these Terms, our Privacy Policy, and
+            By using Evermissed, you agree to these Terms, our Privacy Policy, and
             any additional policies referenced in the platform.
           </p>
         </section>
@@ -73,10 +73,10 @@ export default function TermsPage() {
             fees are generally non-refundable after service delivery; billing disputes
             can be raised at{" "}
             <a
-              href="mailto:billing@eternalmemory.example"
+              href="mailto:billing@evermissed.com"
               className="rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
-              billing@eternalmemory.example
+              billing@evermissed.com
             </a>
             .
           </p>
@@ -96,7 +96,7 @@ export default function TermsPage() {
             7. Intellectual property
           </h2>
           <p className="mt-2">
-            The platform design, branding, and software are owned by EternalMemory or
+            The platform design, branding, and software are owned by Evermissed or
             licensors. You retain rights to your content, while granting us the limited
             rights needed to host and display it within the service.
           </p>
@@ -106,7 +106,7 @@ export default function TermsPage() {
             8. Liability
           </h2>
           <p className="mt-2">
-            To the maximum extent permitted by law, EternalMemory is not liable for
+            To the maximum extent permitted by law, Evermissed is not liable for
             indirect, incidental, or consequential damages. Nothing in these Terms
             limits rights that cannot be excluded by law.
           </p>
@@ -118,10 +118,10 @@ export default function TermsPage() {
           <p className="mt-2">
             Questions about these Terms can be sent to{" "}
             <a
-              href="mailto:support@eternalmemory.example"
+              href="mailto:support@evermissed.com"
               className="rounded-md text-amber-800 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
-              support@eternalmemory.example
+              support@evermissed.com
             </a>
             .
           </p>

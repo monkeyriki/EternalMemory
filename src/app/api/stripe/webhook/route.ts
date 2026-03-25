@@ -12,6 +12,7 @@ import {
   tributePurchasedOwnerEmail,
   tributeReceiptEmail
 } from "@/lib/emailTemplates";
+import { SITE_URL_PUBLIC } from "@/lib/site";
 
 export const runtime = "nodejs";
 
@@ -200,8 +201,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "Virtual tribute insert failed" }, { status: 500 });
     }
 
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://eternalmemory.app";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || SITE_URL_PUBLIC;
     const itemName = storeItem.name?.trim() || "Tribute";
 
     try {

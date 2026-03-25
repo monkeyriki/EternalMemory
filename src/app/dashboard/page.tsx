@@ -7,7 +7,7 @@ import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 import { Button } from "@/components/Button";
 
 export const metadata: Metadata = {
-  title: "Dashboard — EternalMemory",
+  title: "Dashboard — Evermissed",
   description: "Manage your memorials, plans, and B2B tools."
 };
 

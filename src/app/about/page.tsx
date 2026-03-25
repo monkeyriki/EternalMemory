@@ -5,9 +5,9 @@ import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 import { Button } from "@/components/Button";
 
 export const metadata = {
-  title: "Our Story — EternalMemory",
+  title: "Our Story — Evermissed",
   description:
-    "Why EternalMemory exists: preserving legacies, sharing stories, and keeping memories alive for future generations."
+    "Why Evermissed exists: preserving legacies, sharing stories, and keeping memories alive for future generations."
 };
 
 export default function AboutPage() {
@@ -15,7 +15,7 @@ export default function AboutPage() {
     <MemorialPageShell
       title="Our story"
       subtitle="Bridging memories across generations"
-      eyebrow="About EternalMemory"
+      eyebrow="About Evermissed"
       maxWidth="5xl"
       contentClassName="mt-10"
     >
@@ -26,7 +26,7 @@ export default function AboutPage() {
               <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100 shadow-inner">
                 <Image
                   src="/founder.png"
-                  alt="EternalMemory founder and site owner"
+                  alt="Evermissed founder and site owner"
                   fill
                   className="object-cover object-top"
                   sizes="(max-width: 1024px) 100vw, 320px"
@@ -37,7 +37,7 @@ export default function AboutPage() {
                 Founder
               </p>
               <p className="mt-1 text-center text-sm text-slate-500 lg:text-left">
-                EternalMemory
+                Evermissed
               </p>
             </div>
           </aside>
@@ -97,7 +97,7 @@ export default function AboutPage() {
               improving, ensuring that your memories are kept safe, honored, and accessible for generations to come.
             </p>
 
-            <p className="pt-4 font-serif text-lg italic text-slate-600">— Founder, EternalMemory</p>
+            <p className="pt-4 font-serif text-lg italic text-slate-600">— Founder, Evermissed</p>
           </div>
         </div>
 

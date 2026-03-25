@@ -4,6 +4,7 @@ import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { stripe } from "@/lib/stripe";
 import { sendTransactionalEmail } from "@/lib/resendEmail";
 import { b2bSubscriptionRenewalEmail } from "@/lib/emailTemplates";
+import { SITE_URL_PUBLIC } from "@/lib/site";
 
 export const runtime = "nodejs";
 
@@ -253,7 +254,7 @@ export async function POST(req: NextRequest) {
                 ownerUser?.email?.split("@")[0] ||
                 "there";
               const appUrl =
-                process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://eternalmemory.app";
+                process.env.NEXT_PUBLIC_APP_URL?.trim() || SITE_URL_PUBLIC;
               const content = b2bSubscriptionRenewalEmail({
                 ownerName,
                 planName,

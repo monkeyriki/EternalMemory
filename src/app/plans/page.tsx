@@ -90,7 +90,7 @@ function CompareCellIcon({
 }
 
 export const metadata = {
-  title: "Plans & features — EternalMemory",
+  title: "Plans & features — Evermissed",
   description: "Compare Basic, Premium, and Lifetime memorial hosting: gallery size, ads, and billing."
 };
 

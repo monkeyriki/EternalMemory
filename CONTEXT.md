@@ -1,4 +1,4 @@
-# EternalMemory — Project Context (PRD Summary)
+# Evermissed — Project Context (PRD Summary)
 
 This repository implements the **Digital Memorial & Obituary Platform** described in the PRD (humans + pets).
 

@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 
 /** Mittente predefinito solo per test su account Resend (limitato). In produzione usa EMAIL_FROM con dominio verificato. */
-const FALLBACK_FROM = "EternalMemory <onboarding@resend.dev>";
+const FALLBACK_FROM = "Evermissed <onboarding@resend.dev>";
 
 function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY?.trim();
@@ -14,7 +14,7 @@ export type SendEmailInput = {
   subject: string;
   html: string;
   text?: string;
-  /** Es. `EternalMemory <noreply@tuodominio.com>` — deve essere un dominio verificato su Resend */
+  /** Es. `Evermissed <noreply@evermissed.com>` — deve essere un dominio verificato su Resend */
   from?: string;
   replyTo?: string;
 };
