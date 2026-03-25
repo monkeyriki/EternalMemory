@@ -3,6 +3,92 @@ import { Check, Sparkles, Heart, Infinity } from "lucide-react";
 import { Button } from "@/components/Button";
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 
+type CompareCell =
+  | { kind: "check" }
+  | { kind: "text"; value: string }
+  | { kind: "muted"; value: string };
+
+const compareRows: Array<{
+  title: string;
+  description: string;
+  basic: CompareCell;
+  premium: CompareCell;
+  lifetime: CompareCell;
+}> = [
+  {
+    title: "Memorial page",
+    description:
+      "Create and publish a respectful page with story, photos, guestbook, and sharing.",
+    basic: { kind: "check" },
+    premium: { kind: "check" },
+    lifetime: { kind: "check" }
+  },
+  {
+    title: "Photo gallery",
+    description: "Gallery images in addition to the cover (per memorial, hosting limits apply).",
+    basic: { kind: "text", value: "5" },
+    premium: { kind: "text", value: "24" },
+    lifetime: { kind: "text", value: "24" }
+  },
+  {
+    title: "Platform ads",
+    description:
+      "Third-party ads on the public page when enabled for the site. Paid plans hide ads on your memorial.",
+    basic: { kind: "muted", value: "May apply" },
+    premium: { kind: "check" },
+    lifetime: { kind: "check" }
+  },
+  {
+    title: "Price & billing",
+    description: "How hosting is billed for this memorial.",
+    basic: { kind: "text", value: "Free" },
+    premium: { kind: "muted", value: "Monthly or yearly" },
+    lifetime: { kind: "muted", value: "Pay once" }
+  }
+];
+
+function CompareCellIcon({
+  cell,
+  tone
+}: {
+  cell: CompareCell;
+  tone: "basic" | "premium" | "lifetime";
+}) {
+  const checkClass =
+    tone === "basic"
+      ? "text-slate-400"
+      : tone === "premium"
+        ? "text-teal-600"
+        : "text-amber-700";
+
+  if (cell.kind === "check") {
+    return (
+      <div className="flex min-h-[2.5rem] items-center justify-center sm:min-h-0">
+        <span className="sr-only">Included</span>
+        <Check className={`h-5 w-5 ${checkClass}`} strokeWidth={2} aria-hidden />
+      </div>
+    );
+  }
+  const textClass =
+    tone === "basic"
+      ? "text-slate-500"
+      : tone === "premium"
+        ? "text-teal-700"
+        : "text-amber-800";
+  const muted = cell.kind === "muted";
+  return (
+    <div className="flex min-h-[2.5rem] items-center justify-center sm:min-h-0">
+      <p
+        className={`text-center text-xs font-semibold uppercase tracking-wide sm:text-sm ${
+          muted ? "text-slate-500" : textClass
+        }`}
+      >
+        {cell.value}
+      </p>
+    </div>
+  );
+}
+
 export const metadata = {
   title: "Plans & features — EternalMemory",
   description: "Compare Basic, Premium, and Lifetime memorial hosting: gallery size, ads, and billing."
@@ -156,53 +242,55 @@ export default function PlansPage() {
         </div>
       </section>
 
-      <section aria-labelledby="compare-table-heading" className="space-y-4">
-        <h2
-          id="compare-table-heading"
-          className="text-center font-serif text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
-        >
-          Compare in detail
-        </h2>
-        <p className="text-center text-sm text-slate-600">
-          Quick reference for pricing, gallery limits, ads, and billing.
-        </p>
-        <div className="overflow-x-auto rounded-2xl border border-slate-200/90 bg-white/95 shadow-md shadow-slate-400/10 backdrop-blur">
-          <table className="w-full min-w-[600px] border-collapse text-left text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/90">
-                <th className="px-4 py-3.5 font-semibold text-slate-900">Feature</th>
-                <th className="px-4 py-3.5 font-semibold text-slate-900">Basic</th>
-                <th className="px-4 py-3.5 font-semibold text-amber-900/90">Premium</th>
-                <th className="px-4 py-3.5 font-semibold text-amber-900/90">Lifetime</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              <tr className="bg-white/80">
-                <td className="px-4 py-3 font-medium text-slate-800">Price</td>
-                <td className="px-4 py-3">Free</td>
-                <td className="px-4 py-3">Subscription (monthly or yearly)</td>
-                <td className="px-4 py-3">One-time</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3 font-medium text-slate-800">Gallery photos (excl. cover)</td>
-                <td className="px-4 py-3">Up to 5</td>
-                <td className="px-4 py-3">Up to 24</td>
-                <td className="px-4 py-3">Up to 24</td>
-              </tr>
-              <tr className="bg-white/80">
-                <td className="px-4 py-3 font-medium text-slate-800">Platform ads on public page</td>
-                <td className="px-4 py-3">Yes (unless manually hidden)</td>
-                <td className="px-4 py-3">No</td>
-                <td className="px-4 py-3">No</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3 font-medium text-slate-800">Billing</td>
-                <td className="px-4 py-3">—</td>
-                <td className="px-4 py-3">Renews until cancelled</td>
-                <td className="px-4 py-3">Pay once per memorial</td>
-              </tr>
-            </tbody>
-          </table>
+      <section aria-labelledby="compare-table-heading" className="space-y-6">
+        <div className="text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            Website features
+          </p>
+          <h2
+            id="compare-table-heading"
+            className="mt-2 font-serif text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
+          >
+            Compare in detail
+          </h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600">
+            Quick reference for pricing, gallery limits, ads, and billing.
+          </p>
+        </div>
+
+        <div className="-mx-4 overflow-x-auto rounded-3xl bg-slate-50/80 px-4 py-6 sm:mx-0 sm:px-8 sm:py-10">
+          <div className="mx-auto w-full max-w-4xl min-w-[640px]">
+            {/* Column headers — competitor-style uppercase, color per tier */}
+            <div className="grid grid-cols-[minmax(0,1.45fr)_repeat(3,minmax(0,1fr))] gap-4 border-b border-slate-200/80 pb-6 sm:gap-6">
+              <div aria-hidden className="min-w-0" />
+              <div className="text-center text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600 sm:text-xs">
+                Basic
+              </div>
+              <div className="text-center text-[11px] font-bold uppercase tracking-[0.14em] text-teal-800 sm:text-xs">
+                Premium
+              </div>
+              <div className="text-center text-[11px] font-bold uppercase tracking-[0.14em] text-amber-900 sm:text-xs">
+                Lifetime
+              </div>
+            </div>
+
+            <div className="divide-y divide-slate-200/60">
+              {compareRows.map((row) => (
+                <div
+                  key={row.title}
+                  className="grid grid-cols-[minmax(0,1.45fr)_repeat(3,minmax(0,1fr))] items-center gap-4 py-7 sm:gap-6"
+                >
+                  <div className="min-w-0 pr-2">
+                    <p className="font-semibold leading-snug text-slate-900">{row.title}</p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{row.description}</p>
+                  </div>
+                  <CompareCellIcon cell={row.basic} tone="basic" />
+                  <CompareCellIcon cell={row.premium} tone="premium" />
+                  <CompareCellIcon cell={row.lifetime} tone="lifetime" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
