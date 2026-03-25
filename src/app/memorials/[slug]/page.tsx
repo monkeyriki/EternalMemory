@@ -200,7 +200,7 @@ export default async function MemorialSlugPage({
   const { data: memorial } = await supabase
     .from("memorials")
     .select(
-      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, password_hash, ads_free, hosting_plan, plan_expires_at"
+      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, password_hash, ads_free, hosting_plan, plan_expires_at, tags"
     )
     .eq("slug", slug)
     .maybeSingle();

@@ -59,6 +59,8 @@ export type SingleMemorialProps = {
     date_of_birth: string | null;
     date_of_death: string | null;
     city: string | null;
+    /** Normalized tag slugs (directory search); optional on older rows */
+    tags?: string[] | null;
     visibility: string;
     is_draft: boolean;
     // Optional fields – may or may not exist in DB
@@ -410,6 +412,9 @@ export function SingleMemorialClient({
     memorial.date_of_death
   );
   const story = memorial.story ?? null;
+  const displayTags = (memorial.tags ?? []).filter(
+    (t): t is string => typeof t === "string" && t.trim().length > 0
+  );
 
   return (
     <div className="relative min-h-screen overflow-hidden px-4 py-10">
@@ -438,6 +443,18 @@ export function SingleMemorialClient({
                   </span>
                 )}
               </div>
+              {displayTags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Memorial tags">
+                  {displayTags.map((t, i) => (
+                    <span
+                      key={`${t}-${i}`}
+                      className="inline-flex max-w-full items-center rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-xs font-medium text-slate-600"
+                    >
+                      <span className="truncate">{t.replace(/-/g, " ")}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex flex-col items-end gap-1">
               <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
