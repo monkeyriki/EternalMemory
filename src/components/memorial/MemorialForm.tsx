@@ -61,6 +61,7 @@ type MemorialInitialData = {
   story: string | null;
   cover_image_url: string | null;
   gallery_image_urls?: string[] | null;
+  tags?: string[] | null;
   ads_free?: boolean | null;
   hosting_plan?: string | null;
   plan_expires_at?: string | null;
@@ -158,6 +159,7 @@ export default function MemorialForm({
       setDateOfBirth(initialData.date_of_birth ?? "");
       setDateOfDeath(initialData.date_of_death ?? "");
       setCity(initialData.city ?? "");
+      setTagsInput(tagsToInputString(initialData.tags));
       setVisibility(initialData.visibility);
       setStatus(initialData.is_draft ? "draft" : "publish");
       setCoverImageUrl(initialData.cover_image_url ?? "");
