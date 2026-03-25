@@ -39,7 +39,10 @@ export function memorialHostingPriceIdForSku(
 ): string | null {
   const monthly = process.env.STRIPE_PRICE_MEMORIAL_PREMIUM_MONTHLY?.trim();
   const yearly = process.env.STRIPE_PRICE_MEMORIAL_PREMIUM_YEARLY?.trim();
-  const lifetime = process.env.STRIPE_PRICE_MEMORIAL_LIFETIME?.trim();
+  /** Canonical + legacy Vercel name (some projects used PREMIUM_LIFETIME by mistake). */
+  const lifetime =
+    process.env.STRIPE_PRICE_MEMORIAL_LIFETIME?.trim() ||
+    process.env.STRIPE_PRICE_MEMORIAL_PREMIUM_LIFETIME?.trim();
   if (sku === "premium_monthly") return monthly || null;
   if (sku === "premium_yearly") return yearly || null;
   return lifetime || null;
@@ -62,7 +65,11 @@ export function memorialHostingPriceEnvKey(sku: MemorialPlanCheckoutSku): string
  */
 export function memorialHostingPriceMissingMessage(sku: MemorialPlanCheckoutSku): string {
   const key = memorialHostingPriceEnvKey(sku);
-  return `Payment is not configured for this option. Add ${key} to your server environment with a Stripe Price ID (price_…) from the Stripe Dashboard, then redeploy.`;
+  const lifetimeHint =
+    sku === "lifetime"
+      ? " (or the legacy alias STRIPE_PRICE_MEMORIAL_PREMIUM_LIFETIME)"
+      : "";
+  return `Payment is not configured for this option. Add ${key}${lifetimeHint} to your server environment with a Stripe Price ID (price_…) from the Stripe Dashboard, then redeploy.`;
 }
 
 export function hostingTargetForSku(

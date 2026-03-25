@@ -9,6 +9,9 @@ import {
 } from "@/lib/memorialHostingPlan";
 import type { MemorialPlanCheckoutSku } from "@/lib/memorialStripeHosting";
 
+/** Temporary: show raw API response for checkout errors. Set to false after debugging. */
+const SHOW_CHECKOUT_DEBUG_UI = true;
+
 type UpgradeMemorialClientProps = {
   memorialId: string;
   slug: string;
@@ -37,6 +40,8 @@ export default function UpgradeMemorialClient({
 }: UpgradeMemorialClientProps) {
   const [error, setError] = useState<string | null>(null);
   const [loadingSku, setLoadingSku] = useState<string | null>(null);
+  const [checkoutDebugDetails, setCheckoutDebugDetails] = useState<string | null>(null);
+  const [showCheckoutDebug, setShowCheckoutDebug] = useState(false);
   const autoCheckoutStarted = useRef(false);
 
   const effective = getEffectiveHostingPlan({
@@ -50,6 +55,8 @@ export default function UpgradeMemorialClient({
 
   const startCheckout = useCallback(async (plan: MemorialPlanCheckoutSku) => {
     setError(null);
+    setCheckoutDebugDetails(null);
+    setShowCheckoutDebug(false);
     setLoadingSku(plan);
     try {
       const res = await fetch("/api/stripe/memorial-plan-checkout", {
@@ -61,14 +68,37 @@ export default function UpgradeMemorialClient({
           plan
         })
       });
-      const data = (await res.json()) as { ok?: boolean; url?: string; error?: string };
+      let data: { ok?: boolean; url?: string; error?: string } = {};
+      try {
+        data = (await res.json()) as typeof data;
+      } catch {
+        data = { error: "Response was not valid JSON." };
+      }
       if (!res.ok || !data.ok || !data.url) {
         setError(data.error ?? "Checkout could not be started.");
+        setCheckoutDebugDetails(
+          JSON.stringify(
+            {
+              httpStatus: res.status,
+              plan,
+              responseBody: data
+            },
+            null,
+            2
+          )
+        );
         return;
       }
       window.location.href = data.url;
-    } catch {
+    } catch (e) {
       setError("Network error. Please try again.");
+      setCheckoutDebugDetails(
+        JSON.stringify(
+          { plan, caught: e instanceof Error ? e.message : String(e) },
+          null,
+          2
+        )
+      );
     } finally {
       setLoadingSku(null);
     }
@@ -125,8 +155,26 @@ export default function UpgradeMemorialClient({
       </div>
 
       {error && (
-        <div className="rounded-2xl border border-red-200/90 bg-red-50/95 px-4 py-3 text-sm text-red-800 shadow-sm backdrop-blur">
-          {error}
+        <div className="space-y-2">
+          <div className="rounded-2xl border border-red-200/90 bg-red-50/95 px-4 py-3 text-sm text-red-800 shadow-sm backdrop-blur">
+            {error}
+          </div>
+          {SHOW_CHECKOUT_DEBUG_UI && checkoutDebugDetails && (
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => setShowCheckoutDebug((v) => !v)}
+                className="w-full rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-1"
+              >
+                {showCheckoutDebug ? "Hide technical details" : "Show technical details"}
+              </button>
+              {showCheckoutDebug && (
+                <pre className="max-h-48 overflow-auto rounded-md border border-slate-200 bg-white/90 p-3 text-xs leading-relaxed text-slate-700">
+                  {checkoutDebugDetails}
+                </pre>
+              )}
+            </div>
+          )}
         </div>
       )}
 
