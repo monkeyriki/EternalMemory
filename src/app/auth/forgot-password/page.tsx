@@ -10,11 +10,17 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // TEMP DEBUG (remove when done): shows the full Supabase auth error object fields.
+  const SHOW_RECOVERY_DEBUG_UI = true;
+  const [debugDetails, setDebugDetails] = useState<string | null>(null);
+  const [showDebug, setShowDebug] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setDebugDetails(null);
+    setShowDebug(false);
     setLoading(true);
 
     const supabase = getSupabaseBrowserClient();
@@ -28,6 +34,17 @@ export default function ForgotPasswordPage() {
     setLoading(false);
     if (err) {
       console.error("[forgot-password] resetPasswordForEmail error:", err);
+      const anyErr = err as any;
+      const details = {
+        message: anyErr?.message,
+        name: anyErr?.name,
+        status: anyErr?.status,
+        code: anyErr?.code,
+        provider: anyErr?.provider,
+        // keep extra fields if supabase adds them
+        error_description: anyErr?.error_description
+      };
+      setDebugDetails(JSON.stringify(details, null, 2));
       // Supabase sometimes returns a generic message when the Auth email provider is misconfigured.
       if (err.message?.toLowerCase().includes("error sending recovery email")) {
         setError(
@@ -69,6 +86,22 @@ export default function ForgotPasswordPage() {
             <p className="text-sm text-red-600" role="alert">
               {error}
             </p>
+          )}
+          {SHOW_RECOVERY_DEBUG_UI && debugDetails && (
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => setShowDebug((v) => !v)}
+                className="w-full rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-1"
+              >
+                {showDebug ? "Hide error details" : "Show error details"}
+              </button>
+              {showDebug && (
+                <pre className="max-h-40 overflow-auto rounded-md border border-slate-200 bg-white/90 p-3 text-xs leading-relaxed text-slate-700">
+                  {debugDetails}
+                </pre>
+              )}
+            </div>
           )}
           {success && (
             <p className="text-sm text-emerald-700" role="status">
