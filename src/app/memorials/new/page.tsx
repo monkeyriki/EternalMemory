@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { parseMemorialPlanCheckoutSku } from "@/lib/memorialStripeHosting";
 import MemorialNewClient from "./MemorialNewClient";
 
 export const metadata = {
@@ -13,6 +14,7 @@ export default async function MemorialNewPage({
   searchParams?: {
     firstName?: string | string[];
     lastName?: string | string[];
+    checkoutPlan?: string | string[];
   };
 }) {
   const firstNameRaw = searchParams?.firstName;
@@ -27,10 +29,23 @@ export default async function MemorialNewPage({
     .join(" ")
     .replace(/\s+/g, " ")
     .trim();
+
+  const checkoutPlanRaw = searchParams?.checkoutPlan;
+  const checkoutPlanStr =
+    typeof checkoutPlanRaw === "string"
+      ? checkoutPlanRaw
+      : Array.isArray(checkoutPlanRaw)
+        ? checkoutPlanRaw[0]
+        : "";
+  const checkoutPlanAfterCreate = parseMemorialPlanCheckoutSku(checkoutPlanStr);
+
   const nextPath = (() => {
     const params = new URLSearchParams();
     if (firstName) params.set("firstName", firstName);
     if (lastName) params.set("lastName", lastName);
+    if (checkoutPlanAfterCreate) {
+      params.set("checkoutPlan", checkoutPlanAfterCreate);
+    }
     const qs = params.toString();
     return qs ? `/memorials/new?${qs}` : "/memorials/new";
   })();
@@ -44,5 +59,10 @@ export default async function MemorialNewPage({
     redirect(`/auth/login?next=${encodeURIComponent(nextPath)}`);
   }
 
-  return <MemorialNewClient initialFullName={prefillFullName} />;
+  return (
+    <MemorialNewClient
+      initialFullName={prefillFullName}
+      checkoutPlanAfterCreate={checkoutPlanAfterCreate}
+    />
+  );
 }

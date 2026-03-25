@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   getEffectiveHostingPlan,
   memorialPaidHostingActive,
   type MemorialHostingPlan
 } from "@/lib/memorialHostingPlan";
+import type { MemorialPlanCheckoutSku } from "@/lib/memorialStripeHosting";
 
 type UpgradeMemorialClientProps = {
   memorialId: string;
@@ -15,6 +16,8 @@ type UpgradeMemorialClientProps = {
   hostingPlan: string | null;
   planExpiresAt: string | null;
   checkout?: string | null;
+  /** From /plans flow: open Stripe Checkout once on load. */
+  autoCheckout?: MemorialPlanCheckoutSku | null;
 };
 
 function planLabel(p: MemorialHostingPlan): string {
@@ -29,10 +32,12 @@ export default function UpgradeMemorialClient({
   fullName,
   hostingPlan,
   planExpiresAt,
-  checkout
+  checkout,
+  autoCheckout = null
 }: UpgradeMemorialClientProps) {
   const [error, setError] = useState<string | null>(null);
   const [loadingSku, setLoadingSku] = useState<string | null>(null);
+  const autoCheckoutStarted = useRef(false);
 
   const effective = getEffectiveHostingPlan({
     hosting_plan: hostingPlan,
@@ -43,7 +48,7 @@ export default function UpgradeMemorialClient({
     plan_expires_at: planExpiresAt
   });
 
-  async function startCheckout(plan: "premium_monthly" | "premium_yearly" | "lifetime") {
+  const startCheckout = useCallback(async (plan: MemorialPlanCheckoutSku) => {
     setError(null);
     setLoadingSku(plan);
     try {
@@ -67,7 +72,13 @@ export default function UpgradeMemorialClient({
     } finally {
       setLoadingSku(null);
     }
-  }
+  }, [memorialId, slug]);
+
+  useEffect(() => {
+    if (!autoCheckout || autoCheckoutStarted.current) return;
+    autoCheckoutStarted.current = true;
+    void startCheckout(autoCheckout);
+  }, [autoCheckout, startCheckout]);
 
   const expiresDisplay =
     effective === "premium" && planExpiresAt

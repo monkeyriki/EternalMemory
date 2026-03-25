@@ -22,7 +22,7 @@ const planCards = [
       "Platform ads may appear on the public page",
       "Upgrade anytime from edit or upgrade page"
     ],
-    cta: { label: "Create a memorial", href: "/memorials/new", variant: "secondary" as const }
+    cta: { kind: "basic" as const }
   },
   {
     name: "Premium",
@@ -37,7 +37,7 @@ const planCards = [
       "Monthly or yearly billing — cancel anytime",
       "Great for active tributes and family sharing"
     ],
-    cta: { label: "Start with Basic, then upgrade", href: "/memorials/new", variant: "accent" as const }
+    cta: { kind: "premium" as const }
   },
   {
     name: "Lifetime",
@@ -52,7 +52,7 @@ const planCards = [
       "No platform ads on the public memorial",
       "Ideal when you want zero renewals"
     ],
-    cta: { label: "Create a memorial", href: "/memorials/new", variant: "accent" as const }
+    cta: { kind: "lifetime" as const }
   }
 ];
 
@@ -60,7 +60,7 @@ export default function PlansPage() {
   return (
     <MemorialPageShell
       title="Plans & features"
-      subtitle="Every memorial starts on Basic. Upgrade a single memorial to Premium or Lifetime when you need more gallery space and an ad-free experience."
+      subtitle="Start free on Basic, or go straight to secure checkout for Premium or Lifetime when you are ready. Each paid plan applies to one memorial."
       maxWidth="5xl"
       contentClassName="mt-6 space-y-12"
     >
@@ -104,7 +104,9 @@ export default function PlansPage() {
                     <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden />
                   </span>
                 </div>
-                <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-amber-800">{plan.price}</p>
+                <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-amber-800">
+                  {plan.price}
+                </p>
                 <ul className="mt-4 flex flex-1 flex-col gap-2.5 text-sm text-slate-700">
                   {plan.bullets.map((line) => (
                     <li key={line} className="flex gap-2">
@@ -113,15 +115,63 @@ export default function PlansPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-6">
-                  <Link href={plan.cta.href} className="block w-full">
-                    <Button
-                      variant={plan.cta.variant}
-                      className="w-full py-2.5 text-sm font-semibold"
-                    >
-                      {plan.cta.label}
-                    </Button>
-                  </Link>
+                <div className="mt-6 space-y-2">
+                  {plan.cta.kind === "basic" && (
+                    <Link href="/memorials/new" className="block w-full">
+                      <Button
+                        variant="secondary"
+                        className="w-full py-2.5 text-sm font-semibold"
+                      >
+                        Create a memorial
+                      </Button>
+                    </Link>
+                  )}
+                  {plan.cta.kind === "premium" && (
+                    <>
+                      <Link
+                        href="/plans/continue-checkout?sku=premium_monthly"
+                        className="block w-full"
+                      >
+                        <Button
+                          variant="accent"
+                          className="w-full py-2.5 text-sm font-semibold"
+                        >
+                          Subscribe monthly (Stripe)
+                        </Button>
+                      </Link>
+                      <Link
+                        href="/plans/continue-checkout?sku=premium_yearly"
+                        className="block w-full"
+                      >
+                        <Button
+                          variant="secondary"
+                          className="w-full py-2.5 text-sm font-semibold"
+                        >
+                          Subscribe yearly (Stripe)
+                        </Button>
+                      </Link>
+                      <p className="text-center text-xs text-slate-500">
+                        Sign in required. If you have several memorials, you will pick which one to
+                        upgrade.
+                      </p>
+                    </>
+                  )}
+                  {plan.cta.kind === "lifetime" && (
+                    <>
+                      <Link href="/plans/continue-checkout?sku=lifetime" className="block w-full">
+                        <Button
+                          variant="accent"
+                          className="w-full py-2.5 text-sm font-semibold"
+                        >
+                          Pay once with Stripe
+                        </Button>
+                      </Link>
+                      <p className="text-center text-xs text-slate-500">
+                        Sign in required. If you have several memorials, you will pick which one to
+                        upgrade.
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             );
@@ -180,7 +230,7 @@ export default function PlansPage() {
       </section>
 
       <div className="rounded-2xl border border-slate-200/80 bg-white/80 px-5 py-4 text-center text-sm text-slate-600 shadow-sm backdrop-blur">
-        After you publish, open <strong className="text-slate-800">Edit</strong> → hosting, or visit{" "}
+        After you publish, you can also open <strong className="text-slate-800">Edit</strong> → hosting, or visit{" "}
         <code className="rounded-md bg-slate-200/70 px-1.5 py-0.5 text-xs text-slate-800">
           /memorials/your-slug/upgrade
         </code>{" "}

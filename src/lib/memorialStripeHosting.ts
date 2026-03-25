@@ -18,6 +18,22 @@ export type MemorialPlanCheckoutSku =
   | "premium_yearly"
   | "lifetime";
 
+const MEMORIAL_PLAN_CHECKOUT_SKUS: MemorialPlanCheckoutSku[] = [
+  "premium_monthly",
+  "premium_yearly",
+  "lifetime"
+];
+
+/** Validates query params (plans flow, upgrade redirects). */
+export function parseMemorialPlanCheckoutSku(
+  v: string | undefined | null
+): MemorialPlanCheckoutSku | null {
+  if (!v || typeof v !== "string") return null;
+  return MEMORIAL_PLAN_CHECKOUT_SKUS.includes(v as MemorialPlanCheckoutSku)
+    ? (v as MemorialPlanCheckoutSku)
+    : null;
+}
+
 export function memorialHostingPriceIdForSku(
   sku: MemorialPlanCheckoutSku
 ): string | null {

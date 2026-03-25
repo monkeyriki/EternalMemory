@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
+import { parseMemorialPlanCheckoutSku } from "@/lib/memorialStripeHosting";
 import UpgradeMemorialClient from "./UpgradeMemorialClient";
 
 export default async function MemorialUpgradePage({
@@ -23,6 +24,14 @@ export default async function MemorialUpgradePage({
       ? checkoutRaw
       : Array.isArray(checkoutRaw)
         ? checkoutRaw[0]
+        : null;
+
+  const autoCheckoutRaw = searchParams?.autoCheckout;
+  const autoCheckoutParam =
+    typeof autoCheckoutRaw === "string"
+      ? autoCheckoutRaw
+      : Array.isArray(autoCheckoutRaw)
+        ? autoCheckoutRaw[0]
         : null;
 
   const { data: memorial } = await supabase
@@ -49,9 +58,12 @@ export default async function MemorialUpgradePage({
   const isAdmin = role === "admin";
 
   if (!user) {
-    const upgradePath =
-      `/memorials/${slug}/upgrade` +
-      (checkout ? `?checkout=${encodeURIComponent(checkout)}` : "");
+    const autoCheckoutParsed = parseMemorialPlanCheckoutSku(autoCheckoutParam);
+    const qs = new URLSearchParams();
+    if (checkout) qs.set("checkout", checkout);
+    if (autoCheckoutParsed) qs.set("autoCheckout", autoCheckoutParsed);
+    const q = qs.toString();
+    const upgradePath = `/memorials/${slug}/upgrade${q ? `?${q}` : ""}`;
     redirect(`/auth/login?next=${encodeURIComponent(upgradePath)}`);
   }
 
@@ -81,6 +93,7 @@ export default async function MemorialUpgradePage({
         hostingPlan={memorial.hosting_plan as string | null}
         planExpiresAt={memorial.plan_expires_at}
         checkout={checkout}
+        autoCheckout={parseMemorialPlanCheckoutSku(autoCheckoutParam ?? null)}
       />
     </MemorialPageShell>
   );
