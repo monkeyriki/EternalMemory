@@ -135,38 +135,42 @@ export default function UpgradeMemorialClient({
           This memorial already has <strong>Lifetime</strong> hosting. Thank you for your support.
         </p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
-            <h2 className="font-serif text-base font-semibold text-slate-900">Premium — Monthly</h2>
-            <p className="mt-2 text-sm text-slate-600">
+        <div className="grid items-stretch gap-4 sm:grid-cols-1 md:grid-cols-3">
+          <div className="flex h-full min-h-0 flex-col rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
+            <h2 className="shrink-0 font-serif text-base font-semibold text-slate-900">
+              Premium — Monthly
+            </h2>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">
               Larger gallery, no platform ads, ongoing updates while subscribed.
             </p>
             <button
               type="button"
               disabled={paidActive || loadingSku !== null}
               onClick={() => startCheckout("premium_monthly")}
-              className="mt-4 w-full rounded-xl bg-amber-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-amber-900/15 transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 w-full shrink-0 rounded-xl bg-amber-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-amber-900/15 transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loadingSku === "premium_monthly" ? "Redirecting…" : "Subscribe monthly"}
             </button>
           </div>
-          <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
-            <h2 className="font-serif text-base font-semibold text-slate-900">Premium — Yearly</h2>
-            <p className="mt-2 text-sm text-slate-600">
+          <div className="flex h-full min-h-0 flex-col rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-sm backdrop-blur">
+            <h2 className="shrink-0 font-serif text-base font-semibold text-slate-900">
+              Premium — Yearly
+            </h2>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">
               Same benefits as monthly, billed once per year.
             </p>
             <button
               type="button"
               disabled={paidActive || loadingSku !== null}
               onClick={() => startCheckout("premium_yearly")}
-              className="mt-4 w-full rounded-xl bg-amber-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-amber-900/15 transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 w-full shrink-0 rounded-xl bg-amber-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-amber-900/15 transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loadingSku === "premium_yearly" ? "Redirecting…" : "Subscribe yearly"}
             </button>
           </div>
-          <div className="rounded-2xl border border-amber-200/90 bg-amber-50/50 p-5 shadow-sm backdrop-blur ring-1 ring-amber-200/60">
-            <h2 className="font-serif text-base font-semibold text-slate-900">Lifetime</h2>
-            <p className="mt-2 text-sm text-slate-600">
+          <div className="flex h-full min-h-0 flex-col rounded-2xl border border-amber-200/90 bg-amber-50/50 p-5 shadow-sm backdrop-blur ring-1 ring-amber-200/60">
+            <h2 className="shrink-0 font-serif text-base font-semibold text-slate-900">Lifetime</h2>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">
               One-time payment. Keep expanded gallery and no platform ads permanently for this
               memorial.
             </p>
@@ -174,7 +178,7 @@ export default function UpgradeMemorialClient({
               type="button"
               disabled={loadingSku !== null}
               onClick={() => startCheckout("lifetime")}
-              className="mt-4 w-full rounded-xl bg-amber-800 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-amber-900/20 transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 w-full shrink-0 rounded-xl bg-amber-800 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-amber-900/20 transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loadingSku === "lifetime" ? "Redirecting…" : "Buy lifetime"}
             </button>

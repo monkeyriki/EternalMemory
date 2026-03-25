@@ -87,13 +87,13 @@ export default function PlansPage() {
         <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-slate-600 sm:text-base">
           One memorial, one plan. You can change hosting later without losing your page.
         </p>
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
+        <div className="mt-8 grid items-stretch gap-5 md:grid-cols-3">
           {planCards.map((plan) => {
             const Icon = plan.icon;
             return (
               <div
                 key={plan.name}
-                className={`flex flex-col rounded-2xl border p-6 shadow-md shadow-slate-400/10 backdrop-blur ${plan.accent} ${plan.ring}`}
+                className={`flex h-full min-h-0 flex-col rounded-2xl border p-6 shadow-md shadow-slate-400/10 backdrop-blur ${plan.accent} ${plan.ring}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -115,7 +115,7 @@ export default function PlansPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-auto space-y-2 pt-6">
+                <div className="mt-auto shrink-0 pt-6">
                   {plan.cta.kind === "basic" && (
                     <Link href="/memorials/new" className="block w-full">
                       <Button
@@ -127,39 +127,27 @@ export default function PlansPage() {
                     </Link>
                   )}
                   {plan.cta.kind === "premium" && (
-                    <>
-                      <Link
-                        href="/plans/continue-checkout?plan=premium"
-                        className="block w-full"
+                    <Link
+                      href="/plans/continue-checkout?plan=premium"
+                      className="block w-full"
+                    >
+                      <Button
+                        variant="accent"
+                        className="w-full py-2.5 text-sm font-semibold"
                       >
-                        <Button
-                          variant="accent"
-                          className="w-full py-2.5 text-sm font-semibold"
-                        >
-                          Subscribe
-                        </Button>
-                      </Link>
-                      <p className="text-center text-xs text-slate-500">
-                        Sign in if prompted. Multiple memorials: you will choose which page to
-                        upgrade; then pick monthly or yearly.
-                      </p>
-                    </>
+                        Subscribe
+                      </Button>
+                    </Link>
                   )}
                   {plan.cta.kind === "lifetime" && (
-                    <>
-                      <Link href="/plans/continue-checkout?plan=lifetime" className="block w-full">
-                        <Button
-                          variant="accent"
-                          className="w-full py-2.5 text-sm font-semibold"
-                        >
-                          Pay once
-                        </Button>
-                      </Link>
-                      <p className="text-center text-xs text-slate-500">
-                        Sign in if prompted. Multiple memorials: you will choose which page to
-                        upgrade.
-                      </p>
-                    </>
+                    <Link href="/plans/continue-checkout?plan=lifetime" className="block w-full">
+                      <Button
+                        variant="accent"
+                        className="w-full py-2.5 text-sm font-semibold"
+                      >
+                        Pay once
+                      </Button>
+                    </Link>
                   )}
                 </div>
               </div>
