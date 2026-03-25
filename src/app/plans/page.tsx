@@ -326,14 +326,6 @@ export default function PlansPage() {
           </div>
         </div>
       </section>
-
-      <div className="rounded-2xl border border-slate-200/80 bg-white/80 px-5 py-4 text-center text-sm text-slate-600 shadow-sm backdrop-blur">
-        After you publish, you can also open <strong className="text-slate-800">Edit</strong> → hosting, or visit{" "}
-        <code className="rounded-md bg-slate-200/70 px-1.5 py-0.5 text-xs text-slate-800">
-          /memorials/your-slug/upgrade
-        </code>{" "}
-        to change plan for that memorial.
-      </div>
     </MemorialPageShell>
   );
 }
