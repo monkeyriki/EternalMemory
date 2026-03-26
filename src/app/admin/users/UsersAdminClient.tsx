@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { assignB2BRoleAction } from "./actions";
+import { updateUserRoleAction } from "./actions";
 
 export type ProfileRow = {
   id: string;
@@ -13,10 +13,19 @@ export type ProfileRow = {
 
 export function UsersAdminClient({ profiles }: { profiles: ProfileRow[] }) {
   const [msg, setMsg] = useState<string | null>(null);
+  const [draftRoleByUser, setDraftRoleByUser] = useState<Record<string, string>>({});
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
 
-  async function makeB2B(userId: string) {
+  async function updateRole(userId: string, currentRole: string) {
+    const nextRole = (draftRoleByUser[userId] ?? currentRole) as
+      | "user"
+      | "b2b"
+      | "admin";
+    if (nextRole === currentRole) return;
     setMsg(null);
-    const res = await assignB2BRoleAction(userId);
+    setPendingUserId(userId);
+    const res = await updateUserRoleAction(userId, nextRole);
+    setPendingUserId(null);
     if (res.ok) {
       window.location.reload();
     } else {
@@ -50,26 +59,28 @@ export function UsersAdminClient({ profiles }: { profiles: ProfileRow[] }) {
                 <td className="max-w-[260px] truncate px-4 py-3 font-mono text-xs text-slate-600">
                   {p.email ?? "—"}
                 </td>
-                <td className="px-4 py-3 capitalize">{p.role}</td>
+                <td className="px-4 py-3">
+                  <select
+                    value={draftRoleByUser[p.id] ?? p.role}
+                    onChange={(e) =>
+                      setDraftRoleByUser((prev) => ({ ...prev, [p.id]: e.target.value }))
+                    }
+                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs capitalize text-slate-800"
+                  >
+                    <option value="user">user</option>
+                    <option value="b2b">b2b</option>
+                    <option value="admin">admin</option>
+                  </select>
+                </td>
                 <td className="max-w-[220px] px-4 py-3">
-                  {p.role === "admin" ? (
-                    <span
-                      className="text-xs leading-snug text-slate-500"
-                      title="Use a normal account (role user), or change this row in the database if you must remove admin first."
-                    >
-                      Not available — admin accounts cannot be set to B2B here.
-                    </span>
-                  ) : p.role === "b2b" ? (
-                    <span className="text-slate-500">Already B2B</span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => makeB2B(p.id)}
-                      className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700"
-                    >
-                      Make B2B
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => updateRole(p.id, p.role)}
+                    disabled={pendingUserId === p.id}
+                    className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700 disabled:opacity-60"
+                  >
+                    {pendingUserId === p.id ? "Saving..." : "Save role"}
+                  </button>
                 </td>
               </tr>
             ))}

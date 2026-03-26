@@ -86,6 +86,20 @@ export default async function DashboardPage() {
             <p className="text-xs text-slate-500">Hosting options</p>
           </div>
         </Link>
+        {profile?.role !== "b2b" && (
+          <Link
+            href="/dashboard/b2b"
+            className="flex items-center gap-3 rounded-2xl border border-emerald-200/90 bg-emerald-50/70 px-4 py-4 shadow-sm backdrop-blur transition hover:border-emerald-300 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 focus-visible:ring-offset-2 sm:col-span-2 lg:col-span-1"
+          >
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-emerald-700 ring-1 ring-emerald-200">
+              <LayoutGrid className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Become B2B partner</p>
+              <p className="text-xs text-slate-600">$29/month subscription</p>
+            </div>
+          </Link>
+        )}
         <Link
           href="/account/delete"
           className="flex items-center gap-3 rounded-2xl border border-red-200/80 bg-red-50/70 px-4 py-4 shadow-sm backdrop-blur transition hover:border-red-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/70 focus-visible:ring-offset-2 sm:col-span-2 lg:col-span-1"

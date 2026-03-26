@@ -47,13 +47,6 @@ export default async function AdminUsersPage() {
       <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
         Users
       </h1>
-      <p className="text-sm text-slate-600">
-        Promote <strong>registered</strong> accounts (<code className="rounded bg-slate-100 px-1">user</code> role) to B2B for testing. Creates an active{" "}
-        <code className="rounded bg-slate-100 px-1">b2b_subscriptions</code> row
-        with <code className="rounded bg-slate-100 px-1">admin_grant:&lt;id&gt;</code>
-        . <strong>Admin</strong> rows have no action here — sign up a normal user, or
-        use Supabase SQL / service role to set a profile to &quot;user&quot; first if you need to test B2B on that account.
-      </p>
       <div>
         <UsersAdminClient profiles={rows} />
       </div>
