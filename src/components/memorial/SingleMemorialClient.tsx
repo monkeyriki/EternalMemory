@@ -160,9 +160,10 @@ export function SingleMemorialClient({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setShareUrl(window.location.href);
+      // Always share/copy the canonical memorial URL (works for public + unlisted).
+      setShareUrl(`${window.location.origin}/memorials/${memorial.slug}`);
     }
-  }, []);
+  }, [memorial.slug]);
 
   useEffect(() => {
     if (!shareToast) return;
@@ -254,6 +255,8 @@ export function SingleMemorialClient({
     () => `In memory of ${memorial.full_name}`,
     [memorial.full_name]
   );
+  const shareLinkLabel =
+    memorial.visibility === "unlisted" ? "Unlisted memorial link" : "Memorial link";
 
   const copyPageLink = async (message: string) => {
     if (!shareUrl) return;
@@ -966,6 +969,10 @@ export function SingleMemorialClient({
           <div>
             <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
               Share
+            </p>
+            <p className="mb-2 break-all text-xs text-slate-500">
+              {shareLinkLabel}:{" "}
+              <span className="font-mono text-slate-700">{shareUrl || "Loading..."}</span>
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <a
