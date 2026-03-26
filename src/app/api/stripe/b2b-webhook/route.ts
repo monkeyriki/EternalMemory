@@ -8,6 +8,30 @@ import { SITE_URL_PUBLIC } from "@/lib/site";
 
 export const runtime = "nodejs";
 
+function resolveB2BWebhookSecret():
+  | { value: string; source: "test" | "live" | "legacy" }
+  | null {
+  const legacy = process.env.STRIPE_B2B_WEBHOOK_SECRET?.trim();
+  const test = process.env.STRIPE_B2B_WEBHOOK_TEST_SECRET?.trim();
+  const live = process.env.STRIPE_B2B_WEBHOOK_LIVE_SECRET?.trim();
+
+  const vercelEnv = process.env.VERCEL_ENV?.trim();
+  const nodeEnv = process.env.NODE_ENV?.trim();
+  const preferLive = vercelEnv === "production" || nodeEnv === "production";
+
+  if (preferLive) {
+    if (live) return { value: live, source: "live" };
+    if (legacy) return { value: legacy, source: "legacy" };
+    if (test) return { value: test, source: "test" };
+    return null;
+  }
+
+  if (test) return { value: test, source: "test" };
+  if (legacy) return { value: legacy, source: "legacy" };
+  if (live) return { value: live, source: "live" };
+  return null;
+}
+
 /** Stripe API uses snake_case; SDK typings may omit some fields in strict mode. */
 function subscriptionPeriodBounds(sub: unknown): {
   startMs: number;
@@ -114,11 +138,14 @@ async function maybeDemoteToUser(
 }
 
 export async function POST(req: NextRequest) {
-  const secret = process.env.STRIPE_B2B_WEBHOOK_SECRET?.trim();
-  if (!secret) {
-    console.error("b2b-webhook: Missing STRIPE_B2B_WEBHOOK_SECRET");
+  const secretResolved = resolveB2BWebhookSecret();
+  if (!secretResolved) {
+    console.error(
+      "b2b-webhook: Missing secret. Set STRIPE_B2B_WEBHOOK_TEST_SECRET and STRIPE_B2B_WEBHOOK_LIVE_SECRET (or legacy STRIPE_B2B_WEBHOOK_SECRET)."
+    );
     return NextResponse.json({ received: true }, { status: 200 });
   }
+  const secret = secretResolved.value;
 
   const sig = req.headers.get("stripe-signature");
   if (!sig) {
