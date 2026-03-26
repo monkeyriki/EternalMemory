@@ -24,8 +24,10 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     const supabase = getSupabaseBrowserClient();
-    // Build redirect from the actual page origin (avoid env mistakes on Vercel previews).
-    const redirectTo = `${window.location.origin}/auth/callback?next=/auth/update-password`;
+    // Send users straight to the password reset page.
+    // Using /auth/callback + ?next=... can be rejected by Supabase Redirect URL allowlists,
+    // which then falls back to Site URL (home). /auth/update-password is explicit and stable.
+    const redirectTo = `${window.location.origin}/auth/update-password`;
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo
