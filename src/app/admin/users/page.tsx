@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { UsersAdminClient, type ProfileRow } from "./UsersAdminClient";
 
 export default async function AdminUsersPage() {
@@ -20,9 +21,23 @@ export default async function AdminUsersPage() {
     );
   }
 
+  const admin = getSupabaseAdminClient();
+  const { data: authUsers, error: authErr } = await admin.auth.admin.listUsers({
+    perPage: 200,
+    page: 1
+  });
+  if (authErr) {
+    console.error("AdminUsersPage listUsers:", authErr);
+  }
+  const emailById = new Map<string, string>();
+  for (const u of authUsers?.users ?? []) {
+    if (u?.id && u?.email) emailById.set(u.id, u.email);
+  }
+
   const rows: ProfileRow[] = (profiles ?? []).map((p) => ({
     id: p.id,
     display_name: p.display_name,
+    email: emailById.get(p.id) ?? null,
     role: p.role,
     created_at: p.created_at
   }));

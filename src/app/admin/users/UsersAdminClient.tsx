@@ -6,6 +6,7 @@ import { assignB2BRoleAction } from "./actions";
 export type ProfileRow = {
   id: string;
   display_name: string | null;
+  email: string | null;
   role: string;
   created_at: string;
 };
@@ -35,7 +36,7 @@ export function UsersAdminClient({ profiles }: { profiles: ProfileRow[] }) {
           <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
             <tr>
               <th className="px-4 py-3 font-medium">Display name</th>
-              <th className="px-4 py-3 font-medium">User ID</th>
+              <th className="px-4 py-3 font-medium">Email</th>
               <th className="px-4 py-3 font-medium">Role</th>
               <th className="px-4 py-3 font-medium">Action</th>
             </tr>
@@ -44,10 +45,10 @@ export function UsersAdminClient({ profiles }: { profiles: ProfileRow[] }) {
             {profiles.map((p) => (
               <tr key={p.id}>
                 <td className="px-4 py-3 text-slate-900">
-                  {p.display_name ?? "—"}
+                  <span title={`User ID: ${p.id}`}>{p.display_name ?? "—"}</span>
                 </td>
-                <td className="max-w-[200px] truncate px-4 py-3 font-mono text-xs text-slate-500">
-                  {p.id}
+                <td className="max-w-[260px] truncate px-4 py-3 font-mono text-xs text-slate-600">
+                  {p.email ?? "—"}
                 </td>
                 <td className="px-4 py-3 capitalize">{p.role}</td>
                 <td className="max-w-[220px] px-4 py-3">
