@@ -12,7 +12,10 @@ import {
   Mail,
   MessageCircle,
   Link2,
-  Flag
+  Flag,
+  X,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import {
   approveTributeAction,
@@ -155,6 +158,9 @@ export function SingleMemorialClient({
   const [reportModal, setReportModal] = useState<
     null | { scope: "memorial" } | { scope: "tribute"; tributeId: string }
   >(null);
+  const [galleryLightboxIndex, setGalleryLightboxIndex] = useState<number | null>(
+    null
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -189,6 +195,38 @@ export function SingleMemorialClient({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [payModalItemId, checkoutLoadingItemId]);
+
+  useEffect(() => {
+    if (galleryLightboxIndex === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setGalleryLightboxIndex(null);
+        return;
+      }
+      if (galleryMedia.length <= 1) return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setGalleryLightboxIndex(
+          (i) =>
+            i === null
+              ? null
+              : (i - 1 + galleryMedia.length) % galleryMedia.length
+        );
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setGalleryLightboxIndex(
+          (i) => (i === null ? null : (i + 1) % galleryMedia.length)
+        );
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [galleryLightboxIndex, galleryMedia.length]);
 
   const storeItemById = useMemo(() => {
     return new Map(storeItems.map((s) => [s.id, s]));
@@ -514,19 +552,23 @@ export function SingleMemorialClient({
           <section className="space-y-3">
             <h2 className="font-serif text-xl font-semibold text-slate-900">Gallery</h2>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
-              {galleryMedia.map((item) => (
-                <div
+              {galleryMedia.map((item, index) => (
+                <button
                   key={item.id}
-                  className="overflow-hidden rounded-xl border border-slate-100 bg-slate-50 aspect-square"
+                  type="button"
+                  className="group relative aspect-square overflow-hidden rounded-xl border border-slate-100 bg-slate-50 text-left shadow-none ring-amber-400 transition hover:opacity-95 focus:outline-none focus-visible:ring-2"
+                  onClick={() => setGalleryLightboxIndex(index)}
+                  aria-label={`View gallery image ${index + 1} of ${galleryMedia.length} larger`}
                 >
                   <Image
                     src={item.image_url}
                     alt=""
                     width={400}
                     height={400}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover transition group-hover:scale-[1.02]"
                   />
-                </div>
+                  <span className="pointer-events-none absolute inset-0 bg-black/0 transition group-hover:bg-black/10 group-focus-visible:bg-black/10" />
+                </button>
               ))}
             </div>
           </section>
@@ -1184,6 +1226,72 @@ export function SingleMemorialClient({
           </div>
         </div>
       )}
+
+      {galleryLightboxIndex !== null &&
+        galleryMedia[galleryLightboxIndex] != null && (
+          <div
+            className="fixed inset-0 z-[55] flex items-center justify-center bg-black/90 p-4 pt-16"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Enlarged gallery photo"
+            onClick={() => setGalleryLightboxIndex(null)}
+          >
+            <button
+              type="button"
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                setGalleryLightboxIndex(null);
+              }}
+              aria-label="Close enlarged image"
+            >
+              <X className="h-6 w-6" aria-hidden />
+            </button>
+            {galleryMedia.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setGalleryLightboxIndex(
+                      (galleryLightboxIndex - 1 + galleryMedia.length) %
+                        galleryMedia.length
+                    );
+                  }}
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="h-7 w-7" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-4"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setGalleryLightboxIndex(
+                      (galleryLightboxIndex + 1) % galleryMedia.length
+                    );
+                  }}
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="h-7 w-7" aria-hidden />
+                </button>
+              </>
+            )}
+            <div
+              className="relative h-[min(85vh,900px)] w-full max-w-6xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={galleryMedia[galleryLightboxIndex].image_url}
+                alt=""
+                fill
+                className="object-contain"
+                sizes="(max-width: 1024px) 95vw, 1152px"
+              />
+            </div>
+          </div>
+        )}
 
       <ReportContentModal
         memorialId={memorial.id}
