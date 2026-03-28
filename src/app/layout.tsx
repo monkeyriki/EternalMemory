@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Playfair_Display } from "next/font/google";
 import "./tailwind.generated.css";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className={`${playfair.variable} flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,_#f8fafc_0%,_#eef2ff_38%,_#f8fafc_100%)] text-slate-900`}>
         <SiteHeader logoFontClassName={playfair.className} />
         <main className="flex-1">{children}</main>
+        <SpeedInsights />
         <footer className="border-t border-slate-200/80 bg-white/95 px-4 py-8 text-sm text-slate-600 backdrop-blur">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
