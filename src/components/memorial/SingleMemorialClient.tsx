@@ -488,16 +488,18 @@ export function SingleMemorialClient({
           </div>
         )}
 
-        {/* Cover photo */}
+        {/* Cover photo — full image visible (letterboxed if needed) */}
         <section className="space-y-3">
           {memorial.cover_image_url ? (
-            <div className="overflow-hidden rounded-xl border border-slate-100 bg-slate-100">
+            <div className="flex justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-100 p-1 sm:p-2">
               <Image
                 src={memorial.cover_image_url}
                 alt={memorial.full_name}
-                width={800}
-                height={400}
-                className="h-56 w-full object-cover sm:h-72"
+                width={1200}
+                height={1600}
+                className="h-auto w-full max-h-[min(75vh,720px)] object-contain"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 672px"
+                priority
               />
             </div>
           ) : (
