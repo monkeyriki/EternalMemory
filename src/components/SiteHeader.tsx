@@ -10,10 +10,12 @@ type SiteHeaderProps = {
 };
 
 const navItems = [
-  { label: "Home", href: "/" },
-  { label: "About us", href: "/about" },
+  { label: "How it works", href: "/#how-it-works" },
   { label: "Memorials", href: "/memorials" },
-  { label: "Plans & Features", href: "/plans" }
+  { label: "Why EverMissed", href: "/why-evermissed" },
+  { label: "Testimonials", href: "/#testimonials" },
+  { label: "Plans", href: "/plans" },
+  { label: "About", href: "/about" }
 ];
 
 export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
@@ -32,19 +34,25 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
           </span>
         </Link>
 
-        <nav className="hidden shrink-0 items-center gap-1 md:flex">
+        <nav className="hidden shrink-0 items-center gap-0.5 lg:gap-1 md:flex">
           {navItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+              className="rounded-md px-2 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 lg:px-3"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden shrink-0 flex-nowrap items-center md:flex">
+        <div className="hidden shrink-0 flex-nowrap items-center gap-3 md:flex">
+          <Link
+            href="/memorials/new"
+            className="inline-flex items-center justify-center rounded-full bg-[#e07a3f] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#d96c2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e07a3f]/50 focus-visible:ring-offset-2"
+          >
+            Create Memorial
+          </Link>
           <AuthLinks />
         </div>
 
@@ -71,6 +79,13 @@ export function SiteHeader({ logoFontClassName = "" }: SiteHeaderProps) {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/memorials/new"
+              onClick={() => setMobileOpen(false)}
+              className="block rounded-full bg-[#e07a3f] px-4 py-3 text-center text-sm font-semibold text-white hover:bg-[#d96c2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e07a3f]/50"
+            >
+              Create Memorial
+            </Link>
             <div
               className="border-t border-slate-200 pt-3"
               onClick={() => setMobileOpen(false)}
