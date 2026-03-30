@@ -32,7 +32,7 @@ export default async function HomePage() {
   const { data: memorialRows } = await supabase
     .from("memorials")
     .select(
-      "slug, type, full_name, date_of_birth, date_of_death, city, tags, cover_image_url"
+      "id, slug, type, full_name, date_of_birth, date_of_death, city, story, tags, cover_image_url"
     )
     .eq("visibility", "public")
     .eq("is_draft", false)
@@ -40,6 +40,36 @@ export default async function HomePage() {
     .limit(HOME_MEMORIAL_LIMIT);
 
   const memorials = memorialRows ?? [];
+  const memorialIds = memorials.map((m) => m.id);
+  const tributeCountByMemorialId = new Map<string, number>();
+  const photoCountByMemorialId = new Map<string, number>();
+
+  if (memorialIds.length > 0) {
+    const { data: tributeRows } = await supabase
+      .from("virtual_tributes")
+      .select("memorial_id")
+      .in("memorial_id", memorialIds)
+      .eq("is_approved", true);
+    for (const row of tributeRows ?? []) {
+      const memorialId = (row as any).memorial_id as string;
+      tributeCountByMemorialId.set(
+        memorialId,
+        (tributeCountByMemorialId.get(memorialId) ?? 0) + 1
+      );
+    }
+
+    const { data: mediaRows } = await supabase
+      .from("memorial_media")
+      .select("memorial_id")
+      .in("memorial_id", memorialIds);
+    for (const row of mediaRows ?? []) {
+      const memorialId = (row as any).memorial_id as string;
+      photoCountByMemorialId.set(
+        memorialId,
+        (photoCountByMemorialId.get(memorialId) ?? 0) + 1
+      );
+    }
+  }
 
   return (
     <div className="relative overflow-hidden pb-16 md:pb-20">
@@ -230,14 +260,18 @@ export default async function HomePage() {
           <div className="mt-8 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
             {memorials.map((m) => (
               <MemorialCard
-                key={m.slug}
+                key={m.id}
                 slug={m.slug}
                 name={m.full_name}
                 type={m.type === "pet" ? "pet" : "human"}
                 dateOfBirth={m.date_of_birth}
                 dateOfDeath={m.date_of_death}
+                description={m.story}
                 city={m.city}
                 tags={m.tags ?? []}
+                tributeCount={tributeCountByMemorialId.get(m.id) ?? 0}
+                likesCount={tributeCountByMemorialId.get(m.id) ?? 0}
+                photosCount={photoCountByMemorialId.get(m.id) ?? 0}
                 coverImageUrl={m.cover_image_url}
               />
             ))}
