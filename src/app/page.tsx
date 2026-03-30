@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Quote } from "lucide-react";
 import { Button } from "@/components/Button";
+import { WhyChooseUsSection } from "@/components/marketing/WhyChooseUsSection";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import MemorialCard from "@/components/memorial/MemorialCard";
 
@@ -133,6 +134,8 @@ export default async function HomePage() {
           </form>
         </div>
       </section>
+
+      <WhyChooseUsSection />
 
       <section
         id="how-it-works"

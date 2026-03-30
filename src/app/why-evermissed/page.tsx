@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { WhyEverMissedPageContent } from "@/components/marketing/WhyEverMissedPageContent";
+import { WhyEverMissedRedirect } from "./WhyEverMissedRedirect";
 import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -9,5 +9,12 @@ export const metadata: Metadata = {
 };
 
 export default function WhyEverMissedPage() {
-  return <WhyEverMissedPageContent />;
+  return (
+    <>
+      <WhyEverMissedRedirect />
+      <p className="sr-only" aria-live="polite">
+        Redirecting to the home page…
+      </p>
+    </>
+  );
 }

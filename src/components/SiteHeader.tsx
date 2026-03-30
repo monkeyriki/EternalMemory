@@ -12,7 +12,7 @@ type SiteHeaderProps = {
 const navItems = [
   { label: "How it works", href: "/#how-it-works" },
   { label: "Memorials", href: "/memorials" },
-  { label: "Why EverMissed", href: "/why-evermissed" },
+  { label: "Why EverMissed", href: "/#why-evermissed" },
   { label: "Testimonials", href: "/#testimonials" },
   { label: "Plans", href: "/plans" },
   { label: "About", href: "/about" }
