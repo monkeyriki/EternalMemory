@@ -6,6 +6,7 @@ import { WhyChooseUsSection } from "@/components/marketing/WhyChooseUsSection";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { HomeFeaturedBenefitsStrip } from "@/components/marketing/HomeFeaturedBenefitsStrip";
 import { FeaturedMemorialHorizontalCard } from "@/components/memorial/FeaturedMemorialHorizontalCard";
+import { HomeClosingCtaSection } from "@/components/marketing/HomeClosingCtaSection";
 
 const HOME_MEMORIAL_LIMIT = 4;
 
@@ -139,47 +140,6 @@ export default async function HomePage() {
 
       <CreatingMemorialStepsSection />
 
-      <WhyChooseUsSection />
-
-      <section
-        id="testimonials"
-        className="mx-auto mt-14 max-w-6xl scroll-mt-28 px-4 py-14 sm:mt-16 sm:py-16 md:py-20"
-        aria-labelledby="testimonials-heading"
-      >
-        <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#e07a3f]">
-            From our community
-          </p>
-          <h2
-            id="testimonials-heading"
-            className="mt-2 font-serif text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
-          >
-            Stories of comfort & connection
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
-            Families share how they have honored loved ones and found solace in shared memories.
-          </p>
-        </div>
-        <div className="grid gap-5 md:grid-cols-3 md:gap-6">
-          {homeTestimonials.map((t) => (
-            <article
-              key={t.author}
-              className="group relative rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <Quote
-                className="absolute right-4 top-4 h-8 w-8 text-[#e07a3f]/12 transition group-hover:text-[#e07a3f]/25"
-                aria-hidden
-              />
-              <blockquote className="pr-6 text-sm leading-relaxed text-slate-600">
-                &ldquo;{t.quote}&rdquo;
-              </blockquote>
-              <p className="mt-5 border-t border-slate-100 pt-4 font-medium text-slate-900">{t.author}</p>
-              <p className="text-xs text-slate-500">{t.detail}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section
         id="featured-memorials"
         className="border-t border-slate-200/80 bg-[#f5f3f0] py-14 sm:py-16 md:py-20"
@@ -253,6 +213,49 @@ export default async function HomePage() {
           <HomeFeaturedBenefitsStrip />
         </div>
       </section>
+
+      <WhyChooseUsSection />
+
+      <section
+        id="testimonials"
+        className="mx-auto mt-14 max-w-6xl scroll-mt-28 px-4 py-14 sm:mt-16 sm:py-16 md:py-20"
+        aria-labelledby="testimonials-heading"
+      >
+        <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#e07a3f]">
+            From our community
+          </p>
+          <h2
+            id="testimonials-heading"
+            className="mt-2 font-serif text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
+          >
+            Stories of comfort & connection
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
+            Families share how they have honored loved ones and found solace in shared memories.
+          </p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-3 md:gap-6">
+          {homeTestimonials.map((t) => (
+            <article
+              key={t.author}
+              className="group relative rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <Quote
+                className="absolute right-4 top-4 h-8 w-8 text-[#e07a3f]/12 transition group-hover:text-[#e07a3f]/25"
+                aria-hidden
+              />
+              <blockquote className="pr-6 text-sm leading-relaxed text-slate-600">
+                &ldquo;{t.quote}&rdquo;
+              </blockquote>
+              <p className="mt-5 border-t border-slate-100 pt-4 font-medium text-slate-900">{t.author}</p>
+              <p className="text-xs text-slate-500">{t.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <HomeClosingCtaSection />
     </div>
   );
 }
