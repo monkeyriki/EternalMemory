@@ -261,7 +261,6 @@ export default async function HomePage() {
             {memorials.map((m, index) => {
               const tributeReal = tributeCountByMemorialId.get(m.id) ?? 0;
               const photoReal = photoCountByMemorialId.get(m.id) ?? 0;
-              const likesDisplay = Math.max(tributeReal, 200 + index * 37);
               const photosDisplay = Math.max(photoReal, 180 + index * 29);
               const tributesDisplay = Math.max(tributeReal, 50 + index * 11);
               return (
@@ -276,7 +275,6 @@ export default async function HomePage() {
                 city={m.city}
                 tags={m.tags ?? []}
                 tributeCount={tributesDisplay}
-                likesCount={likesDisplay}
                 photosCount={photosDisplay}
                 coverImageUrl={m.cover_image_url}
               />

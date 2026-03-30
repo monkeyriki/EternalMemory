@@ -167,7 +167,6 @@ export default async function MemorialsIndexPage({
               slug={m.slug}
               tags={m.tags ?? []}
               tributeCount={tributeCountByMemorialId.get(m.id) ?? 0}
-              likesCount={tributeCountByMemorialId.get(m.id) ?? 0}
               photosCount={photoCountByMemorialId.get(m.id) ?? 0}
               coverImageUrl={m.cover_image_url}
             />

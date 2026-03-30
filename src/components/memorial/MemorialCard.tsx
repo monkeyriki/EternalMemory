@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, Heart, Image as ImageIcon, MapPin } from "lucide-react";
+import { CalendarDays, Image as ImageIcon, MapPin } from "lucide-react";
 
 type MemorialType = "human" | "pet";
 
@@ -13,7 +13,6 @@ export type MemorialCardProps = {
   slug: string;
   tags?: string[];
   tributeCount?: number;
-  likesCount?: number;
   photosCount?: number;
   /** Public cover image URL (e.g. Supabase storage). */
   coverImageUrl?: string | null;
@@ -31,6 +30,19 @@ function formatFullDate(date?: string | null): string | null {
   });
 }
 
+function plainTextSummary(input?: string | null): string {
+  if (!input) return "";
+  // Convert HTML-ish story content to plain text for card previews.
+  return input
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, "\"")
+    .replace(/&#39;/gi, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export default function MemorialCard({
   name,
   type,
@@ -41,7 +53,6 @@ export default function MemorialCard({
   slug,
   tags = [],
   tributeCount = 0,
-  likesCount = 0,
   photosCount = 0,
   coverImageUrl
 }: MemorialCardProps) {
@@ -52,7 +63,7 @@ export default function MemorialCard({
     yBirth || yDeath
       ? `${yBirth ?? "—"} – ${yDeath ?? "—"}`
       : "—";
-  const summary = (description ?? "").trim();
+  const summary = plainTextSummary(description);
 
   const cover = coverImageUrl?.trim() || null;
 
@@ -125,10 +136,6 @@ export default function MemorialCard({
         </div>
         <div className="mt-4 flex shrink-0 items-center gap-4 border-t border-slate-100 pt-4">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-            <span className="inline-flex items-center gap-1.5">
-              <Heart className="h-3.5 w-3.5 text-[#e07a3f]" />
-              <span>{Math.max(likesCount, 0)} likes</span>
-            </span>
             <span className="inline-flex items-center gap-1.5">
               <ImageIcon className="h-3.5 w-3.5 text-[#e07a3f]" />
               <span>{Math.max(photosCount, 0)} photos</span>
