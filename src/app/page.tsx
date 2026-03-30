@@ -4,7 +4,6 @@ import { Button } from "@/components/Button";
 import { CreatingMemorialStepsSection } from "@/components/marketing/CreatingMemorialStepsSection";
 import { WhyChooseUsSection } from "@/components/marketing/WhyChooseUsSection";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
-import { HomeFeaturedBenefitsStrip } from "@/components/marketing/HomeFeaturedBenefitsStrip";
 import { FeaturedMemorialHorizontalCard } from "@/components/memorial/FeaturedMemorialHorizontalCard";
 import { HomeClosingCtaSection } from "@/components/marketing/HomeClosingCtaSection";
 
@@ -209,8 +208,6 @@ export default async function HomePage() {
               </div>
             </>
           )}
-
-          <HomeFeaturedBenefitsStrip />
         </div>
       </section>
 
