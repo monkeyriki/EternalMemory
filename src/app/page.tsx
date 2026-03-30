@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Quote } from "lucide-react";
 import { Button } from "@/components/Button";
+import { CreatingMemorialStepsSection } from "@/components/marketing/CreatingMemorialStepsSection";
 import { WhyChooseUsSection } from "@/components/marketing/WhyChooseUsSection";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import MemorialCard from "@/components/memorial/MemorialCard";
@@ -135,50 +136,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <WhyChooseUsSection />
+      <CreatingMemorialStepsSection />
 
-      <section
-        id="how-it-works"
-        className="mx-auto mt-10 max-w-6xl scroll-mt-28 px-4 sm:mt-14"
-        aria-labelledby="how-it-works-heading"
-      >
-        <div className="rounded-3xl border border-slate-200/60 bg-gradient-to-b from-white to-[#faf9f7]/80 px-5 py-10 shadow-sm sm:px-8 sm:py-12 md:px-10">
-          <div className="mb-8 text-center sm:mb-10 sm:text-left">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#e07a3f]">
-              Simple process
-            </p>
-            <h2
-              id="how-it-works-heading"
-              className="mt-2 font-serif text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
-            >
-              Why families choose us
-            </h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-slate-600 sm:mx-0">
-              Thoughtful tools for a calm, respectful space to remember someone special.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3 sm:gap-5">
-            <article className="group rounded-2xl border border-slate-200/70 bg-white/95 p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-[#e07a3f]/25 hover:shadow-md sm:p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Fast setup</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                Publish a meaningful memorial page in minutes.
-              </p>
-            </article>
-            <article className="group rounded-2xl border border-slate-200/70 bg-white/95 p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-[#e07a3f]/25 hover:shadow-md sm:p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Designed for families</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                Simple sharing via link and QR, from any device.
-              </p>
-            </article>
-            <article className="group rounded-2xl border border-slate-200/70 bg-white/95 p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-[#e07a3f]/25 hover:shadow-md sm:p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Respectful and private</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                Control visibility and keep memories in one safe place.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
+      <WhyChooseUsSection />
 
       <section
         id="testimonials"
