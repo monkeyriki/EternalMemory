@@ -79,9 +79,9 @@ export function AuthLinks() {
         <button
           type="button"
           onClick={handleLogout}
-          className="inline-flex shrink-0 items-center whitespace-nowrap rounded-md py-2 text-sm font-semibold uppercase tracking-wide text-slate-600 transition-colors hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+          className="inline-flex shrink-0 items-center whitespace-nowrap rounded-md py-2 text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
         >
-          Sign out
+          Sign Out
         </button>
       </div>
     );
@@ -90,9 +90,9 @@ export function AuthLinks() {
   return (
     <Link
       href="/auth/login"
-      className="inline-flex shrink-0 items-center whitespace-nowrap rounded-md py-2 text-sm font-semibold uppercase tracking-wide text-slate-600 transition-colors hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+      className="inline-flex shrink-0 items-center whitespace-nowrap rounded-md py-2 text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
     >
-      Sign in
+      Sign In
     </Link>
   );
 }
