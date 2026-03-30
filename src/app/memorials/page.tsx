@@ -1,45 +1,219 @@
 import Link from "next/link";
-import { User, PawPrint } from "lucide-react";
+import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import MemorialCard from "@/components/memorial/MemorialCard";
+import DirectoryFilters from "@/components/memorial/DirectoryFilters";
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
+import {
+  buildMemorialDirectoryQueryString,
+  directoryHasAdvancedFilters,
+  parseTagsFilterParam,
+  parseYearFilter,
+  type MemorialDirectorySearchParams
+} from "@/app/memorials/directoryParams";
 
-export default function MemorialsIndexPage() {
+export default async function MemorialsIndexPage({
+  searchParams
+}: {
+  searchParams?: MemorialDirectorySearchParams;
+}) {
+  const pageSize = 12;
+  const pageRaw = searchParams?.page ?? "1";
+  const page = Math.max(1, Number.parseInt(pageRaw, 10) || 1);
+  const from = (page - 1) * pageSize;
+  const supabase = await getSupabaseServerClient();
+
+  let query = supabase
+    .from("memorials")
+    .select(
+      "id, slug, type, full_name, date_of_birth, date_of_death, city, state, tags, story, cover_image_url"
+    )
+    .eq("visibility", "public")
+    .eq("is_draft", false);
+
+  if (searchParams?.search?.trim()) {
+    query = query.ilike("full_name", `%${searchParams.search.trim()}%`);
+  }
+  if (searchParams?.city?.trim()) {
+    query = query.ilike("city", `%${searchParams.city.trim()}%`);
+  }
+  if (searchParams?.state?.trim()) {
+    query = query.ilike("state", `%${searchParams.state.trim()}%`);
+  }
+
+  const bMin = parseYearFilter(searchParams?.birth_year_min);
+  const bMax = parseYearFilter(searchParams?.birth_year_max);
+  const dMin = parseYearFilter(searchParams?.death_year_min);
+  const dMax = parseYearFilter(searchParams?.death_year_max);
+  if (bMin != null) query = query.gte("birth_year", bMin);
+  if (bMax != null) query = query.lte("birth_year", bMax);
+  if (dMin != null) query = query.gte("death_year", dMin);
+  if (dMax != null) query = query.lte("death_year", dMax);
+
+  const tagFilters = parseTagsFilterParam(searchParams?.tags);
+  if (tagFilters.length > 0) {
+    query = query.overlaps("tags", tagFilters);
+  }
+
+  if (searchParams?.sort === "alpha") {
+    query = query.order("full_name", { ascending: true });
+  } else if (searchParams?.sort === "updated") {
+    query = query.order("updated_at", { ascending: false });
+  } else {
+    query = query.order("created_at", { ascending: false });
+  }
+
+  const { data: memorials } = await query.range(from, from + pageSize - 1);
+  const list = memorials ?? [];
+  const memorialIds = list.map((m) => m.id);
+  const tributeCountByMemorialId = new Map<string, number>();
+  const photoCountByMemorialId = new Map<string, number>();
+
+  if (memorialIds.length > 0) {
+    const { data: tributeRows } = await supabase
+      .from("virtual_tributes")
+      .select("memorial_id")
+      .in("memorial_id", memorialIds)
+      .eq("is_approved", true);
+    for (const t of tributeRows ?? []) {
+      const memorialId = (t as any).memorial_id as string;
+      tributeCountByMemorialId.set(
+        memorialId,
+        (tributeCountByMemorialId.get(memorialId) ?? 0) + 1
+      );
+    }
+
+    const { data: mediaRows } = await supabase
+      .from("memorial_media")
+      .select("memorial_id")
+      .in("memorial_id", memorialIds);
+    for (const media of mediaRows ?? []) {
+      const memorialId = (media as any).memorial_id as string;
+      photoCountByMemorialId.set(
+        memorialId,
+        (photoCountByMemorialId.get(memorialId) ?? 0) + 1
+      );
+    }
+  }
+
+  const basePath = "/memorials";
+  const hasFilters =
+    searchParams?.search?.trim() ||
+    searchParams?.city?.trim() ||
+    searchParams?.state?.trim() ||
+    (searchParams?.sort && searchParams.sort !== "recent") ||
+    directoryHasAdvancedFilters(searchParams);
+
   return (
     <MemorialPageShell
       title="Memorials"
-      subtitle="Choose a category to explore public memorials, or create a new one to honor someone you love."
-      maxWidth="3xl"
+      subtitle="Browse public memorials with richer cards, full dates, story previews, and tribute stats."
+      maxWidth="5xl"
+      contentClassName="mt-6"
     >
-      <div className="flex flex-col justify-center gap-4 sm:flex-row sm:gap-6">
+      <div className="mb-4 flex flex-wrap gap-2">
         <Link
           href="/memorials/humans"
-          className="group flex flex-1 items-center justify-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-6 py-8 text-center shadow-md shadow-slate-400/10 backdrop-blur transition hover:border-amber-300/80 hover:shadow-lg hover:shadow-amber-900/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+          className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:border-[#e07a3f]/30 hover:text-[#c45d2c]"
         >
-          <User className="h-8 w-8 shrink-0 text-amber-700 transition group-hover:scale-105" strokeWidth={1.5} />
-          <div className="text-left">
-            <span className="font-serif text-xl font-semibold text-slate-900">Human memorials</span>
-            <p className="mt-1 text-sm text-slate-600">Browse tributes for people</p>
-          </div>
+          Humans
         </Link>
         <Link
           href="/memorials/pets"
-          className="group flex flex-1 items-center justify-center gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-6 py-8 text-center shadow-md shadow-slate-400/10 backdrop-blur transition hover:border-amber-300/80 hover:shadow-lg hover:shadow-amber-900/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+          className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:border-[#e07a3f]/30 hover:text-[#c45d2c]"
         >
-          <PawPrint className="h-8 w-8 shrink-0 text-amber-700 transition group-hover:scale-105" strokeWidth={1.5} />
-          <div className="text-left">
-            <span className="font-serif text-xl font-semibold text-slate-900">Pet memorials</span>
-            <p className="mt-1 text-sm text-slate-600">Celebrate beloved companions</p>
-          </div>
+          Pets
         </Link>
       </div>
-      <p className="mt-8 text-center text-sm text-slate-500">
-        Want to add a memorial?{" "}
-        <Link
-          href="/memorials/new"
-          className="rounded-md font-medium text-amber-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
-        >
-          Create one
-        </Link>
-      </p>
+
+      <DirectoryFilters
+        currentSearch={searchParams?.search}
+        currentCity={searchParams?.city}
+        currentState={searchParams?.state}
+        currentSort={searchParams?.sort}
+        currentBirthYearMin={searchParams?.birth_year_min}
+        currentBirthYearMax={searchParams?.birth_year_max}
+        currentDeathYearMin={searchParams?.death_year_min}
+        currentDeathYearMax={searchParams?.death_year_max}
+        currentTags={searchParams?.tags}
+      />
+
+      {list.length === 0 ? (
+        <div className="mt-6 rounded-2xl border border-slate-200/90 bg-white/95 p-8 text-center shadow-md shadow-slate-400/10 backdrop-blur">
+          {hasFilters ? (
+            <>
+              <p className="text-slate-600">No memorials match your search.</p>
+              <Link
+                href={basePath}
+                className="mt-2 inline-block rounded-md text-sm font-medium text-amber-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+              >
+                Clear filters
+              </Link>
+            </>
+          ) : (
+            <p className="text-slate-600">No memorials found yet.</p>
+          )}
+        </div>
+      ) : (
+        <div className="mt-6 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {list.map((m) => (
+            <MemorialCard
+              key={m.id}
+              name={m.full_name}
+              type={m.type}
+              dateOfBirth={m.date_of_birth}
+              dateOfDeath={m.date_of_death}
+              description={m.story}
+              city={m.city}
+              slug={m.slug}
+              tags={m.tags ?? []}
+              tributeCount={tributeCountByMemorialId.get(m.id) ?? 0}
+              likesCount={tributeCountByMemorialId.get(m.id) ?? 0}
+              photosCount={photoCountByMemorialId.get(m.id) ?? 0}
+              coverImageUrl={m.cover_image_url}
+            />
+          ))}
+        </div>
+      )}
+
+      <nav
+        className="mt-10 flex items-center justify-between border-t border-slate-200/80 pt-8"
+        aria-label="Pagination"
+      >
+        <div>
+          {page > 1 ? (
+            <Link
+              href={`${basePath}${buildMemorialDirectoryQueryString(
+                searchParams ?? {},
+                page - 1
+              )}`}
+              className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+            >
+              Previous
+            </Link>
+          ) : (
+            <span className="inline-block rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400">
+              Previous
+            </span>
+          )}
+        </div>
+        <div>
+          {list.length === pageSize ? (
+            <Link
+              href={`${basePath}${buildMemorialDirectoryQueryString(
+                searchParams ?? {},
+                page + 1
+              )}`}
+              className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
+            >
+              Next
+            </Link>
+          ) : (
+            <span className="inline-block rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400">
+              Next
+            </span>
+          )}
+        </div>
+      </nav>
     </MemorialPageShell>
   );
 }

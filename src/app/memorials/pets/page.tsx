@@ -3,7 +3,6 @@ import MemorialCard from "@/components/memorial/MemorialCard";
 import DirectoryFilters from "@/components/memorial/DirectoryFilters";
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import {
   buildMemorialDirectoryQueryString,
   directoryHasAdvancedFilters,
@@ -26,7 +25,7 @@ export default async function MemorialsPetsPage({
   let query = supabase
     .from("memorials")
     .select(
-      "id, slug, type, full_name, date_of_birth, date_of_death, city, state, tags, cover_image_url"
+      "id, slug, type, full_name, date_of_birth, date_of_death, city, state, tags, story, cover_image_url"
     )
     .eq("type", "pet")
     .eq("visibility", "public")
@@ -65,8 +64,38 @@ export default async function MemorialsPetsPage({
   }
 
   const { data: memorials } = await query.range(from, from + pageSize - 1);
+  const list = memorials ?? [];
+  const memorialIds = list.map((m) => m.id);
+  const tributeCountByMemorialId = new Map<string, number>();
+  const photoCountByMemorialId = new Map<string, number>();
 
-  if (!memorials) return notFound();
+  if (memorialIds.length > 0) {
+    const { data: tributeRows } = await supabase
+      .from("virtual_tributes")
+      .select("memorial_id")
+      .in("memorial_id", memorialIds)
+      .eq("is_approved", true);
+    for (const t of tributeRows ?? []) {
+      const memorialId = (t as any).memorial_id as string;
+      tributeCountByMemorialId.set(
+        memorialId,
+        (tributeCountByMemorialId.get(memorialId) ?? 0) + 1
+      );
+    }
+
+    const { data: mediaRows } = await supabase
+      .from("memorial_media")
+      .select("memorial_id")
+      .in("memorial_id", memorialIds);
+    for (const media of mediaRows ?? []) {
+      const memorialId = (media as any).memorial_id as string;
+      photoCountByMemorialId.set(
+        memorialId,
+        (photoCountByMemorialId.get(memorialId) ?? 0) + 1
+      );
+    }
+  }
+
 
   const basePath = "/memorials/pets";
   const hasFilters =
@@ -95,7 +124,7 @@ export default async function MemorialsPetsPage({
           currentTags={searchParams?.tags}
         />
 
-        {memorials.length === 0 ? (
+        {list.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-slate-200/90 bg-white/95 p-8 text-center shadow-md shadow-slate-400/10 backdrop-blur">
             {hasFilters ? (
               <>
@@ -113,16 +142,20 @@ export default async function MemorialsPetsPage({
           </div>
         ) : (
           <div className="mt-6 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {memorials.map((m) => (
+            {list.map((m) => (
               <MemorialCard
                 key={m.id}
                 name={m.full_name}
                 type={m.type}
                 dateOfBirth={m.date_of_birth}
                 dateOfDeath={m.date_of_death}
+                description={m.story}
                 city={m.city}
                 slug={m.slug}
                 tags={m.tags ?? []}
+                tributeCount={tributeCountByMemorialId.get(m.id) ?? 0}
+                likesCount={tributeCountByMemorialId.get(m.id) ?? 0}
+                photosCount={photoCountByMemorialId.get(m.id) ?? 0}
                 coverImageUrl={m.cover_image_url}
               />
             ))}
@@ -151,7 +184,7 @@ export default async function MemorialsPetsPage({
             )}
           </div>
           <div>
-            {memorials.length === pageSize ? (
+            {list.length === pageSize ? (
               <Link
                 href={`${basePath}${buildMemorialDirectoryQueryString(
                   searchParams ?? {},
