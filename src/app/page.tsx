@@ -4,7 +4,8 @@ import { Button } from "@/components/Button";
 import { CreatingMemorialStepsSection } from "@/components/marketing/CreatingMemorialStepsSection";
 import { WhyChooseUsSection } from "@/components/marketing/WhyChooseUsSection";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
-import MemorialCard from "@/components/memorial/MemorialCard";
+import { HomeFeaturedBenefitsStrip } from "@/components/marketing/HomeFeaturedBenefitsStrip";
+import { FeaturedMemorialHorizontalCard } from "@/components/memorial/FeaturedMemorialHorizontalCard";
 
 const HOME_MEMORIAL_LIMIT = 4;
 
@@ -180,71 +181,77 @@ export default async function HomePage() {
       </section>
 
       <section
-        className="mx-auto mt-2 max-w-6xl px-4 pb-2"
+        id="featured-memorials"
+        className="border-t border-slate-200/80 bg-[#f5f3f0] py-14 sm:py-16 md:py-20"
         aria-labelledby="home-memorials-heading"
       >
-        <div className="flex flex-col gap-3 border-t border-slate-200/80 pt-12 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#e07a3f]">
               Honoring those we love
             </p>
             <h2
               id="home-memorials-heading"
-              className="mt-2 font-serif text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
+              className="mt-3 font-serif text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl"
             >
-              Featured memorials
+              Featured Memorials
             </h2>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-slate-600">
-              Recently published public pages (up to {HOME_MEMORIAL_LIMIT}). Humans and pets.
+            <p className="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">
+              Beautiful tributes created by families who chose EverMissed to honor and preserve the
+              memory of their loved ones.
             </p>
           </div>
-          <Link
-            href="/memorials"
-            className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-[#c45d2c] underline-offset-4 transition hover:text-[#e07a3f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e07a3f]/40 focus-visible:ring-offset-2"
-          >
-            Browse all memorials
-            <span aria-hidden>→</span>
-          </Link>
-        </div>
 
-        {memorials.length === 0 ? (
-          <div className="mt-8 rounded-2xl border border-dashed border-slate-200/90 bg-white/90 p-10 text-center text-sm text-slate-600 shadow-sm">
-            <p>No public memorials yet.</p>
-            <p className="mt-3">
-              <Link
-                href="/memorials/new"
-                className="font-semibold text-[#c45d2c] underline-offset-4 transition hover:text-[#e07a3f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e07a3f]/40 focus-visible:ring-offset-2"
-              >
-                Create the first memorial
-              </Link>
-            </p>
-          </div>
-        ) : (
-          <div className="mt-8 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-            {memorials.map((m, index) => {
-              const tributeReal = tributeCountByMemorialId.get(m.id) ?? 0;
-              const photoReal = photoCountByMemorialId.get(m.id) ?? 0;
-              const photosDisplay = Math.max(photoReal, 180 + index * 29);
-              const tributesDisplay = Math.max(tributeReal, 50 + index * 11);
-              return (
-              <MemorialCard
-                key={m.id}
-                slug={m.slug}
-                name={m.full_name}
-                type={m.type === "pet" ? "pet" : "human"}
-                dateOfBirth={m.date_of_birth}
-                dateOfDeath={m.date_of_death}
-                description={m.story}
-                city={m.city}
-                tags={m.tags ?? []}
-                tributeCount={tributesDisplay}
-                photosCount={photosDisplay}
-                coverImageUrl={m.cover_image_url}
-              />
-              );
-            })}
-          </div>
-        )}
+          {memorials.length === 0 ? (
+            <div className="mt-10 rounded-2xl border border-dashed border-slate-300/90 bg-white/90 p-10 text-center text-sm text-slate-600 shadow-sm">
+              <p>No public memorials yet.</p>
+              <p className="mt-3">
+                <Link
+                  href="/memorials/new"
+                  className="font-semibold text-[#c45d2c] underline-offset-4 transition hover:text-[#e07a3f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e07a3f]/40 focus-visible:ring-offset-2"
+                >
+                  Create the first memorial
+                </Link>
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="mt-10 grid items-stretch gap-6 sm:grid-cols-2">
+                {memorials.map((m, index) => {
+                  const tributeReal = tributeCountByMemorialId.get(m.id) ?? 0;
+                  const photoReal = photoCountByMemorialId.get(m.id) ?? 0;
+                  const photosDisplay = Math.max(photoReal, 180 + index * 29);
+                  const tributesDisplay = Math.max(tributeReal, 50 + index * 11);
+                  return (
+                    <FeaturedMemorialHorizontalCard
+                      key={m.id}
+                      slug={m.slug}
+                      name={m.full_name}
+                      type={m.type === "pet" ? "pet" : "human"}
+                      dateOfBirth={m.date_of_birth}
+                      dateOfDeath={m.date_of_death}
+                      description={m.story}
+                      tributeCount={tributesDisplay}
+                      photosCount={photosDisplay}
+                      coverImageUrl={m.cover_image_url}
+                    />
+                  );
+                })}
+              </div>
+              <div className="mt-10 flex justify-center">
+                <Link
+                  href="/memorials"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#e07a3f] underline-offset-4 transition hover:text-[#d96c2f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e07a3f]/40 focus-visible:ring-offset-2"
+                >
+                  View All Memorials
+                  <span aria-hidden>→</span>
+                </Link>
+              </div>
+            </>
+          )}
+
+          <HomeFeaturedBenefitsStrip />
+        </div>
       </section>
     </div>
   );
