@@ -148,14 +148,22 @@ export default function MemorialsAdminClient({
                   {new Date(m.created_at).toLocaleDateString()}
                 </p>
               </div>
-              <button
-                type="button"
-                disabled={pendingId === m.id}
-                onClick={() => void onDelete(m.id, m.full_name)}
-                className="shrink-0 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-800 hover:bg-red-100 disabled:opacity-50"
-              >
-                {pendingId === m.id ? "Deleting…" : "Delete memorial"}
-              </button>
+              <div className="flex shrink-0 items-center gap-2">
+                <Link
+                  href={`/memorials/${m.slug}/edit`}
+                  className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100"
+                >
+                  Edit
+                </Link>
+                <button
+                  type="button"
+                  disabled={pendingId === m.id}
+                  onClick={() => void onDelete(m.id, m.full_name)}
+                  className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-800 hover:bg-red-100 disabled:opacity-50"
+                >
+                  {pendingId === m.id ? "Deleting…" : "Delete memorial"}
+                </button>
+              </div>
             </li>
           ))}
         </ul>
