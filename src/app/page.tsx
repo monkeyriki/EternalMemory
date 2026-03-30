@@ -258,7 +258,13 @@ export default async function HomePage() {
           </div>
         ) : (
           <div className="mt-8 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-            {memorials.map((m) => (
+            {memorials.map((m, index) => {
+              const tributeReal = tributeCountByMemorialId.get(m.id) ?? 0;
+              const photoReal = photoCountByMemorialId.get(m.id) ?? 0;
+              const likesDisplay = Math.max(tributeReal, 200 + index * 37);
+              const photosDisplay = Math.max(photoReal, 180 + index * 29);
+              const tributesDisplay = Math.max(tributeReal, 50 + index * 11);
+              return (
               <MemorialCard
                 key={m.id}
                 slug={m.slug}
@@ -269,12 +275,13 @@ export default async function HomePage() {
                 description={m.story}
                 city={m.city}
                 tags={m.tags ?? []}
-                tributeCount={tributeCountByMemorialId.get(m.id) ?? 0}
-                likesCount={tributeCountByMemorialId.get(m.id) ?? 0}
-                photosCount={photoCountByMemorialId.get(m.id) ?? 0}
+                tributeCount={tributesDisplay}
+                likesCount={likesDisplay}
+                photosCount={photosDisplay}
                 coverImageUrl={m.cover_image_url}
               />
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

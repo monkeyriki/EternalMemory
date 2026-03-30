@@ -123,8 +123,8 @@ export default function MemorialCard({
             </div>
           )}
         </div>
-        <div className="mt-4 flex shrink-0 items-center justify-between border-t border-slate-100 pt-4">
-          <div className="flex items-center gap-4 text-xs text-slate-500">
+        <div className="mt-4 flex shrink-0 items-center gap-4 border-t border-slate-100 pt-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
             <span className="inline-flex items-center gap-1.5">
               <Heart className="h-3.5 w-3.5 text-[#e07a3f]" />
               <span>{Math.max(likesCount, 0)} likes</span>
@@ -133,12 +133,12 @@ export default function MemorialCard({
               <ImageIcon className="h-3.5 w-3.5 text-[#e07a3f]" />
               <span>{Math.max(photosCount, 0)} photos</span>
             </span>
-            <span className="hidden sm:inline text-slate-400">|</span>
-            <span className="hidden sm:inline">{Math.max(tributeCount, 0)} tributes</span>
+            <span className="text-slate-400">|</span>
+            <span>{Math.max(tributeCount, 0)} tributes</span>
           </div>
           <Link
             href={`/memorials/${slug}`}
-            className="inline-flex rounded-xl bg-[#e07a3f] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#d96c2f]"
+            className="ml-auto inline-flex rounded-xl bg-[#e07a3f] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#d96c2f]"
             aria-label={`View memorial ${name}`}
           >
             View
