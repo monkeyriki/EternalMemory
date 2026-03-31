@@ -196,6 +196,10 @@ export default function MemorialForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (galleryUploadLoading || coverUploadLoading) {
+      setSubmitError("Please wait for image uploads to finish before creating the memorial.");
+      return;
+    }
     if (!validate()) return;
     setSubmitError(null);
     const data: MemorialFormData = {
@@ -417,12 +421,17 @@ export default function MemorialForm({
                   setCoverUploadLoading(true);
                   const fd = new FormData();
                   fd.set("file", f);
-                  const result = await uploadCoverImageAction(fd);
-                  setCoverUploadLoading(false);
-                  if (result.ok && result.url) {
-                    setCoverImageUrl(result.url);
-                  } else {
-                    setCoverUploadError(result.error ?? "Upload failed");
+                  try {
+                    const result = await uploadCoverImageAction(fd);
+                    if (result?.ok && result.url) {
+                      setCoverImageUrl(result.url);
+                    } else {
+                      setCoverUploadError(result?.error ?? "Upload failed");
+                    }
+                  } catch {
+                    setCoverUploadError("Upload failed");
+                  } finally {
+                    setCoverUploadLoading(false);
                   }
                   e.target.value = "";
                 }}
@@ -488,6 +497,7 @@ export default function MemorialForm({
                   const files = Array.from(e.target.files ?? []);
                   e.target.value = "";
                   if (files.length === 0) return;
+                  setSubmitError(null);
                   setGalleryError(null);
                   const room = maxGalleryImages - galleryUrls.length;
                   if (room <= 0) {
@@ -501,11 +511,20 @@ export default function MemorialForm({
                     for (const f of toUpload) {
                       const fd = new FormData();
                       fd.set("file", f);
-                      const result = await uploadCoverImageAction(fd);
-                      if (result.ok && result.url) {
+                      let result:
+                        | Awaited<ReturnType<typeof uploadCoverImageAction>>
+                        | undefined;
+                      try {
+                        result = await uploadCoverImageAction(fd);
+                      } catch {
+                        result = undefined;
+                      }
+                      if (result?.ok && result.url) {
                         next.push(result.url);
                       } else {
-                        setGalleryError(result.error ?? "One or more uploads failed.");
+                        setGalleryError(
+                          result?.error ?? "One or more uploads failed. Please retry."
+                        );
                         break;
                       }
                     }
@@ -727,7 +746,7 @@ export default function MemorialForm({
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || galleryUploadLoading || coverUploadLoading}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-700 py-3.5 text-sm font-semibold text-white shadow-md shadow-amber-900/15 transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading ? (
