@@ -23,6 +23,26 @@ body {
   outline: none;
 }
 
+.tiptap .ProseMirror h2 {
+  margin-top: 0.9rem;
+  margin-bottom: 0.45rem;
+  font-size: 1.125rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.tiptap .ProseMirror h3 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.tiptap .ProseMirror p {
+  margin: 0.45rem 0;
+}
+
 .tiptap p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
