@@ -18,6 +18,23 @@ const STATUS_ORDER: Record<string, number> = {
   dismissed: 2
 };
 
+const utcDateTime = new Intl.DateTimeFormat("en-GB", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+  timeZone: "UTC"
+});
+
+function formatUtcDateTime(value: string): string {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "Invalid date";
+  return `${utcDateTime.format(d)} UTC`;
+}
+
 function sortReports(list: ReportRow[]): ReportRow[] {
   return [...list].sort((a, b) => {
     const sa = STATUS_ORDER[a.status] ?? 9;
@@ -176,7 +193,7 @@ export default function ReportsQueueClient({
                       {r.status}
                     </span>
                     <span className="text-xs text-slate-500">
-                      {new Date(r.created_at).toLocaleString()}
+                      {formatUtcDateTime(r.created_at)}
                     </span>
                   </div>
                   <p className="mt-2 font-medium text-slate-900">
@@ -264,7 +281,7 @@ export default function ReportsQueueClient({
                 {r.status !== "open" && (
                   <span className="text-xs text-slate-400">
                     {r.reviewed_at
-                      ? `Closed ${new Date(r.reviewed_at).toLocaleString()}`
+                      ? `Closed ${formatUtcDateTime(r.reviewed_at)}`
                       : ""}
                   </span>
                 )}
