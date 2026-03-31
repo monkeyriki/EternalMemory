@@ -30,14 +30,23 @@ export default async function MemorialsIndexPage({
     .eq("visibility", "public")
     .eq("is_draft", false);
 
+  let countQuery = supabase
+    .from("memorials")
+    .select("id", { count: "exact", head: true })
+    .eq("visibility", "public")
+    .eq("is_draft", false);
+
   if (searchParams?.search?.trim()) {
     query = query.ilike("full_name", `%${searchParams.search.trim()}%`);
+    countQuery = countQuery.ilike("full_name", `%${searchParams.search.trim()}%`);
   }
   if (searchParams?.city?.trim()) {
     query = query.ilike("city", `%${searchParams.city.trim()}%`);
+    countQuery = countQuery.ilike("city", `%${searchParams.city.trim()}%`);
   }
   if (searchParams?.state?.trim()) {
     query = query.ilike("state", `%${searchParams.state.trim()}%`);
+    countQuery = countQuery.ilike("state", `%${searchParams.state.trim()}%`);
   }
 
   const bMin = parseYearFilter(searchParams?.birth_year_min);
@@ -48,10 +57,15 @@ export default async function MemorialsIndexPage({
   if (bMax != null) query = query.lte("birth_year", bMax);
   if (dMin != null) query = query.gte("death_year", dMin);
   if (dMax != null) query = query.lte("death_year", dMax);
+  if (bMin != null) countQuery = countQuery.gte("birth_year", bMin);
+  if (bMax != null) countQuery = countQuery.lte("birth_year", bMax);
+  if (dMin != null) countQuery = countQuery.gte("death_year", dMin);
+  if (dMax != null) countQuery = countQuery.lte("death_year", dMax);
 
   const tagFilters = parseTagsFilterParam(searchParams?.tags);
   if (tagFilters.length > 0) {
     query = query.overlaps("tags", tagFilters);
+    countQuery = countQuery.overlaps("tags", tagFilters);
   }
 
   if (searchParams?.sort === "alpha") {
@@ -63,7 +77,13 @@ export default async function MemorialsIndexPage({
   }
 
   const { data: memorials } = await query.range(from, from + pageSize - 1);
+  const { count: totalCount } = await countQuery;
   const list = memorials ?? [];
+  const total = totalCount ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const hasPrev = currentPage > 1;
+  const hasNext = currentPage < totalPages;
   const memorialIds = list.map((m) => m.id);
   const tributeCountByMemorialId = new Map<string, number>();
   const photoCountByMemorialId = new Map<string, number>();
@@ -179,35 +199,46 @@ export default async function MemorialsIndexPage({
         aria-label="Pagination"
       >
         <div>
-          {page > 1 ? (
+          {hasPrev ? (
             <Link
               href={`${basePath}${buildMemorialDirectoryQueryString(
                 searchParams ?? {},
-                page - 1
+                currentPage - 1
               )}`}
               className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
               Previous
             </Link>
           ) : (
-            <span className="inline-block rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400">
+            <span
+              className="inline-block cursor-not-allowed rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400 opacity-70"
+              aria-disabled="true"
+              title="You are already on the first page."
+            >
               Previous
             </span>
           )}
         </div>
+        <p className="text-sm font-medium text-slate-500">
+          Page {currentPage} of {totalPages}
+        </p>
         <div>
-          {list.length === pageSize ? (
+          {hasNext ? (
             <Link
               href={`${basePath}${buildMemorialDirectoryQueryString(
                 searchParams ?? {},
-                page + 1
+                currentPage + 1
               )}`}
               className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
             >
               Next
             </Link>
           ) : (
-            <span className="inline-block rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400">
+            <span
+              className="inline-block cursor-not-allowed rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400 opacity-70"
+              aria-disabled="true"
+              title="No more memorials on the next page."
+            >
               Next
             </span>
           )}
