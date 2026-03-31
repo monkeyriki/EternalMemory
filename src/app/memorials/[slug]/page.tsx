@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { buildMemorialAdsPayload } from "@/lib/memorialAds";
 import { maxGalleryImagesForMemorial } from "@/lib/memorialHostingPlan";
 import { SingleMemorialClient } from "@/components/memorial/SingleMemorialClient";
@@ -58,7 +59,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const slug = params.slug.toLowerCase();
   const supabase = await getSupabaseServerClient();
-  const { data: memorial } = await supabase
+  const admin = getSupabaseAdminClient();
+  const { data: memorial } = await admin
     .from("memorials")
     .select(
       "id, slug, full_name, date_of_birth, date_of_death, visibility, is_draft, cover_image_url"
@@ -196,11 +198,12 @@ export default async function MemorialSlugPage({
   }
 
   const slug = params.slug.toLowerCase();
+  const admin = getSupabaseAdminClient();
 
-  const { data: memorial } = await supabase
+  const { data: memorial } = await admin
     .from("memorials")
     .select(
-      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, password_hash, ads_free, hosting_plan, plan_expires_at, tags"
+      "id, slug, owner_id, type, full_name, date_of_birth, date_of_death, city, visibility, is_draft, story, cover_image_url, ads_free, hosting_plan, plan_expires_at, tags"
     )
     .eq("slug", slug)
     .maybeSingle();

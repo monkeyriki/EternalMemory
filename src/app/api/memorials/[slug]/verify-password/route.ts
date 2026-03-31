@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getSupabaseServerClient } from "@/lib/supabaseServer";
+import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import {
   MEMORIAL_GATE_COOKIE_NAME,
   memorialGateCookieSerializeOptions,
@@ -20,7 +20,7 @@ export async function POST(
   const { password } = await req.json();
   const slug = params.slug.toLowerCase();
 
-  const supabase = await getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
 
   const { data: memorial } = await supabase
     .from("memorials")
