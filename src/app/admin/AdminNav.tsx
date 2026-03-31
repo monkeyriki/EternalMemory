@@ -7,7 +7,7 @@ const links = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/store", label: "Store Items" },
-  { href: "/admin/moderation", label: "Moderation" },
+  { href: "/admin/moderation", label: "Memorial" },
   { href: "/admin/reports", label: "Reports" },
   { href: "/admin/account-deletion-requests", label: "Deletion requests" },
   { href: "/admin/memorials", label: "Memorials" },

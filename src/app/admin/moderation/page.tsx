@@ -17,7 +17,7 @@ export default async function AdminModerationPage() {
   return (
     <div className="space-y-6">
       <h1 className="font-serif text-3xl font-semibold tracking-tight text-slate-900">
-        Moderation
+        Memorial
       </h1>
       <p className="text-sm text-slate-600">
         Review and remove recent tributes. Approve pending guest tributes.
