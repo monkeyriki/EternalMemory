@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -530,14 +529,13 @@ export function SingleMemorialClient({
         <section className="space-y-3">
           {memorial.cover_image_url ? (
             <div className="flex justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-100 p-1 sm:p-2">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={memorial.cover_image_url}
                 alt={memorial.full_name}
-                width={1200}
-                height={1600}
+                loading="eager"
+                decoding="async"
                 className="h-auto w-full max-h-[min(75vh,720px)] object-contain"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 672px"
-                priority
               />
             </div>
           ) : (
@@ -560,11 +558,12 @@ export function SingleMemorialClient({
                   onClick={() => setGalleryLightboxIndex(index)}
                   aria-label={`View gallery image ${index + 1} of ${galleryMedia.length} larger`}
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={item.image_url}
                     alt=""
-                    width={400}
-                    height={400}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover transition group-hover:scale-[1.02]"
                   />
                   <span className="pointer-events-none absolute inset-0 bg-black/0 transition group-hover:bg-black/10 group-focus-visible:bg-black/10" />
@@ -1282,12 +1281,13 @@ export function SingleMemorialClient({
               className="relative h-[min(85vh,900px)] w-full max-w-6xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={galleryMedia[galleryLightboxIndex].image_url}
                 alt=""
-                fill
-                className="object-contain"
-                sizes="(max-width: 1024px) 95vw, 1152px"
+                loading="eager"
+                decoding="async"
+                className="h-full w-full object-contain"
               />
             </div>
           </div>
