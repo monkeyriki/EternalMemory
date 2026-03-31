@@ -28,6 +28,23 @@ const STATUS_BADGE: Record<AccountDeletionRequestRow["status"], string> = {
   rejected: "bg-slate-200 text-slate-700"
 };
 
+const utcDateTime = new Intl.DateTimeFormat("en-GB", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+  timeZone: "UTC"
+});
+
+function formatUtcDateTime(value: string): string {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "Invalid date";
+  return `${utcDateTime.format(d)} UTC`;
+}
+
 function sortRows(rows: AccountDeletionRequestRow[]) {
   const rank: Record<AccountDeletionRequestRow["status"], number> = {
     pending: 0,
@@ -159,7 +176,7 @@ function RequestRow({
               {row.status}
             </span>
             <span className="text-xs text-slate-500">
-              {new Date(row.requested_at).toLocaleString()}
+              {formatUtcDateTime(row.requested_at)}
             </span>
           </div>
           <p className="mt-2 text-sm text-slate-800">
@@ -211,7 +228,7 @@ function RequestRow({
 
         {row.processed_at ? (
           <p className="text-xs text-slate-500">
-            Processed at: {new Date(row.processed_at).toLocaleString()}
+            Processed at: {formatUtcDateTime(row.processed_at)}
           </p>
         ) : null}
       </div>
