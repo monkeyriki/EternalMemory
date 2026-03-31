@@ -24,8 +24,8 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     const supabase = getSupabaseBrowserClient();
-    // Recovery links can arrive in different token formats; update-password handles all of them client-side.
-    const redirectTo = `${window.location.origin}/auth/update-password`;
+    // Prefer callback: server-side exchange avoids browser PKCE storage edge cases.
+    const redirectTo = `${window.location.origin}/auth/callback?next=/auth/update-password`;
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo

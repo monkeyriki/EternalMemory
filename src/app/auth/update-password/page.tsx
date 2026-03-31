@@ -22,7 +22,6 @@ export default function UpdatePasswordPage() {
     const bootstrapRecoverySession = async () => {
       try {
         const url = new URL(window.location.href);
-        const code = url.searchParams.get("code");
         const tokenHash = url.searchParams.get("token_hash");
         const type = url.searchParams.get("type");
         const hash = window.location.hash.startsWith("#")
@@ -33,10 +32,7 @@ export default function UpdatePasswordPage() {
         const refreshToken = hashParams.get("refresh_token");
         const hashType = hashParams.get("type");
 
-        if (code) {
-          const { error: exErr } = await supabase.auth.exchangeCodeForSession(code);
-          if (exErr && active) setError(exErr.message);
-        } else if (tokenHash && type === "recovery") {
+        if (tokenHash && type === "recovery") {
           const { error: otpErr } = await supabase.auth.verifyOtp({
             token_hash: tokenHash,
             type: "recovery"
@@ -51,7 +47,7 @@ export default function UpdatePasswordPage() {
         }
 
         // Remove one-time tokens from URL once parsed.
-        if (code || tokenHash || hash.includes("access_token=")) {
+        if (tokenHash || hash.includes("access_token=")) {
           window.history.replaceState({}, "", "/auth/update-password");
         }
       } catch {
