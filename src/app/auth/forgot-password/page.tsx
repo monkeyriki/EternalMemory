@@ -24,10 +24,8 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     const supabase = getSupabaseBrowserClient();
-    // Send users straight to the password reset page.
-    // Using /auth/callback + ?next=... can be rejected by Supabase Redirect URL allowlists,
-    // which then falls back to Site URL (home). /auth/update-password is explicit and stable.
-    const redirectTo = `${window.location.origin}/auth/update-password`;
+    // Use callback so Supabase can exchange code -> session before landing on update page.
+    const redirectTo = `${window.location.origin}/auth/callback?next=/auth/update-password`;
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo

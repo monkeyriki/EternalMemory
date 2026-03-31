@@ -30,6 +30,14 @@ export default function UpdatePasswordPage() {
 
     setLoading(true);
     const supabase = getSupabaseBrowserClient();
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
+    if (!session) {
+      setLoading(false);
+      setError("Session expired or invalid. Request a new reset email.");
+      return;
+    }
     const { error: err } = await supabase.auth.updateUser({ password });
     setLoading(false);
 
