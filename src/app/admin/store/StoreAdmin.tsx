@@ -391,9 +391,11 @@ export default function StoreAdmin({ initialItems }: { initialItems: StoreItem[]
                 <button
                   type="button"
                   onClick={() => toggleActive(i.id)}
-                  className="text-sm text-amber-700 underline-offset-2 hover:underline"
+                  className={`text-sm underline-offset-2 hover:underline ${
+                    i.is_active ? "text-amber-700" : "text-emerald-700"
+                  }`}
                 >
-                  Toggle active
+                  {i.is_active ? "Deactivate" : "Activate"}
                 </button>
                 <button
                   type="button"
