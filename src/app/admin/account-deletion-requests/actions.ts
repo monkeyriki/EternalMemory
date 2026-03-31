@@ -1,6 +1,7 @@
 "use server";
 
 import { requireAdmin } from "@/lib/requireAdmin";
+import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 
 const ALLOWED_STATUS = new Set([
   "pending",
@@ -30,6 +31,36 @@ export async function updateAccountDeletionRequestAction(input: {
 
   const adminNote = (input.adminNote ?? "").trim().slice(0, 2000);
   const now = new Date().toISOString();
+  const requestedCompletion = status === "completed";
+
+  if (requestedCompletion) {
+    const { data: reqRow, error: reqErr } = await (guard.supabase as any)
+      .from("account_deletion_requests")
+      .select("user_id, status")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (reqErr || !reqRow?.user_id) {
+      console.error("[updateAccountDeletionRequestAction] load request failed", reqErr);
+      return {
+        ok: false,
+        error: "Could not load deletion request user."
+      };
+    }
+
+    // Avoid deleting the same account twice when an already-completed request is edited.
+    if (reqRow.status !== "completed") {
+      const admin = getSupabaseAdminClient();
+      const { error: deleteErr } = await admin.auth.admin.deleteUser(reqRow.user_id);
+      if (deleteErr) {
+        console.error("[updateAccountDeletionRequestAction] deleteUser failed", deleteErr);
+        return {
+          ok: false,
+          error: "Could not delete the user account. Request was not marked as completed."
+        };
+      }
+    }
+  }
 
   const { error } = await (guard.supabase as any)
     .from("account_deletion_requests")
