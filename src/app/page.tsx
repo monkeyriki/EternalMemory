@@ -102,27 +102,37 @@ export default async function HomePage() {
             className="mx-auto mt-10 max-w-3xl rounded-2xl border border-white/80 bg-white/92 p-5 text-left shadow-xl shadow-slate-900/[0.08] backdrop-blur-md transition-shadow duration-300 hover:shadow-2xl hover:shadow-slate-900/10 sm:p-7"
           >
             <p className="font-serif text-xl text-slate-800 sm:text-2xl">I want to share memories of</p>
-            <div className="mt-5 flex flex-col gap-2.5 sm:gap-3 sm:flex-row">
-              <input
-                type="text"
-                name="firstName"
-                placeholder="First Name"
-                autoComplete="given-name"
-                aria-label="First name"
-                className="h-11 sm:h-12 flex-1 rounded-xl border border-slate-300 bg-white px-4 text-[15px] text-slate-900 shadow-sm placeholder:text-slate-500 transition focus:border-[#e07a3f]/40 focus:outline-none focus:ring-2 focus:ring-[#e07a3f]/25"
-              />
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Last Name"
-                autoComplete="family-name"
-                aria-label="Last name"
-                className="h-11 sm:h-12 flex-1 rounded-xl border border-slate-300 bg-white px-4 text-[15px] text-slate-900 shadow-sm placeholder:text-slate-500 transition focus:border-[#e07a3f]/40 focus:outline-none focus:ring-2 focus:ring-[#e07a3f]/25"
-              />
+            <div className="mt-5 flex flex-col gap-3 sm:grid sm:grid-cols-2 sm:gap-3">
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                  First name
+                </span>
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="Enter first name"
+                  autoComplete="given-name"
+                  aria-label="First name"
+                  className="h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-[15px] text-slate-900 shadow-sm placeholder:text-slate-500 transition focus:border-[#e07a3f]/50 focus:outline-none focus:ring-2 focus:ring-[#e07a3f]/25"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                  Last name
+                </span>
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Enter last name"
+                  autoComplete="family-name"
+                  aria-label="Last name"
+                  className="h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-[15px] text-slate-900 shadow-sm placeholder:text-slate-500 transition focus:border-[#e07a3f]/50 focus:outline-none focus:ring-2 focus:ring-[#e07a3f]/25"
+                />
+              </label>
               <Button
                 type="submit"
                 variant="accent"
-                className="h-11 sm:h-12 w-full shadow-md shadow-amber-900/10 transition hover:shadow-lg sm:w-auto sm:min-w-[170px]"
+                className="h-12 w-full shadow-md shadow-amber-900/10 transition hover:shadow-lg sm:col-span-2"
               >
                 Get Started
               </Button>
