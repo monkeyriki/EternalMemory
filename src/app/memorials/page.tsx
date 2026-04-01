@@ -3,6 +3,7 @@ import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import MemorialCard from "@/components/memorial/MemorialCard";
 import DirectoryFilters from "@/components/memorial/DirectoryFilters";
 import { MemorialPageShell } from "@/components/memorial/MemorialPageShell";
+import { DirectoryPaginationControls } from "@/components/memorial/DirectoryPaginationControls";
 import {
   buildMemorialDirectoryQueryString,
   directoryHasAdvancedFilters,
@@ -194,56 +195,26 @@ export default async function MemorialsIndexPage({
         </div>
       )}
 
-      <nav
-        className="mt-10 flex items-center justify-between border-t border-slate-200/80 pt-8"
-        aria-label="Pagination"
-      >
-        <div>
-          {hasPrev ? (
-            <Link
-              href={`${basePath}${buildMemorialDirectoryQueryString(
+      <DirectoryPaginationControls
+        prevHref={
+          hasPrev
+            ? `${basePath}${buildMemorialDirectoryQueryString(
                 searchParams ?? {},
                 currentPage - 1
-              )}`}
-              className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
-            >
-              Previous
-            </Link>
-          ) : (
-            <span
-              className="inline-block cursor-not-allowed rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400 opacity-70"
-              aria-disabled="true"
-              title="You are already on the first page."
-            >
-              Previous
-            </span>
-          )}
-        </div>
-        <p className="text-sm font-medium text-slate-500">
-          Page {currentPage} of {totalPages}
-        </p>
-        <div>
-          {hasNext ? (
-            <Link
-              href={`${basePath}${buildMemorialDirectoryQueryString(
+              )}`
+            : null
+        }
+        nextHref={
+          hasNext
+            ? `${basePath}${buildMemorialDirectoryQueryString(
                 searchParams ?? {},
                 currentPage + 1
-              )}`}
-              className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2"
-            >
-              Next
-            </Link>
-          ) : (
-            <span
-              className="inline-block cursor-not-allowed rounded-xl border border-slate-100 bg-slate-50/80 px-5 py-2.5 text-sm text-slate-400 opacity-70"
-              aria-disabled="true"
-              title="No more memorials on the next page."
-            >
-              Next
-            </span>
-          )}
-        </div>
-      </nav>
+              )}`
+            : null
+        }
+        currentPage={currentPage}
+        totalPages={totalPages}
+      />
     </MemorialPageShell>
   );
 }
