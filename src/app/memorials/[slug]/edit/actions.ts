@@ -34,6 +34,11 @@ type UpdateMemorialResult = {
 export async function updateMemorialAction(
   input: UpdateMemorialInput
 ): Promise<UpdateMemorialResult> {
+  const todayIso = new Date().toISOString().slice(0, 10);
+  if (input.dateOfDeath && input.dateOfDeath > todayIso) {
+    return { ok: false, error: "Date of death cannot be in the future." };
+  }
+
   const supabase = await getSupabaseServerClient();
 
   const {

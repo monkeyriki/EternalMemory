@@ -90,6 +90,7 @@ function generateSlug(name: string): string {
 }
 
 const DEFAULT_SHELL_SUBTITLE = "Honor and remember those who meant so much.";
+const TODAY_ISO = new Date().toISOString().slice(0, 10);
 
 export default function MemorialForm({
   mode,
@@ -189,6 +190,9 @@ export default function MemorialForm({
     if (requiresPasswordForProtection && !password.trim()) {
       newErrors.password =
         "Password is required for password-protected memorials";
+    }
+    if (dateOfDeath && dateOfDeath > TODAY_ISO) {
+      newErrors.dateOfDeath = "Date of death cannot be in the future.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -357,9 +361,13 @@ export default function MemorialForm({
                   type="date"
                   value={dateOfDeath}
                   onChange={(e) => setDateOfDeath(e.target.value)}
+                  max={TODAY_ISO}
                   className="w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
                   disabled={isLoading}
                 />
+                {errors.dateOfDeath && (
+                  <p className="mt-1 text-sm text-red-600">{errors.dateOfDeath}</p>
+                )}
               </div>
             </div>
             <div>

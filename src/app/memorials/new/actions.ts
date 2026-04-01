@@ -51,6 +51,11 @@ export async function createMemorialAction(
     return { ok: false, error: "Invalid memorial URL (slug)." };
   }
 
+  const todayIso = new Date().toISOString().slice(0, 10);
+  if (input.dateOfDeath && input.dateOfDeath > todayIso) {
+    return { ok: false, error: "Date of death cannot be in the future." };
+  }
+
   let password_hash: string | null = null;
   if (input.visibility === "password_protected") {
     if (!input.password?.trim()) {
