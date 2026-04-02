@@ -10,7 +10,7 @@ import { assertIpNotBannedFromHeaders } from "@/lib/ipBanCheck";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
   const ipBlock = await assertIpNotBannedFromHeaders(req.headers);
   if (!ipBlock.ok) {
@@ -18,14 +18,15 @@ export async function POST(
   }
 
   const { password } = await req.json();
-  const slug = params.slug.toLowerCase();
+  const { slug } = await context.params;
+  const normalizedSlug = slug.toLowerCase();
 
   const supabase = getSupabaseAdminClient();
 
   const { data: memorial } = await supabase
     .from("memorials")
     .select("id, visibility, password_hash")
-    .eq("slug", slug)
+    .eq("slug", normalizedSlug)
     .maybeSingle();
 
   if (!memorial || memorial.visibility !== "password_protected") {
@@ -43,7 +44,7 @@ export async function POST(
 
   try {
     const gate = signMemorialGateCookie(memorial.id);
-    const res = NextResponse.json({ ok: true, token: slug }, { status: 200 });
+    const res = NextResponse.json({ ok: true, token: normalizedSlug }, { status: 200 });
     res.cookies.set(
       MEMORIAL_GATE_COOKIE_NAME,
       gate,
